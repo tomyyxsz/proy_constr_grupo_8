@@ -18,7 +18,7 @@ function App() {
         <div>
                <h1>Get started</h1>
                    <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+                       Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
           </p>
         </div>
         <button 
@@ -29,7 +29,7 @@ function App() {
         </button>
       </section>
 
-      <div className="ticks"></div>
+            <div className="ticks"></div>
 
       <section id="next-steps">
         <div id="docs">
