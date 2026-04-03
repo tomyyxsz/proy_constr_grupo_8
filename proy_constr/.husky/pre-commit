@@ -1,1 +1,1 @@
-npm run lint
+npm --prefix proy_constr run lint
