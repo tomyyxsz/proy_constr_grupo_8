@@ -15,7 +15,7 @@ function App() {
                   <img src={reactLogo} className="framework" alt="React logo" />
           <img src={viteLogo} className="vite" alt="Vite logo" />
         </div>
-        <div>
+         <div>
                <h1>Get started</h1>
                    <p>
                        Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
@@ -29,9 +29,9 @@ function App() {
         </button>
       </section>
 
-            <div className="ticks"></div>
+               <div className="ticks"></div>
 
-      <section id="next-steps">
+         <section id="next-steps">
         <div id="docs">
           <svg className="icon" role="presentation" aria-hidden="true">
             <use href="/icons.svg#documentation-icon"></use>
