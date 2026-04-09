@@ -1,5 +1,7 @@
 import './App.css'
 import { useState } from 'react'
+import InicioSesion from './InicioSesion'
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -12,6 +14,7 @@ function App() {
       <button onClick={() => setCount(count + 1)}>
         Incrementar
       </button>
+      <InicioSesion />
     </div>
   )
 }
