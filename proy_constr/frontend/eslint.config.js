@@ -24,6 +24,10 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'indent': ['error', 2, { SwitchCase: 1 }],
+      'camelcase': ['error', { properties: 'always' }],
+      'no-unreachable': 'error',
+      'max-lines-per-function': ['error', { max: 150, skipComments: false, skipBlankLines: true }],
     },
   },
 ])
