@@ -30,4 +30,12 @@ export default defineConfig([
       'max-lines-per-function': ['error', { max: 150, skipComments: false, skipBlankLines: true }],
     },
   },
+  {
+    files: ['**/*.{test,spec}.{js,jsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+      },
+    },
+  },
 ])
