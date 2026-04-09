@@ -18,6 +18,10 @@
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "test": "^3.3.0"
   }
 
 }

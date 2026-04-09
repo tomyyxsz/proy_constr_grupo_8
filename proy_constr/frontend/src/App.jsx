@@ -1,5 +1,7 @@
 import './App.css'
 import { useState } from 'react'
+import InicioSesion from './InicioSesion'
+
 import { Header } from './Header'
 
 function App() {
@@ -15,6 +17,9 @@ function App() {
         <p>Contador: {count}</p>
         <button onClick={() => setCount(count + 1)}>
         Incrementar
+      </button>
+      <InicioSesion />
+    </div>
         </button>
       </div>
     </>
