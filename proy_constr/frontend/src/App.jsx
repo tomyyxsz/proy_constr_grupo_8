@@ -1,5 +1,7 @@
 import './App.css'
+import Footer from './Footer'
 import { useState } from 'react'
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -12,6 +14,7 @@ function App() {
       <button onClick={() => setCount(count + 1)}>
         Incrementar
       </button>
+      <Footer />
     </div>
   )
 }
