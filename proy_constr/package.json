@@ -15,6 +15,7 @@
     "lint": "npm run lint --workspace frontend",
     "preview": "npm run preview --workspace frontend",
     "prepare": "cd .. && husky proy_constr/.husky"
+  
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
