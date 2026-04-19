@@ -1,33 +1,28 @@
-import './App.css'
-import Footer from './Footer'
 import { useState } from 'react'
-import InicioSesion from './InicioSesion'
-
-import { Header } from './Header'
+import Login from './pages/Login'
+import Home from './pages/Home'
+import { Header } from './components/Header'
+import  Footer  from './components/Footer'
 
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [user, setUser] = useState(null)
 
+  const handleLogin = ({ email }) => {
+    // Aquí puedes validar contra tu backend
+    // Por ahora simula login exitoso
+    setUser({ email, name: email.split('@')[0] })
+  }
 
-  return (
-    <>
-      <Header isAuthenticated={false} />
-    
-      <div>
-        <h1>Hola Mundo</h1>
-        <p>Contador: {count}</p>
-        <button onClick={() => setCount(count + 1)}>
-        Incrementar
-      </button>
-      <Footer />
-      <InicioSesion />
+  const handleLogout = () => {
+    setUser(null)
+  }
 
-    </div>
-        </button>
-      </div>
-    </>
-  )
+  if (!user) {
+    return <Login onLogin={handleLogin} />
+  }
+
+  return <Home user={user} onLogout={handleLogout} />
 }
 
 export default App
