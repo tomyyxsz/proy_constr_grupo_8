@@ -13,18 +13,15 @@ function App() {
   return (
     <>
       <Header isAuthenticated={false} />
-    
+
       <div>
         <h1>Hola Mundo</h1>
         <p>Contador: {count}</p>
         <button onClick={() => setCount(count + 1)}>
-        Incrementar
-      </button>
-      <Footer />
-      <InicioSesion />
-
-    </div>
+          Incrementar
         </button>
+        <InicioSesion />
+        <Footer/>
       </div>
     </>
   )
