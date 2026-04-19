@@ -42,7 +42,7 @@ enum EstadoReserva {
 }
 
 model Usuario {
-  id String @id
+  id String @id @default(uuid())
   rut String @db.VarChar(10)
   nombre String @db.VarChar(100)
   apellido String @db.VarChar(100)
@@ -67,7 +67,7 @@ model Usuario {
 }
 
 model Semestre {
-  id_semestre String @id
+  id_semestre String @id @default(uuid())
   anio Int 
   periodo Int
   fecha_inicio DateTime @db.Timestamp(6)
@@ -83,7 +83,7 @@ model Semestre {
 }
 
 model Curso {
-  id_curso String @id
+  id_curso String @id @default(uuid())
   nombre_curso String @db.VarChar(255)
 
   ref_Semestre String @db.VarChar(10)
@@ -112,7 +112,7 @@ model Estudiante_curso {
 }
 
 model Ayudantia{
-  id_ayudantia String @id
+  id_ayudantia String @id @default(uuid())
   nombre_ayudantia String @db.VarChar(255)
 
   ref_Curso String @db.VarChar(10)
@@ -132,7 +132,7 @@ model Ayudantia{
 }
 
 model Grupo_Curso {
-  id_grupo_curso String @id
+  id_grupo_curso String @id @default(uuid())
   ref_curso String @db.VarChar(10)
   curso Curso @relation(fields: [ref_curso], references: [id_curso])
 
@@ -169,7 +169,7 @@ model Inscripcion_Ayudantia {
 }
 
 model BloqueHorario {
-  id_bloque_horario String @id
+  id_bloque_horario String @id @default(uuid())
   nro_bloque Int
   hora_inicio String @db.VarChar(50)
   hora_fin String @db.VarChar(50)
@@ -187,7 +187,7 @@ model BloqueReservado{ // tabla creada a partir de relacion N a N
 }
 
 model Reserva{
-  id_reserva String @id
+  id_reserva String @id @default(uuid())
   fecha_reserva DateTime @default(now()) @db.Timestamp(6)
   estado_reserva EstadoReserva @default(PENDIENTE)
   solicitante_nombre String @db.VarChar(50)
@@ -203,7 +203,7 @@ model Reserva{
 }
 
 model Articulo {
-  id_articulo String @id
+  id_articulo String @id @default(uuid())
   nombre_articulo String @db.VarChar(100)
   stock_actual Int
   unidad_medida String @db.VarChar(50)
@@ -216,7 +216,7 @@ model Articulo {
 }
 
 model Movimiento_Stock{
-  id_movimiento String @id
+  id_movimiento String @id @default(uuid())
 
   ref_articulo String @db.VarChar(10)
   articulo Articulo @relation(fields: [ref_articulo], references: [id_articulo])
@@ -234,7 +234,7 @@ model Movimiento_Stock{
 }
 
 model Impresion { // tabla clave
-  id_impresion String @id
+  id_impresion String @id @default(uuid())
   solicitante_nombre String @db.VarChar(50)
   solicitante_apellido String @db.VarChar(50)
   solicitante_email String @db.VarChar(100)
@@ -275,7 +275,7 @@ model Impresion { // tabla clave
 }
 
 model Uso_Impresion{
-  id_uso_impresion String @id
+  id_uso_impresion String @id @default(uuid())
   ref_impresion String @db.VarChar(10)
   impresion Impresion @relation(fields: [ref_impresion], references: [id_impresion])
 
