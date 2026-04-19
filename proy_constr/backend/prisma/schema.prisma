@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model publicacion {
+  id                Int      @id @default(autoincrement())
+  titulo            String   @db.VarChar(255)
+  contenido         String
+  fecha_publicacion DateTime @default(now()) @db.Timestamp(6)
+}
+
+model usuario {
+  id       Int    @id @default(autoincrement())
+  nombre   String @db.VarChar(255)
+  email    String @db.VarChar(255) @unique
+  password String @db.VarChar(255)
+}
