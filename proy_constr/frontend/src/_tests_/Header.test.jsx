@@ -9,7 +9,7 @@ import { Header } from '../Header';
 describe('Header Component', () => {
   test('renders logo and navigation links', () => {
     render(<Header />);
-    expect(screen.getByText('TaskFlow')).toBeInTheDocument();
+    expect(screen.getByText('MakerBox')).toBeInTheDocument();
     expect(screen.getByText('Proyectos')).toBeInTheDocument();
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
