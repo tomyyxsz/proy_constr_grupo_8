@@ -8,14 +8,79 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // formato de email : asdad@as
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/; // minimo 8 caracteres, al menos 1 mayuscula, 1 minuscula, 1 numero y 1 simbolo
 const ALLOWED_ROLES = ["ESTUDIANTE", "AYUDANTE", "PROFESOR"];
 
-function hashPassword(password) { // 
+function calcularDV(rutBody) { // funcion para calcular el digito verificador del rut
+  let sum = 0;
+  let multiplicador = 2;
+
+  for (let i = rutBody.length - 1; i >= 0; i -= 1) {
+    sum += Number(rutBody[i]) * multiplicador;
+    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+  }
+
+  const resto = 11 - (sum % 11);
+
+  if (resto === 11) {
+    return "0";
+  }
+
+  if (resto === 10) {
+    return "K";
+  }
+
+  return String(resto);
+}
+
+function normalizeRut(rutInput) {
+  const original = String(rutInput).trim().toUpperCase().replace(/\./g, "");
+  const compact = original.replace(/-/g, "");
+  const tieneGuion = original.includes("-");
+  let body = "";
+  let providedDv = null;
+
+  if (tieneGuion) {
+    const [bodyPart, dvPart = ""] = original.split("-");
+    body = bodyPart.replace(/\D/g, ""); // body = solo numeros ej 12345678
+    providedDv = dvPart.trim() ? dvPart.trim() : null;
+  } else if (/^\d{7,8}$/.test(compact)) { 
+    body = compact;
+  } else if (/^\d{8}K$/.test(compact)) { 
+    body = compact.slice(0, -1);
+    providedDv = "K";
+  } else if (/^\d{9}$/.test(compact)) {
+    body = compact.slice(0, -1);
+    providedDv = compact.slice(-1);
+  } else {
+    return null;
+  }
+
+  if (!/^\d{7,8}$/.test(body)) {
+    return null;
+  }
+
+  if (providedDv && !/^[\dK]$/.test(providedDv)) {
+    return null;
+  }
+
+  const calculatedDv = calcularDV(body);
+
+  if (providedDv && providedDv !== calculatedDv) {
+    return null;
+  }
+
+  return `${body}-${calculatedDv}`;
+}
+
+function hashPassword(password) { // encripta la contrasena usando scrypt con una salt aleatoria.
+  // salta es un valor aleatorio en formato hexadecimal que se genera para cada contrasena
+  // de esta forma si dos usuarios tienen la misma contrasena, sus hashes seran diferentes debido a las salts distintas.
   const salt = crypto.randomBytes(16).toString("hex");
   const hashed = crypto.scryptSync(password, salt, 64).toString("hex");
   return `${salt}:${hashed}`;
 }
 
 
-function normalizeRole(role) {
+function normalizeRole(role) { // normaliza el rol a mayusculas y valida que sea uno de los permitidos. 
+// si no se especifica, se asigna ESTUDIANTE por defecto.
   if (!role) {
     return "ESTUDIANTE"; // rol por defecto si no se especifica en el cuerpo de la solicitud
   }
@@ -24,7 +89,7 @@ function normalizeRole(role) {
   return ALLOWED_ROLES.includes(normalized) ? normalized : null;
 }
 
-router.post("/registro", async (req, res) => {
+router.post("/registro", async (req, res) => { // ruta POST /registro para registrar un nuevo usuario
   const {
     rut,
     nombre,
@@ -33,7 +98,7 @@ router.post("/registro", async (req, res) => {
     password,
   } = req.body;
 
-  const roleFromBody = req.body.usuario_rol;
+  const roleFromBody = req.body.usuario_rol; // rol opcional, si no se envia se asigna ESTUDIANTE por defecto
 
   if (!rut || !nombre || !apellido || !email || !password) { // validacion de campos llenos
     return res.status(400).json({
@@ -44,6 +109,7 @@ router.post("/registro", async (req, res) => {
 
   const cleanEmail = String(email).trim().toLowerCase();
   const cleanPassword = String(password);
+  const normalizedRut = normalizeRut(rut);
   const role = normalizeRole(roleFromBody);
 
   if (!EMAIL_REGEX.test(cleanEmail)) { // validacion de formato de email
@@ -67,11 +133,18 @@ router.post("/registro", async (req, res) => {
     });
   }
 
+  if (!normalizedRut) {
+    return res.status(400).json({
+      error: "RUT invalido. Envia solo numeros o formato con DV valido.",
+      ejemplo: "12345678 o 12345678-5",
+    });
+  }
+
   try {
     const newUser = await prisma.usuario.create({ // crear nuevo usuario en bd
       data: {
         id: crypto.randomUUID(),
-        rut: String(rut).trim(),
+        rut: normalizedRut,
         nombre: String(nombre).trim(),
         apellido: String(apellido).trim(),
         email: cleanEmail,

@@ -6,7 +6,7 @@ const router = express.Router();
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function verifyPassword(plainPassword, storedPassword) {
+function verifyPassword(plainPassword, storedPassword) { // verifica si la contrasena ingresada coincide con el hash almacenado en la base de datos.
   if (!storedPassword || !storedPassword.includes(":")) {
     return false;
   }
@@ -20,7 +20,7 @@ function verifyPassword(plainPassword, storedPassword) {
   return crypto.timingSafeEqual(Buffer.from(candidate, "hex"), Buffer.from(hashed, "hex"));
 }
 
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res) => { // ruta POST /login para iniciar sesion de un usuario existente
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -37,7 +37,7 @@ router.post("/login", async (req, res) => {
   }
 
   try {
-    const user = await prisma.usuario.findUnique({
+    const user = await prisma.usuario.findUnique({ // buscar usuario por email en la base de datos
       where: { email: cleanEmail },
       select: {
         id: true,
@@ -51,14 +51,14 @@ router.post("/login", async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({
+      return res.status(404).json({ // 404 = usuario no encontrado
         error: "Usuario no encontrado. Debes registrarte primero.",
       });
     }
 
     const isValidPassword = verifyPassword(password, user.password);
     if (!isValidPassword) {
-      return res.status(401).json({ error: "Credenciales invalidas." });
+      return res.status(401).json({ error: "Credenciales invalidas." }); // 401 = credenciales invalidas
     }
 
     return res.json({
@@ -74,7 +74,7 @@ router.post("/login", async (req, res) => {
     });
   } catch (error) {
     console.error("Error al iniciar sesion:", error);
-    return res.status(500).json({ error: "Error interno al iniciar sesion." });
+    return res.status(500).json({ error: "Error interno al iniciar sesion." }); // 500 = error en la base de datos/backend
   }
 });
 
