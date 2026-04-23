@@ -26,10 +26,10 @@ export const Header = ({ isAuthenticated = false, user = null }) => {
         ) : (
           <>
             <button onClick={() => console.log('login')}>
-              Iniciar sesión
+              -----
             </button>
             <button onClick={() => console.log('register')}>
-              Registrarse
+              -----
             </button>
           </>
         )}

@@ -16,7 +16,7 @@ function validateLoginForm(email, password) {
   return ''
 }
 
-function Login({ onLogin }) {
+function Login({ onLogin, onRegisterClick }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -27,6 +27,11 @@ function Login({ onLogin }) {
     if (validationError) { setError(validationError); return }
     setError('')
     onLogin({ email, password })
+  }
+
+  const handleRegisterClick = (e) => {
+    e.preventDefault()
+    if (onRegisterClick) onRegisterClick()
   }
 
   return (
@@ -54,6 +59,9 @@ function Login({ onLogin }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <p className="login-register-link">
+              ¿No tienes cuenta? <a href="#" onClick={handleRegisterClick}>Regístrate aquí</a>
+            </p>
             {error && <p className="login-error" role="alert">{error}</p>}
             <button className="login-button" type="submit">Ingresar</button>
           </form>
