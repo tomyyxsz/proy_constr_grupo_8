@@ -1,4 +1,4 @@
- import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Home from './pages/Home'
@@ -19,6 +19,7 @@ function App() {
     // Aquí puedes validar contra tu backend
     // Por ahora simula login exitoso
     setUser({ email, name: email.split('@')[0] })
+    console.log(password)
     setCurrentPage('home')
   }
 
@@ -26,6 +27,7 @@ function App() {
     // Aquí puedes enviar los datos al backend
     // Por ahora simula registro exitoso y hace login automático
     setUser({ email, name: nombre, role })
+    console.log('Usuario registrado:', { rut, nombre, apellidos, email, role, password })
     setCurrentPage('home')
   }
 

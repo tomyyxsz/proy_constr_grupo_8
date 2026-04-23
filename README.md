@@ -67,3 +67,15 @@ Todos se ejecutan desde proy_constr:
 - npm run build: build del frontend.
 - npm run lint: lint del frontend.
 - npm run lint --workspace backend: lint del backend.
+
+## Coverage con Codecov
+
+Para generar cobertura localmente:
+
+'''bash
+cd proy_constr
+npm run coverage
+'''
+
+Eso crea el reporte `frontend/coverage/lcov.info`, que GitHub Actions sube a Codecov desde [.github/workflows/codecov.yml](.github/workflows/codecov.yml).
+
