@@ -67,5 +67,3 @@ Todos se ejecutan desde proy_constr:
 - npm run build: build del frontend.
 - npm run lint: lint del frontend.
 - npm run lint --workspace backend: lint del backend.
-
-
