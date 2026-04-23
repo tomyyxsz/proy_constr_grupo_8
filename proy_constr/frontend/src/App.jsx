@@ -1,30 +1,48 @@
-import './App.css'
-import Footer from './Footer'
 import { useState } from 'react'
-import InicioSesion from './InicioSesion'
-
-import { Header } from './Header'
-
+import Login from './pages/Login'
+import Register from './pages/Register'
+import Home from './pages/Home'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [user, setUser] = useState(null)
+  const [currentPage, setCurrentPage] = useState('login') // 'login', 'register', 'home'
 
+  const handleLogin = ({ email , password}) => {
+    // Aquí puedes validar contra tu backend
+    // Por ahora simula login exitoso
+    setUser({ email, name: email.split('@')[0] })
+    setCurrentPage('home')
+  }
+  //estan en rojo porque aun no se usan
+  const handleRegister = ({ rut, nombre, apellidos, email, password, role }) => {
+    // Aquí puedes enviar los datos al backend
+    // Por ahora simula registro exitoso y hace login automático
+    setUser({ email, name: nombre, role })
+    setCurrentPage('home')
+  }
 
-  return (
-    <>
-      <Header isAuthenticated={false} />
+  const handleLogout = () => {
+    setUser(null)
+    setCurrentPage('login')
+  }
 
-      <div>
-        <h1>Hola Mundo</h1>
-        <p>Contador: {count}</p>
-        <button onClick={() => setCount(count + 1)}>
-          Incrementar
-        </button>
-        <InicioSesion />
-        <Footer/>
-      </div>
-    </>
-  )
+  const handleRegisterClick = () => {
+    setCurrentPage('register')
+  }
+
+  const handleLoginClick = () => {
+    setCurrentPage('login')
+  }
+
+  if (currentPage === 'login') {
+    return <Login onLogin={handleLogin} onRegisterClick={handleRegisterClick} />
+  }
+
+  if (currentPage === 'register') {
+    return <Register onRegister={handleRegister} onLoginClick={handleLoginClick} />
+  }
+
+  return <Home user={user} onLogout={handleLogout} />
 }
 
 export default App

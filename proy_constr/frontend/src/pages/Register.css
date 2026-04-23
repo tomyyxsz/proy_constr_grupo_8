@@ -1,0 +1,205 @@
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.register-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f7f7f7;
+  padding: 2rem 1rem;
+}
+
+.register-card {
+  background: #fff;
+  border: 1px solid #f0c0c0;
+  border-top: 3px solid #c0392b;
+  border-radius: 14px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 16px rgba(192, 57, 43, 0.07);
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.register-title {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0 0 4px;
+  color: #1a1a1a;
+}
+
+.register-subtitle {
+  font-size: 13px;
+  color: #999;
+  margin: 0;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.register-input {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 9px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.register-input:hover {
+  border-color: #e8a09a;
+  background: #fffafa;
+}
+
+.register-input:focus {
+  border-color: #c0392b;
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.09);
+}
+
+.register-select {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 9px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  color: #666;
+}
+
+.register-select:hover {
+  border-color: #e8a09a;
+  background: #fffafa;
+}
+
+.register-select:focus {
+  border-color: #c0392b;
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.09);
+}
+
+.register-select option {
+  color: #1a1a1a;
+  background: #fff;
+}
+
+.register-button {
+  width: 100%;
+  padding: 11px;
+  background-color: #c0392b;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.register-button:hover {
+  background-color: #a93226;
+  box-shadow: 0 4px 14px rgba(192, 57, 43, 0.22);
+  transform: translateY(-1px);
+}
+
+.register-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.register-error {
+  color: #c0392b;
+  font-size: 13px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.register-login-link {
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+}
+
+.register-login-link a {
+  color: #c0392b;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.register-login-link a:hover {
+  color: #a93226;
+  text-decoration: underline;
+}
+
+.register-password-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.register-password-group .register-input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.register-password-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+}
+
+.register-password-toggle:hover {
+  opacity: 0.7;
+}
+
+.register-password-toggle:active {
+  opacity: 0.5;
+}
+
+.register-password-match {
+  color: #27ae60;
+  font-size: 12px;
+  margin: 0;
+  margin-top: -8px;
+  font-weight: 500;
+}
+
+.register-password-mismatch {
+  color: #c0392b;
+  font-size: 12px;
+  margin: 0;
+  margin-top: -8px;
+  font-weight: 500;
+}
