@@ -15,19 +15,23 @@ function App() {
     localStorage.setItem('currentPage', currentPage)
   }, [currentPage])
 
-  const handleLogin = ({ email , password}) => {
-    // Aquí puedes validar contra tu backend
-    // Por ahora simula login exitoso
-    setUser({ email, name: email.split('@')[0] })
-    console.log(password)
+  const handleLogin = (usuarioAutenticado) => {
+    setUser({
+      id: usuarioAutenticado.id,
+      email: usuarioAutenticado.email,
+      name: usuarioAutenticado.nombre,
+      role: usuarioAutenticado['usuario_rol'],
+    })
     setCurrentPage('home')
   }
 
-  const handleRegister = ({ rut, nombre, apellidos, email, password, role }) => {
-    // Aquí puedes enviar los datos al backend
-    // Por ahora simula registro exitoso y hace login automático
-    setUser({ email, name: nombre, role })
-    console.log('Usuario registrado:', { rut, nombre, apellidos, email, role, password })
+  const handleRegister = (usuarioRegistrado) => {
+    setUser({
+      id: usuarioRegistrado.id,
+      email: usuarioRegistrado.email,
+      name: usuarioRegistrado.nombre,
+      role: usuarioRegistrado['usuario_rol'],
+    })
     setCurrentPage('home')
   }
 
@@ -55,6 +59,10 @@ function App() {
 
   if (currentPage === 'register') {
     return <Register onRegister={handleRegister} onLoginClick={handleLoginClick} />
+  }
+
+  if (currentPage === 'home' && !user) {
+    return <Login onLogin={handleLogin} onRegisterClick={handleRegisterClick} />
   }
 
   return <Home user={user} onLogout={handleLogout} onGoHome={handleGoHome} />

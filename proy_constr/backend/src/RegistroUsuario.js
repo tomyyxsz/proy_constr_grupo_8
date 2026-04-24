@@ -4,11 +4,11 @@ import { prisma } from "./lib/prisma.js";
 
 const router = express.Router();
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // formato de email : asdad@asdasd.algo
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/; // minimo 8 caracteres, al menos 1 mayuscula, 1 minuscula, 1 numero y 1 simbolo
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 const ALLOWED_ROLES = ["ESTUDIANTE", "AYUDANTE", "PROFESOR"];
 
-function calcularDV(rutBody) { // funcion para calcular el digito verificador del rut
+function calcularDV(rutBody) {
   let sum = 0;
   let multiplicador = 2;
 
@@ -39,11 +39,11 @@ function normalizeRut(rutInput) {
 
   if (tieneGuion) {
     const [bodyPart, dvPart = ""] = original.split("-");
-    body = bodyPart.replace(/\D/g, ""); // body = solo numeros ej 12345678
+    body = bodyPart.replace(/\D/g, "");
     providedDv = dvPart.trim() ? dvPart.trim() : null;
-  } else if (/^\d{7,8}$/.test(compact)) { 
+  } else if (/^\d{7,8}$/.test(compact)) {
     body = compact;
-  } else if (/^\d{8}K$/.test(compact)) { 
+  } else if (/^\d{8}K$/.test(compact)) {
     body = compact.slice(0, -1);
     providedDv = "K";
   } else if (/^\d{9}$/.test(compact)) {
@@ -70,26 +70,22 @@ function normalizeRut(rutInput) {
   return `${body}-${calculatedDv}`;
 }
 
-function hashPassword(password) { // encripta la contrasena usando scrypt con una salt aleatoria.
-  // salta es un valor aleatorio en formato hexadecimal que se genera para cada contrasena
-  // de esta forma si dos usuarios tienen la misma contrasena, sus hashes seran diferentes debido a las salts distintas.
+function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString("hex");
   const hashed = crypto.scryptSync(password, salt, 64).toString("hex");
   return `${salt}:${hashed}`;
 }
 
-
-function normalizeRole(role) { // normaliza el rol a mayusculas y valida que sea uno de los permitidos. 
-// si no se especifica, se asigna ESTUDIANTE por defecto.
+function normalizeRole(role) {
   if (!role) {
-    return "ESTUDIANTE"; // rol por defecto si no se especifica en el cuerpo de la solicitud
+    return "ESTUDIANTE";
   }
 
   const normalized = String(role).trim().toUpperCase();
   return ALLOWED_ROLES.includes(normalized) ? normalized : null;
 }
 
-router.post("/registro", async (req, res) => { // ruta POST /registro para registrar un nuevo usuario
+router.post("/registro", async (req, res) => {
   const {
     rut,
     nombre,
@@ -98,12 +94,11 @@ router.post("/registro", async (req, res) => { // ruta POST /registro para regis
     password,
   } = req.body;
 
-  const roleFromBody = req.body.usuario_rol; // rol opcional, si no se envia se asigna ESTUDIANTE por defecto
+  const roleFromBody = req.body.usuario_rol;
 
-  if (!rut || !nombre || !apellido || !email || !password) { // validacion de campos llenos
+  if (!rut || !nombre || !apellido || !email || !password) {
     return res.status(400).json({
-      error:
-        "Debes enviar rut, nombre, apellido, email y password para registrar un usuario.",
+      error: "Debes enviar rut, nombre, apellido, email y password para registrar un usuario.",
     });
   }
 
@@ -112,18 +107,17 @@ router.post("/registro", async (req, res) => { // ruta POST /registro para regis
   const normalizedRut = normalizeRut(rut);
   const role = normalizeRole(roleFromBody);
 
-  if (!EMAIL_REGEX.test(cleanEmail)) { // validacion de formato de email
+  if (!EMAIL_REGEX.test(cleanEmail)) {
     return res.status(400).json({
       error: "El correo no tiene un formato valido.",
       regla: "usuario@dominio.com",
     });
   }
 
-  if (!PASSWORD_REGEX.test(cleanPassword)) { // validacion de contrasena
+  if (!PASSWORD_REGEX.test(cleanPassword)) {
     return res.status(400).json({
       error: "La contrasena no cumple la politica de seguridad.",
-      regla:
-        "Minimo 8 caracteres, al menos 1 mayuscula, 1 minuscula, 1 numero y 1 simbolo.",
+      regla: "Minimo 8 caracteres, al menos 1 mayuscula, 1 minuscula, 1 numero y 1 simbolo.",
     });
   }
 
@@ -140,8 +134,18 @@ router.post("/registro", async (req, res) => { // ruta POST /registro para regis
     });
   }
 
+  const existingUser = await prisma.usuario.findUnique({
+    where: { rut: normalizedRut },
+  });
+
+  if (existingUser) {
+    return res.status(409).json({
+      error: "Ya existe un usuario registrado con ese RUT.",
+    });
+  }
+
   try {
-    const newUser = await prisma.usuario.create({ // crear nuevo usuario en bd
+    const newUser = await prisma.usuario.create({
       data: {
         id: crypto.randomUUID(),
         rut: normalizedRut,
@@ -149,7 +153,7 @@ router.post("/registro", async (req, res) => { // ruta POST /registro para regis
         apellido: String(apellido).trim(),
         email: cleanEmail,
         password: hashPassword(cleanPassword),
-        "usuario_rol": role,
+        ["usuario_rol"]: role,
       },
       select: {
         id: true,
@@ -157,23 +161,37 @@ router.post("/registro", async (req, res) => { // ruta POST /registro para regis
         nombre: true,
         apellido: true,
         email: true,
-        "usuario_rol": true,
-        "creado_en": true,
+        ["usuario_rol"]: true,
+        ["creado_en"]: true,
       },
     });
 
-    return res.status(201).json({ // respuesta 201: exitosa
+    return res.status(201).json({
       message: "Usuario registrado correctamente.",
       usuario: newUser,
     });
   } catch (error) {
     if (error?.code === "P2002") {
-      return res.status(409).json({ // respuesta 409: conflicto, email ya registrado
-        error: "Ya existe un usuario registrado con ese email.",
+      const uniqueField = Array.isArray(error.meta?.target) ? error.meta.target[0] : null;
+
+      if (uniqueField === "rut") {
+        return res.status(409).json({
+          error: "Ya existe un usuario registrado con ese RUT.",
+        });
+      }
+
+      if (uniqueField === "email") {
+        return res.status(409).json({
+          error: "Ya existe un usuario registrado con ese email.",
+        });
+      }
+
+      return res.status(409).json({
+        error: "Ya existe un dato único repetido.",
       });
     }
 
-    console.error("Error al registrar usuario:", error); // log del error (500) para depuracion
+    console.error("Error al registrar usuario:", error);
     return res.status(500).json({ error: "Error interno al registrar usuario." });
   }
 });

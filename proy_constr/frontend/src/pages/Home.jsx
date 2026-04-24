@@ -9,7 +9,7 @@ export default function Home({ user, onLogout, onGoHome }) {
     <div>
       <Header />
       <div className="home-container">
-        <h1>Hola {user.name}</h1> 
+        <h1>Hola {user?.name || 'usuario'}</h1> 
         {/* contenido */}
         <div className="home-buttons">
           <button onClick={onLogout} className="home-logout-btn">

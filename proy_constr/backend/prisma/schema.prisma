@@ -43,7 +43,7 @@ enum EstadoReserva {
 
 model Usuario {
   id String @id @default(uuid()) @db.Uuid
-  rut String @db.VarChar(10)
+  rut String @db.VarChar(10) @unique
   nombre String @db.VarChar(100)
   apellido String @db.VarChar(100)
   email String @db.VarChar(255) @unique

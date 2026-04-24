@@ -2,31 +2,48 @@ import { useState } from 'react';
 import './Login.css';
 import { Header } from '../components/Header'
 import  Footer  from '../components/Footer'
+import { loginUser } from '../api/ApiLogin'
 
 
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/ //regular expresssion to validate email format
-const MIN_PASSWORD_LENGTH = 6 //minimun password length
 
 function validateLoginForm(email, password) {
   if (!email || !password) return 'Completa correo y contraseña'
   if (!EMAIL_REGEX.test(email)) return 'Ingresa un correo válido'
-  if (password.length < MIN_PASSWORD_LENGTH)
-    return `La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres`
-  return ''
+
 }
 
+
 function Login({ onLogin, onRegisterClick }) {
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e) => {
+  // validar formulario antes de enviar datos al backend, mostrar errores de validacion en el frontend
+  const handleSubmit = async (e) => {
+
     e.preventDefault()
     const validationError = validateLoginForm(email, password)
-    if (validationError) { setError(validationError); return }
+
+    if (validationError) { 
+      setError(validationError);
+      return }
+
     setError('')
-    onLogin({ email, password })
+
+    try {
+      setIsSubmitting(true)
+      const response = await loginUser(email, password)
+      onLogin(response.usuario)
+    } catch (apiError) {
+      setError(apiError.message)
+    } finally {
+      setIsSubmitting(false)
+    }
+
   }
 
   const handleRegisterClick = (e) => {
@@ -63,7 +80,9 @@ function Login({ onLogin, onRegisterClick }) {
               ¿No tienes cuenta? <a href="#" onClick={handleRegisterClick}>Regístrate aquí</a>
             </p>
             {error && <p className="login-error" role="alert">{error}</p>}
-            <button className="login-button" type="submit">Ingresar</button>
+            <button className="login-button" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Validando...' : 'Ingresar'}
+            </button>
           </form>
         </div>
       </div>

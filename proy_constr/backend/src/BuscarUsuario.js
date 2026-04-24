@@ -100,5 +100,28 @@ router.get("/:id", async (req, res) => {
     return res.status(500).json({ error: "Error interno al buscar usuario." });
   }
 });
+// ruta para borrar usuarios en caso de rut repetido o que haya habido algun error. se borra con el rut
+// la ruta para postman es DELETE http://localhost:3001/api/usuarios/rut/12345678-9 (ejemplo de rut)
+router.delete("/rut/:rut", async (req, res) => {
+  try {
+    const rut = String(req.params.rut).trim().toUpperCase();
+
+    const deleted = await prisma.usuario.deleteMany({
+      where: { rut },
+    });
+
+    if (deleted.count === 0) {
+      return res.status(404).json({ error: "No se encontró ningún usuario con ese RUT." });
+    }
+
+    return res.json({
+      message: "Usuarios eliminados correctamente.",
+      eliminados: deleted.count,
+    });
+  } catch (error) {
+    console.error("Error al eliminar usuarios por rut:", error);
+    return res.status(500).json({ error: "Error interno al eliminar usuarios." });
+  }
+});
 
 export default router;
