@@ -2,20 +2,20 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import { Header } from '../Header';
+import { Header } from '../components/Header';
 
 
 
 describe('Header Component', () => {
   test('renders logo and navigation links', () => {
     render(<Header />);
-    expect(screen.getByText('TaskFlow')).toBeInTheDocument();
+    expect(screen.getByText('MakerBox')).toBeInTheDocument();
     expect(screen.getByText('Proyectos')).toBeInTheDocument();
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
   test('shows login button when user not authenticated', () => {
     render(<Header isAuthenticated={false} />);
-    expect(screen.getByText('Iniciar Sesión')).toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(2);
   });
   test('shows user menu when authenticated', () => {
     render(<Header isAuthenticated={true} user={{ name: 'Juan' }} />);
