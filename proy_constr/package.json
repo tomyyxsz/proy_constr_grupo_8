@@ -15,7 +15,7 @@
     "lint": "npm run lint --workspace frontend",
     "coverage": "npm run test:coverage --workspace frontend",
     "preview": "npm run preview --workspace frontend",
-    "prepare": "cd .. && husky proy_constr/.husky"
+    "prepare": "[ \"$NODE_ENV\" != \"production\" ] && husky install .husky || true"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.1.5",
@@ -23,6 +23,7 @@
     "vitest": "^4.1.5"
   },
   "dependencies": {
+    "axios": "^1.15.2",
     "express": "^5.2.1",
     "test": "^3.3.0"
   }
