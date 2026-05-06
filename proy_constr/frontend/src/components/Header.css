@@ -1,0 +1,50 @@
+.app-header { /*Se definen lo que va dentro del header */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #a93226 0%, #a93226 100%);
+  color: #ffffff;
+  position: relative;
+  z-index: 20;
+}
+
+.app-header__menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  min-width: 200px;
+  background: #ffffff;
+  color: #18202f;
+  border-radius: 14px;
+  box-shadow: 0 18px 36px rgba(7, 13, 24, 0.24);
+  overflow: hidden;
+  padding: 8px;
+}
+
+.app-header__menu-item {
+  width: 100%;
+  display: block;
+  padding: 10px 12px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+@media (max-width: 720px) {
+  .app-header {
+    flex-wrap: wrap;
+  }
+
+  .app-header__nav {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .app-header__actions {
+    margin-left: auto;
+  }
+}

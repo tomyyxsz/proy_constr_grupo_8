@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Home from './pages/Home'
+import Footer from './components/Footer'
+import { Header } from './components/Header'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -53,19 +55,39 @@ function App() {
     setCurrentPage('home')
   }
 
-  if (currentPage === 'login') {
-    return <Login onLogin={handleLogin} onRegisterClick={handleRegisterClick} />
+  const isAuthenticated = Boolean(user)
+
+  const renderPage = () => {
+    if (currentPage === 'login') {
+      return <Login onLogin={handleLogin} onRegisterClick={handleRegisterClick} />
+    }
+
+    if (currentPage === 'register') {
+      return <Register onRegister={handleRegister} onLoginClick={handleLoginClick} />
+    }
+
+    if (currentPage === 'home' && !user) {
+      return <Login onLogin={handleLogin} onRegisterClick={handleRegisterClick} />
+    }
+
+    return <Home user={user} onLogout={handleLogout} onGoHome={handleGoHome} />
   }
 
-  if (currentPage === 'register') {
-    return <Register onRegister={handleRegister} onLoginClick={handleLoginClick} />
-  }
-
-  if (currentPage === 'home' && !user) {
-    return <Login onLogin={handleLogin} onRegisterClick={handleRegisterClick} />
-  }
-
-  return <Home user={user} onLogout={handleLogout} onGoHome={handleGoHome} />
+  return (
+    <div className="app-shell">
+      <Header
+        isAuthenticated={isAuthenticated}
+        user={user}
+        onLoginClick={handleLoginClick}
+        onRegisterClick={handleRegisterClick}
+        onLogout={handleLogout}
+      />
+      <main>
+        {renderPage()}
+      </main>
+      <Footer />
+    </div>
+  )
 }
 
 export default App
