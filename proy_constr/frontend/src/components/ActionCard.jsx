@@ -1,3 +1,4 @@
+//Tarjeta de accion para el dashboard recibe icono titulo descricion y una fucion de clic 
 function ActionCard({ icon, iconClass = '', title, description, onClick }) {
   return (
     <button className="action-card" onClick={onClick}>
