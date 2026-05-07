@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import './Register.css';
-import { Header } from '../components/Header'
-import Footer from '../components/Footer'
 import { registerUser } from '../api/ApiRegistro'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -81,7 +79,6 @@ function Register({ onRegister, onLoginClick }) {
 
   return (
     <div className="register-page">
-      <Header />
       <div className="register-wrapper">
         <div className="register-card">
           <div className="register-header">
@@ -169,7 +166,6 @@ function Register({ onRegister, onLoginClick }) {
           </p>
         </div>
       </div>
-      <Footer />
     </div>
   )
 }

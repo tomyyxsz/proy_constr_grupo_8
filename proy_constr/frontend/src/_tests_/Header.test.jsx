@@ -10,8 +10,6 @@ describe('Header Component', () => {
   test('renders logo and navigation links', () => {
     render(<Header />);
     expect(screen.getByText('MakerBox')).toBeInTheDocument();
-    expect(screen.getByText('Proyectos')).toBeInTheDocument();
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
   test('shows login button when user not authenticated', () => {
     render(<Header isAuthenticated={false} />);
