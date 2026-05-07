@@ -41,6 +41,7 @@ export const Header = ({
               aria-haspopup="menu"
               aria-expanded={menuOpen}
             >
+              <span className="app-header__avatar">{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
               <span className="app-header__user-name">{user?.name || 'Usuario'}</span>
               <span className="app-header__caret">▾</span>
             </button>

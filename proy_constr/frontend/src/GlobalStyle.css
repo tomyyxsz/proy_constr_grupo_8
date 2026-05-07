@@ -1,0 +1,41 @@
+html,
+body,
+#root { /* Se añade esto para que el html, body y el root ocupen toda la pantalla */
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden; /* Se añade esto que es para que no se pueda desplazar la ventana*/
+  background: #f7f7f7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.app-shell {
+  min-height: 100dvh; /*Aca se añade el dvh (que es para telefonos), pero más abajo se añade un media query para que en pantallas anchas se use el vh (que es para computador)*/
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-shell__main {
+  flex: 1;
+  min-height: 0; /* Se añade esto para que el main no tenga un tamaño mínimo y pueda ajustarse al contenido */
+  display: flex;
+  overflow: hidden;
+}
+
+.app-shell__main > * {
+  flex: 1;
+  min-height: 0;
+}
+
+@media (min-width: 720px) { /*Se añade esto para que en pantallas anchas se use el vh (que es para computador)*/
+  .app-shell {
+    min-height: 100vh;
+  }
+}

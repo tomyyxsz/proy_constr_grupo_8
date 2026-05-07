@@ -82,7 +82,7 @@ function App() {
         onRegisterClick={handleRegisterClick}
         onLogout={handleLogout}
       />
-      <main>
+      <main className="app-shell__main">
         {renderPage()}
       </main>
       <Footer />

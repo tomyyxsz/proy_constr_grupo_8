@@ -1,13 +1,102 @@
-.app-header { /*Se definen lo que va dentro del header */
+.app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
   padding: 16px 24px;
-  background: linear-gradient(135deg, #a93226 0%, #a93226 100%);
+  background-color: #a93226;
   color: #ffffff;
   position: relative;
   z-index: 20;
+}
+
+.app-header__brand {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.app-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+}
+
+.app-header__link {
+  color: #d7e3ff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.app-header__link:hover {
+  color: #ffffff;
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.app-header__guest-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-header__button,
+.app-header__button--ghost,
+.app-header__user-button,
+.app-header__menu-item {
+  border: 0;
+  border-radius: 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.app-header__button,
+.app-header__button--ghost {
+  padding: 10px 16px;
+  font-weight: 600;
+}
+
+.app-header__button {
+  background: #f3f6ff;
+  color: #18202f;
+}
+
+.app-header__user-area {
+  position: relative;
+}
+
+.app-header__user-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.1);
+  color: #ffffff;
+}
+
+.app-header__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f3f6ff;
+  color: #18202f;
+  font-weight: 700;
+}
+
+.app-header__user-name {
+  font-weight: 600;
+}
+
+.app-header__caret {
+  font-size: 0.8rem;
 }
 
 .app-header__menu {
@@ -32,9 +121,15 @@
   text-align: left;
 }
 
-@media (max-width: 720px) {
+.app-header__menu-item:hover {
+  background: #eef3ff;
+}
+
+@media (max-width: 720px) { /* Se añade para que se ajuste en las pantallas */
   .app-header {
     flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 14px;
   }
 
   .app-header__nav {
@@ -44,7 +139,30 @@
     flex-wrap: wrap;
   }
 
+  .app-header__brand {
+    font-size: 1rem;
+  }
+
   .app-header__actions {
     margin-left: auto;
+  }
+
+  .app-header__guest-actions {
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .app-header__button,
+  .app-header__button--ghost,
+  .app-header__user-button {
+    padding: 8px 10px;
+  }
+
+  .app-header__user-name {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
