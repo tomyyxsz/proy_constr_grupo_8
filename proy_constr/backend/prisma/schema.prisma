@@ -10,6 +10,7 @@ enum TipoRol {
   PROFESOR
   AYUDANTE
   ESTUDIANTE
+  ADMINISTRADOR
 }
 
 enum EstadoAyudantia {
