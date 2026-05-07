@@ -15,11 +15,7 @@ export const Header = ({ isAuthenticated = false, user = null }) => {
         MakerBox
       </div>
 
-      <nav style={{ display: 'flex', gap: '32px' }}>
-        <a href="/projects" style={{ color: 'white', textDecoration: 'none' }}>Proyectos</a>
-        <a href="/dashboard" style={{ color: 'white', textDecoration: 'none' }}>Dashboard</a>
-      </nav>
-
+     
       <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
         {isAuthenticated ? (
           <span>{user?.name}</span>
