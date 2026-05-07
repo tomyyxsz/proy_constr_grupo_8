@@ -1,6 +1,6 @@
 import ActionCard from '../ActionCard'
 
-function AyudanteDashboard({ user }) {
+function AyudanteDashboard() {
   return (
     <div className="dashboard-grid">
       <ActionCard

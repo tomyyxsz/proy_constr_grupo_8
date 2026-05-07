@@ -1,7 +1,7 @@
 import ActionCard from '../ActionCard'
 import './Dashboard.css'
 
-function StudentDashboard({ user }) {
+function StudentDashboard() {
   return (
     <div className="dashboard-grid">
       <ActionCard

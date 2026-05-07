@@ -11,7 +11,7 @@ const DASHBOARDS = {
   PROFESOR: ProfesorDashboard,
 }
 
-function Home({ user, onLogout, onGoHome }) {
+function Home({ user, onLogout}) {
   const DashboardComponent = DASHBOARDS[user?.role]
 
   return (

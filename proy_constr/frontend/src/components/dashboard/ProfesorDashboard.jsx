@@ -1,6 +1,6 @@
 import ActionCard from '../ActionCard'
 
-function ProfesorDashboard({ user }) {
+function ProfesorDashboard() {
   return (
     <div className="dashboard-grid">
       <ActionCard
