@@ -1,3 +1,4 @@
+//dashboard para ayudantes con acciones especificas de ayudante
 import ActionCard from '../ActionCard'
 
 function AyudanteDashboard() {

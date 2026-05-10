@@ -1,3 +1,4 @@
+//dashboard para profesores donde se controlan acciones especificas de profesor 
 import ActionCard from '../ActionCard'
 
 function ProfesorDashboard() {

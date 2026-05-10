@@ -1,3 +1,4 @@
+//dashboard para estudiante con acciones especificas de estudiante
 import ActionCard from '../ActionCard'
 import './Dashboard.css'
 
