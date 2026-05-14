@@ -1,0 +1,51 @@
+/* Grid de tarjetas */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.action-card {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+  width: 100%;
+}
+
+.action-card:hover {
+  border-color: #b0b0b0;
+}
+
+.action-card:active {
+  transform: scale(0.98);
+}
+
+.action-card-icon {
+  font-size: 1.75rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+
+.icon-estudiante { color: #0F6E56; }
+.icon-ayudante   { color: #185FA5; }
+.icon-profesor   { color: #993C1D; }
+
+.action-card h3 {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 0 0 6px;
+  color: #1a1a1a;
+}
+
+.action-card p {
+  font-size: 0.8rem;
+  color: #6b6b6b;
+  margin: 0;
+  line-height: 1.5;
+}
+

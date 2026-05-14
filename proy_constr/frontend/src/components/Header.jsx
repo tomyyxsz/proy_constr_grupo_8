@@ -22,7 +22,7 @@ export const Header = ({
   const handleLoginClick = () => { //Cuando se hace click en Iniciar sesión, se llama a la función onLoginClick para mostrar la página de inicio de sesión
     if (onLoginClick) onLoginClick()
   }
-
+  
   const handleRegisterClick = () => { //Cuando se hace click en Registrarse, se llama a la función onRegisterClick para mostrar la página de registro
     if (onRegisterClick) onRegisterClick()
   }
