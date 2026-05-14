@@ -37,7 +37,7 @@ jobs:
           DATABASE_URL: ${{ secrets.BD_URL }}
 
       - name: Run backend tests with coverage
-        run: npm exec --workspace backend vitest run --coverage
+        run: npm run test:coverage --workspace backend
         env:
           CI: true
 
@@ -45,5 +45,5 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./proy_constr/backend/coverage/lcov.info
+          files: ./backend/coverage/lcov.info
           fail_ci_if_error: true
