@@ -1,10 +1,6 @@
 import { useState } from 'react';
 import './Login.css';
-import { Header } from '../components/Header'
-import  Footer  from '../components/Footer'
 import { loginUser } from '../api/ApiLogin'
-
-
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/ //regular expresssion to validate email format
 
@@ -13,7 +9,6 @@ function validateLoginForm(email, password) {
   if (!EMAIL_REGEX.test(email)) return 'Ingresa un correo válido'
 
 }
-
 
 function Login({ onLogin, onRegisterClick }) {
 
@@ -53,7 +48,6 @@ function Login({ onLogin, onRegisterClick }) {
 
   return (
     <div className="login-page">
-      <Header />
       <div className="login-wrapper">
         <div className="login-card">
           <div className="login-header">
@@ -86,7 +80,6 @@ function Login({ onLogin, onRegisterClick }) {
           </form>
         </div>
       </div>
-      <Footer />
     </div>
   )
 }

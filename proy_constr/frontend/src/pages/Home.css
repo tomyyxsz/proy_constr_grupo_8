@@ -11,6 +11,17 @@
   width: 100%;
   margin: 0 auto;
   padding: 2rem 1.5rem;
+
+  .home-container {
+  min-height: 0;
+  height: 100%;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 
@@ -60,4 +71,29 @@
 .home-role-error {
   color: #c0392b;
   font-size: 0.9rem;
+}
+  
+.home-home-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+@media (max-width: 720px) { /* Se añade para que se ajuste en las pantallas */
+  .home-container {
+    padding: 1.25rem 1rem;
+  }
+
+  .home-container h1 {
+    font-size: 22px;
+    margin-bottom: 1.25rem;
+  }
+
+  .home-buttons {
+    gap: 0.75rem;
+  }
+
+  .home-logout-btn,
+  .home-home-btn {
+    width: 100%;
+  }
 }
