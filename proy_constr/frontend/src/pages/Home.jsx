@@ -1,5 +1,3 @@
-import { Header } from '../components/Header'
-import Footer from '../components/Footer'
 import StudentDashboard from '../components/dashboard/StudentDashboard'
 import AyudanteDashboard from '../components/dashboard/AyudanteDashboard'
 import ProfesorDashboard from '../components/dashboard/ProfesorDashboard'
@@ -11,12 +9,11 @@ const DASHBOARDS = {
   PROFESOR: ProfesorDashboard,
 }
 
-function Home({ user, onLogout}) {
+function Home({ user}) {
   const DashboardComponent = DASHBOARDS[user?.role]
 
   return (
     <div className="home-page">
-      <Header user={user} onLogout={onLogout} />
       <div className="home-wrapper">
         <div className="home-welcome">
           <div className="home-welcome-info">
@@ -31,7 +28,6 @@ function Home({ user, onLogout}) {
           : <p className="home-role-error">Rol no reconocido: {user?.role}</p>
         }
       </div>
-      <Footer />
     </div>
   )
 }
