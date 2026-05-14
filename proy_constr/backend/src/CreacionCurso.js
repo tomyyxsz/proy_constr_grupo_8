@@ -1,7 +1,7 @@
 // clase para que el profesor cree curso
 // se le da un formulario en frontend con nombre del curso, escoge el anio y periodo y este se asocia a un semestre
 // se le asigna la ref al profesor que lo creo. se actualiza al momento de recibir correctamente la solicitud
-// los campos creaado_en y actualizado_en se actualizan automaticamente con la fecha y hora actual
+// los campos creado_en y actualizado_en se actualizan automaticamente con la fecha y hora actual
 
 import express from "express";
 import { prisma } from "./lib/prisma.js";
