@@ -1,74 +1,13 @@
 import crypto from "node:crypto";
 import express from "express";
 import { prisma } from "./lib/prisma.js";
+import {esCorreoValido, esContrasenaValida, normalizeRut} from "./lib/validaciones.js";
 
 const router = express.Router();
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
-const ALLOWED_ROLES = ["ESTUDIANTE", "AYUDANTE", "PROFESOR"];
+const ALLOWED_ROLES = ["ESTUDIANTE", "AYUDANTE", "PROFESOR","ADMINISTRADOR" ];
 
-function calcularDV(rutBody) {
-  let sum = 0;
-  let multiplicador = 2;
 
-  for (let i = rutBody.length - 1; i >= 0; i -= 1) {
-    sum += Number(rutBody[i]) * multiplicador;
-    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
-  }
-
-  const resto = 11 - (sum % 11);
-
-  if (resto === 11) {
-    return "0";
-  }
-
-  if (resto === 10) {
-    return "K";
-  }
-
-  return String(resto);
-}
-
-function normalizeRut(rutInput) {
-  const original = String(rutInput).trim().toUpperCase().replace(/\./g, "");
-  const compact = original.replace(/-/g, "");
-  const tieneGuion = original.includes("-");
-  let body = "";
-  let providedDv = null;
-
-  if (tieneGuion) {
-    const [bodyPart, dvPart = ""] = original.split("-");
-    body = bodyPart.replace(/\D/g, "");
-    providedDv = dvPart.trim() ? dvPart.trim() : null;
-  } else if (/^\d{7,8}$/.test(compact)) {
-    body = compact;
-  } else if (/^\d{8}K$/.test(compact)) {
-    body = compact.slice(0, -1);
-    providedDv = "K";
-  } else if (/^\d{9}$/.test(compact)) {
-    body = compact.slice(0, -1);
-    providedDv = compact.slice(-1);
-  } else {
-    return null;
-  }
-
-  if (!/^\d{7,8}$/.test(body)) {
-    return null;
-  }
-
-  if (providedDv && !/^[\dK]$/.test(providedDv)) {
-    return null;
-  }
-
-  const calculatedDv = calcularDV(body);
-
-  if (providedDv && providedDv !== calculatedDv) {
-    return null;
-  }
-
-  return `${body}-${calculatedDv}`;
-}
 
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString("hex");
@@ -107,14 +46,14 @@ router.post("/registro", async (req, res) => {
   const normalizedRut = normalizeRut(rut);
   const role = normalizeRole(roleFromBody);
 
-  if (!EMAIL_REGEX.test(cleanEmail)) {
+  if (!esCorreoValido(cleanEmail)) {
     return res.status(400).json({
       error: "El correo no tiene un formato valido.",
       regla: "usuario@dominio.com",
     });
   }
 
-  if (!PASSWORD_REGEX.test(cleanPassword)) {
+  if (!esContrasenaValida(cleanPassword)) {
     return res.status(400).json({
       error: "La contrasena no cumple la politica de seguridad.",
       regla: "Minimo 8 caracteres, al menos 1 mayuscula, 1 minuscula, 1 numero y 1 simbolo.",

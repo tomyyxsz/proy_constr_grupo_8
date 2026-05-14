@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "lint": "eslint . --ext .js,.ts --fix"
@@ -16,9 +19,10 @@
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "vitest": "^4.1.6"
   },
   "devDependencies": {
-    "prisma": "^7.8.0"
+    "prisma": "^7.6.0"
   }
 }
