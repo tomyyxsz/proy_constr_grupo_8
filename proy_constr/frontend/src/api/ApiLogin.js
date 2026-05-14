@@ -1,7 +1,7 @@
 // vincular login con backend usando axios
 
 import axios from "axios";
-const API_BASE_URL = "http://localhost:3001/api/usuarios";
+const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/usuarios`;
 
 export async function loginUser(email, password) {
   try {
