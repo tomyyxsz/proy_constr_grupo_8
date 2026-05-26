@@ -49,252 +49,252 @@ model Usuario {
   apellido String @db.VarChar(100)
   email String @db.VarChar(255) @unique
   password String @db.VarChar(255)
-  usuario_rol TipoRol @default(ESTUDIANTE)
-  borrado_en DateTime? @db.Timestamp(6)
-  creado_en DateTime @default(now()) @db.Timestamp(6)
-  actualizado_en DateTime @updatedAt @db.Timestamp(6)
+  usuarioRol TipoRol @default(ESTUDIANTE)
+  borradoEn DateTime? @db.Timestamp(6)
+  creadoEn DateTime @default(now()) @db.Timestamp(6)
+  actualizadoEn DateTime @updatedAt @db.Timestamp(6)
 
-  Cursos_como_profesor Curso[]
-  Estudiante_curso Estudiante_curso[]
-  Grupo_Estudiante Grupo_Estudiante[]
-  Ayudantia Ayudantia[]
-  Inscripcion_Ayudantia Inscripcion_Ayudantia[]
-  Reserva Reserva[]
-  Movimiento_Stock Movimiento_Stock[]
-  Impresion_estudiante Impresion[] @relation("Impresion_estudiante")
-  Impresion_ayudante Impresion[] @relation("Impresion_ayudante")
-  Uso_Impresion_solicitante Uso_Impresion[] @relation("Uso_Impresion_solicitante")
-  Uso_Impresion_estudiante Uso_Impresion[] @relation("Uso_Impresion_estudiante")
+  cursosComoProfesor Curso[]
+  estudianteCurso EstudianteCurso[]
+  grupoEstudiante GrupoEstudiante[]
+  ayudantias Ayudantia[]
+  inscripcionAyudantia inscripcionAyudantia[]
+  reservas Reserva[]
+  movimientoStock MovimientoStock[]
+  impresionEstudiante Impresion[] @relation("impresionEstudiante")
+  impresionAyudante Impresion[] @relation("impresionAyudante")
+  usoImpresionSolicitante UsoImpresion[] @relation("usoImpresionSolicitante")
+  usoImpresionEstudiante UsoImpresion[] @relation("usoImpresionEstudiante")
 
 }
 
 model Semestre {
-  id_semestre String @id @default(uuid()) @db.Uuid
+  idSemestre String @id @default(uuid()) @db.Uuid
   anio Int 
   periodo Int
-  fecha_inicio DateTime @db.Timestamp(6)
-  fecha_fin DateTime @db.Timestamp(6)
-  estado_semestre String @db.VarChar(50) @default("ACTIVO")
-  borrado_en DateTime? @db.Timestamp(6)
-  creado_en DateTime @default(now()) @db.Timestamp(6)
-  actualizado_en DateTime @updatedAt @db.Timestamp(6)
+  fechaInicio DateTime @db.Timestamp(6)
+  fechaFin DateTime @db.Timestamp(6)
+  estadoSemestre String @db.VarChar(50) @default("ACTIVO")
+  borradoEn DateTime? @db.Timestamp(6)
+  creadoEn DateTime @default(now()) @db.Timestamp(6)
+  actualizadoEn DateTime @updatedAt @db.Timestamp(6)
 
   cursos Curso[]
-  Uso_Impresion Uso_Impresion[]
+  usoImpresion UsoImpresion[]
 
 }
 
 model Curso {
-  id_curso String @id @default(uuid()) @db.Uuid
-  nombre_curso String @db.VarChar(255)
+  idCurso String @id @default(uuid()) @db.Uuid
+  nombreCurso String @db.VarChar(255)
 
-  ref_Semestre String @db.Uuid
-  semestre Semestre @relation(fields: [ref_Semestre], references: [id_semestre])
+  refSemestre String @db.Uuid
+  semestre Semestre @relation(fields: [refSemestre], references: [idSemestre])
 
-  ref_Profesor String @db.Uuid
-  profesor Usuario @relation(fields: [ref_Profesor], references: [id])
-  borrado_en DateTime? @db.Timestamp(6)
-  creado_en DateTime @default(now()) @db.Timestamp(6)
-  actualizado_en DateTime @updatedAt @db.Timestamp(6)
+  refProfesor String @db.Uuid
+  profesor Usuario @relation(fields: [refProfesor], references: [id])
+  borradoEn DateTime? @db.Timestamp(6)
+  creadoEn DateTime @default(now()) @db.Timestamp(6)
+  actualizadoEn DateTime @updatedAt @db.Timestamp(6)
 
-  Estudiante_curso Estudiante_curso[]
-  Grupo_Curso Grupo_Curso[]
+  estudianteCurso EstudianteCurso[]
+  grupoCurso GrupoCurso[]
   ayudantias Ayudantia[]
   impresiones Impresion[]
 
 }
 
-model Estudiante_curso {
-  ref_Curso String @db.Uuid
-  curso Curso @relation(fields: [ref_Curso], references: [id_curso])
+model EstudianteCurso {
+  refCurso String @db.Uuid
+  curso Curso @relation(fields: [refCurso], references: [idCurso])
 
-  ref_Estudiante String @db.Uuid
-  estudiante Usuario @relation(fields: [ref_Estudiante], references: [id])
+  refEstudiante String @db.Uuid
+  estudiante Usuario @relation(fields: [refEstudiante], references: [id])
 
-  @@id([ref_Curso, ref_Estudiante])
+  @@id([refCurso, refEstudiante])
 }
 
 model Ayudantia{
-  id_ayudantia String @id @default(uuid()) @db.Uuid
-  nombre_ayudantia String @db.VarChar(255)
+  idAyudantia String @id @default(uuid()) @db.Uuid
+  nombreAyudantia String @db.VarChar(255)
 
-  ref_Curso String @db.Uuid
-  curso Curso @relation(fields: [ref_Curso], references: [id_curso])
+  refCurso String @db.Uuid
+  curso Curso @relation(fields: [refCurso], references: [idCurso])
 
-  ref_Grupo String @db.Uuid
-  grupo Grupo_Curso @relation(fields: [ref_Grupo], references: [id_grupo_curso])
+  refGrupo String @db.Uuid
+  grupo GrupoCurso @relation(fields: [refGrupo], references: [idGrupoCurso])
 
-  ref_Ayudante String @db.Uuid
-  ayudante Usuario @relation(fields: [ref_Ayudante], references: [id])
+  refAyudante String @db.Uuid
+  ayudante Usuario @relation(fields: [refAyudante], references: [id])
 
   horario DateTime @db.Timestamp(6)
-  cupo_maximo Int
-  estado_ayudantia EstadoAyudantia @default(ACTIVA)
+  cupoMaximo Int
+  estadoAyudantia EstadoAyudantia @default(ACTIVA)
 
-  Inscripcion_Ayudantia Inscripcion_Ayudantia[]
+  inscripcionAyudantia inscripcionAyudantia[]
 }
 
-model Grupo_Curso {
-  id_grupo_curso String @id @default(uuid()) @db.Uuid
-  ref_curso String @db.Uuid
-  curso Curso @relation(fields: [ref_curso], references: [id_curso])
+model GrupoCurso {
+  idGrupoCurso String @id @default(uuid()) @db.Uuid
+  refCurso String @db.Uuid
+  curso Curso @relation(fields: [refCurso], references: [idCurso])
 
-  nombre_grupo String @db.VarChar(100)
+  nombreGrupo String @db.VarChar(100)
 
-  Ayudantia Ayudantia[]
-  Grupo_Estudiante Grupo_Estudiante[]
+  ayudantias Ayudantia[]
+  grupoEstudiantes GrupoEstudiante[]
 
 
 }
 
-model Grupo_Estudiante{ // tabla creada a partir de relacion N a N
-  ref_Grupo String @db.Uuid
-  grupo Grupo_Curso @relation(fields: [ref_Grupo], references: [id_grupo_curso])
+model GrupoEstudiante{ // tabla creada a partir de relacion N a N
+  refGrupo String @db.Uuid
+  grupo GrupoCurso @relation(fields: [refGrupo], references: [idGrupoCurso])
 
-  ref_Estudiante String @db.Uuid
-  estudiante Usuario @relation(fields: [ref_Estudiante], references: [id])
+  refEstudiante String @db.Uuid
+  estudiante Usuario @relation(fields: [refEstudiante], references: [id])
 
-  @@id([ref_Grupo, ref_Estudiante])
+  @@id([refGrupo, refEstudiante])
 }
 
-model Inscripcion_Ayudantia {
-  ref_Ayudantia String @db.Uuid
-  ayudantia Ayudantia @relation(fields: [ref_Ayudantia], references: [id_ayudantia])
+model inscripcionAyudantia {
+  refAyudantia String @db.Uuid
+  ayudantia Ayudantia @relation(fields: [refAyudantia], references: [idAyudantia])
 
-  ref_Estudiante String @db.Uuid
-  estudiante Usuario @relation(fields: [ref_Estudiante], references: [id])
+  refEstudiante String @db.Uuid
+  estudiante Usuario @relation(fields: [refEstudiante], references: [id])
 
-  fecha_inscripcion DateTime @default(now()) @db.Timestamp(6)
+  fechaInscripcion DateTime @default(now()) @db.Timestamp(6)
 
-  estado_asistencia EstadoAsistencia @default(AUSENTE)
+  estadoAsistencia EstadoAsistencia @default(AUSENTE)
 
-  @@id([ref_Ayudantia, ref_Estudiante])
+  @@id([refAyudantia, refEstudiante])
 }
 
 model BloqueHorario {
-  id_bloque_horario String @id @default(uuid()) @db.Uuid
-  nro_bloque Int
-  hora_inicio String @db.VarChar(50)
-  hora_fin String @db.VarChar(50)
+  idBloqueHorario String @id @default(uuid()) @db.Uuid
+  nroBloque Int
+  horaInicio String @db.VarChar(50)
+  horaFin String @db.VarChar(50)
 
-  BloqueReservado BloqueReservado[]
+  bloqueReservados BloqueReservado[]
 }
 
 model BloqueReservado{ // tabla creada a partir de relacion N a N
-  id_bloque String @db.Uuid
-  bloque BloqueHorario @relation(fields: [id_bloque], references: [id_bloque_horario])
-  id_reserva String @db.Uuid
-  reserva Reserva @relation(fields: [id_reserva], references: [id_reserva])
+  idBloque String @db.Uuid
+  bloque BloqueHorario @relation(fields: [idBloque], references: [idBloqueHorario])
+  idReserva String @db.Uuid
+  reserva Reserva @relation(fields: [idReserva], references: [idReserva])
 
-  @@id([id_bloque, id_reserva])
+  @@id([idBloque, idReserva])
 }
 
 model Reserva{
-  id_reserva String @id @default(uuid()) @db.Uuid
-  fecha_reserva DateTime @default(now()) @db.Timestamp(6)
-  estado_reserva EstadoReserva @default(PENDIENTE)
-  solicitante_nombre String @db.VarChar(50)
-  solicitante_email String @db.VarChar(100)
-  solicitante_apellido String @db.VarChar(50)
-  solicitante_rut String @db.VarChar(10)
-  ref_ayudante String @db.Uuid
-  ayudante Usuario @relation(fields: [ref_ayudante], references: [id])
+  idReserva String @id @default(uuid()) @db.Uuid
+  fechaReserva DateTime @default(now()) @db.Timestamp(6)
+  estadoReserva EstadoReserva @default(PENDIENTE)
+  solicitanteNombre String @db.VarChar(50)
+  solicitanteEmail String @db.VarChar(100)
+  solicitanteApellido String @db.VarChar(50)
+  solicitanteRut String @db.VarChar(10)
+  refAyudante String @db.Uuid
+  ayudante Usuario @relation(fields: [refAyudante], references: [id])
 
-  motivo_reserva String @db.VarChar(255)
-  creado_en DateTime @default(now()) @db.Timestamp(6)
-  BloqueReservado BloqueReservado[]
+  motivoReserva String @db.VarChar(255)
+  creadoEn DateTime @default(now()) @db.Timestamp(6)
+  bloqueReservados BloqueReservado[]
 }
 
 model Articulo {
-  id_articulo String @id @default(uuid()) @db.Uuid
-  nombre_articulo String @db.VarChar(100)
-  stock_actual Int
-  unidad_medida String @db.VarChar(50)
-  alerta_stock Int
-  notificar_stock Boolean @default(false)
-  actualizado_en DateTime @updatedAt @db.Timestamp(6)
+  idArticulo String @id @default(uuid()) @db.Uuid
+  nombreArticulo String @db.VarChar(100)
+  stockActual Int
+  unidadMedida String @db.VarChar(50)
+  alertaStock Int
+  notificarStock Boolean @default(false)
+  actualizadoEn DateTime @updatedAt @db.Timestamp(6)
 
-  Movimiento_Stock Movimiento_Stock[]
-  Uso_Impresion Uso_Impresion[]
+  movimientoStock MovimientoStock[]
+  usoImpresion UsoImpresion[]
 }
 
-model Movimiento_Stock{
-  id_movimiento String @id @default(uuid()) @db.Uuid
+model MovimientoStock{
+  idMovimiento String @id @default(uuid()) @db.Uuid
 
-  ref_articulo String @db.Uuid
-  articulo Articulo @relation(fields: [ref_articulo], references: [id_articulo])
+  refArticulo String @db.Uuid
+  articulo Articulo @relation(fields: [refArticulo], references: [idArticulo])
 
-  ref_usuario String @db.Uuid
-  usuario Usuario @relation(fields: [ref_usuario], references: [id])
+  refUsuario String @db.Uuid
+  usuario Usuario @relation(fields: [refUsuario], references: [id])
 
-  tipo_movimiento TipoMovimientoStock @default(ENTRADA)
+  tipoMovimiento TipoMovimientoStock @default(ENTRADA)
 
-  cambio_stock Int
-  stock_resultante Int
+  cambioStock Int
+  stockResultante Int
   observacion String @db.VarChar(255)
 
-  creado_en DateTime @default(now()) @db.Timestamp(6)
+  creadoEn DateTime @default(now()) @db.Timestamp(6)
 }
 
 model Impresion { // tabla clave
-  id_impresion String @id @default(uuid()) @db.Uuid
-  solicitante_nombre String @db.VarChar(50)
-  solicitante_apellido String @db.VarChar(50)
-  solicitante_email String @db.VarChar(100)
-  solicitante_rut String @db.VarChar(10)
+  idImpresion String @id @default(uuid()) @db.Uuid
+  solicitanteNombre String @db.VarChar(50)
+  solicitanteApellido String @db.VarChar(50)
+  solicitanteEmail String @db.VarChar(100)
+  solicitanteRut String @db.VarChar(10)
 
-  ref_estudiante String @db.Uuid
-  estudiante Usuario @relation("Impresion_estudiante", fields: [ref_estudiante], references: [id])
+  refEstudiante String @db.Uuid
+  estudiante Usuario @relation("impresionEstudiante", fields: [refEstudiante], references: [id])
   
-  ref_ayudante String @db.Uuid
-  ayudante Usuario @relation("Impresion_ayudante", fields: [ref_ayudante], references: [id])
+  refAyudante String @db.Uuid
+  ayudante Usuario @relation("impresionAyudante", fields: [refAyudante], references: [id])
 
-  tipo_usuario String @db.VarChar(50) // tipo_usuario
-  tipo_solicitud String @db.VarChar(50) // tipo_solicitud 
-  nombre_curso String @db.VarChar(100)
+  tipoUsuario String @db.VarChar(50)
+  tipoSolicitud String @db.VarChar(50)
+  nombreCurso String @db.VarChar(100)
 
-  ref_curso String @db.Uuid
-  curso Curso @relation(fields: [ref_curso], references: [id_curso])
+  refCurso String @db.Uuid
+  curso Curso @relation(fields: [refCurso], references: [idCurso])
 
-  color_opcion1 String @db.VarChar(50)
-  color_opcion2 String @db.VarChar(50)
-  color_opcion3 String @db.VarChar(50)
+  colorOpcion1 String @db.VarChar(50)
+  colorOpcion2 String @db.VarChar(50)
+  colorOpcion3 String @db.VarChar(50)
 
-  comentario_tecnico String @db.VarChar(255)
-  url_modelo_3d String @db.VarChar(255)
-  url_modelo_stl String @db.VarChar(255)
+  comentarioTecnico String @db.VarChar(255)
+  urlModelo3d String @db.VarChar(255)
+  urlModeloStl String @db.VarChar(255)
 
-  comentario_usuario String @db.VarChar(255)
-  estado_impresion EstadoImpresion @default(PENDIENTE)
+  comentarioUsuario String @db.VarChar(255)
+  estadoImpresion EstadoImpresion @default(PENDIENTE)
 
-  observacion_ayudante String @db.VarChar(255)
-  motivo_rechazo String? @db.VarChar(255) 
-  tiempo_estimado_impresion String @db.VarChar(50)
-  inicio_impresion DateTime? @db.Timestamp(6)
-  creado_en DateTime @default(now()) @db.Timestamp(6)
+  observacionAyudante String @db.VarChar(255)
+  motivoRechazo String? @db.VarChar(255) 
+  tiempoEstimadoImpresion String @db.VarChar(50)
+  inicioImpresion DateTime? @db.Timestamp(6)
+  creadoEn DateTime @default(now()) @db.Timestamp(6)
 
 
-  Uso_Impresion Uso_Impresion[]
+  usoImpresion UsoImpresion[]
 }
 
-model Uso_Impresion{
-  id_uso_impresion String @id @default(uuid()) @db.Uuid
-  ref_impresion String @db.Uuid
-  impresion Impresion @relation(fields: [ref_impresion], references: [id_impresion])
+model UsoImpresion{
+  idUsoImpresion String @id @default(uuid()) @db.Uuid
+  refImpresion String @db.Uuid
+  impresion Impresion @relation(fields: [refImpresion], references: [idImpresion])
 
-  ref_solicitante String @db.Uuid
-  solicitante Usuario @relation("Uso_Impresion_solicitante", fields: [ref_solicitante], references: [id])
+  refSolicitante String @db.Uuid
+  solicitante Usuario @relation("usoImpresionSolicitante", fields: [refSolicitante], references: [id])
 
-  ref_estudiante String @db.Uuid
-  estudiante Usuario @relation("Uso_Impresion_estudiante", fields: [ref_estudiante], references: [id])
+  refEstudiante String @db.Uuid
+  estudiante Usuario @relation("usoImpresionEstudiante", fields: [refEstudiante], references: [id])
 
-  ref_semestre String @db.Uuid
-  semestre Semestre @relation(fields: [ref_semestre], references: [id_semestre])
+  refSemestre String @db.Uuid
+  semestre Semestre @relation(fields: [refSemestre], references: [idSemestre])
 
-  cantidad_filamento Int
-  ref_articulo String @db.Uuid
-  articulo Articulo @relation(fields: [ref_articulo], references: [id_articulo])
+  cantidadFilamento Int
+  refArticulo String @db.Uuid
+  articulo Articulo @relation(fields: [refArticulo], references: [idArticulo])
 
-  creado_en DateTime @default(now()) @db.Timestamp(6)
-  actualizado_en DateTime @updatedAt @db.Timestamp(6)
+  creadoEn DateTime @default(now()) @db.Timestamp(6)
+  actualizadoEn DateTime @updatedAt @db.Timestamp(6)
 }
