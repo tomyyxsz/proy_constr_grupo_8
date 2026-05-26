@@ -1,7 +1,7 @@
 // clase para que el profesor cree curso
 // se le da un formulario en frontend con nombre del curso, escoge el anio y periodo y este se asocia a un semestre
 // se le asigna la ref al profesor que lo creo. se actualiza al momento de recibir correctamente la solicitud
-// los campos creado_en y actualizado_en se actualizan automaticamente con la fecha y hora actual
+// los campos creadoEn y actualizadoEn se actualizan automaticamente con la fecha y hora actual
 
 import express from "express";
 import { prisma } from "./lib/prisma.js";
@@ -29,7 +29,7 @@ router.post("/crear-curso", async (req, res) => {
     }
 
     const semestre = await prisma.semestre.findUnique({
-      where: { ["id_semestre"]: idSemestre },
+      where: { idSemestre },
     });
 
     if (!semestre) {
@@ -40,17 +40,17 @@ router.post("/crear-curso", async (req, res) => {
 
     const curso = await prisma.curso.create({
       data: {
-        ["nombre_curso"]: String(nombreCurso).trim(),
-        ["ref_Semestre"]: idSemestre,
-        ["ref_Profesor"]: idProfesor,
+        nombreCurso: String(nombreCurso).trim(),
+        refSemestre: idSemestre,
+        refProfesor: idProfesor,
       },
       select: {
-        ["id_curso"]: true,
-        ["nombre_curso"]: true,
-        ["ref_Semestre"]: true,
-        ["ref_Profesor"]: true,
-        ["creado_en"]: true,
-        ["actualizado_en"]: true,
+        idCurso: true,
+        nombreCurso: true,
+        refSemestre: true,
+        refProfesor: true,
+        creadoEn: true,
+        actualizadoEn: true,
       },
     });
 
