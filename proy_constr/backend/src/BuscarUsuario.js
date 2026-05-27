@@ -9,9 +9,9 @@ const USER_SELECT = {
   nombre: true,
   apellido: true,
   email: true,
-  "usuario_rol": true,
-  "creado_en": true,
-  "actualizado_en": true,
+  usuarioRol: true,
+  creadoEn: true,
+  actualizadoEn: true,
 };
 
 const ALLOWED_ROLES = ["ESTUDIANTE", "AYUDANTE", "PROFESOR"];
@@ -41,11 +41,11 @@ router.get("/buscar", async (req, res) => {
     const normalizedRole = normalizeRole(rol);
     if (!normalizedRole) {
       return res.status(400).json({
-        error: "usuario_rol invalido. Usa ESTUDIANTE, AYUDANTE o PROFESOR.",
+        error: "Rol de usuario invalido. Usa ESTUDIANTE, AYUDANTE o PROFESOR.",
       });
     }
 
-    filters.push({ "usuario_rol": normalizedRole });
+    filters.push({ usuarioRol: normalizedRole });
   }
 
   if (nombre) {
@@ -64,7 +64,7 @@ router.get("/buscar", async (req, res) => {
 
   try {
     const orderBy = {};
-    orderBy["creado_en"] = "desc";
+    orderBy["creadoEn"] = "desc";
 
     const usuarios = await prisma.usuario.findMany({
       where: {

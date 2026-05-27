@@ -18,7 +18,7 @@ export async function registerUser({
       apellido,
       email,
       password,
-      ["usuario_rol"]: usuarioRol,
+      usuarioRol: usuarioRol,
     });
     return response.data;
   } catch (error) {

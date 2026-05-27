@@ -5,7 +5,7 @@ import {esCorreoValido, esContrasenaValida, normalizeRut} from "./lib/validacion
 
 const router = express.Router();
 
-const ALLOWED_ROLES = ["ESTUDIANTE", "AYUDANTE", "PROFESOR","ADMINISTRADOR" ];
+const allowedRoles = ["ESTUDIANTE", "AYUDANTE", "PROFESOR","ADMINISTRADOR" ];
 
 
 
@@ -13,6 +13,7 @@ function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString("hex");
   const hashed = crypto.scryptSync(password, salt, 64).toString("hex");
   return `${salt}:${hashed}`;
+  
 }
 
 function normalizeRole(role) {
@@ -21,7 +22,7 @@ function normalizeRole(role) {
   }
 
   const normalized = String(role).trim().toUpperCase();
-  return ALLOWED_ROLES.includes(normalized) ? normalized : null;
+  return allowedRoles.includes(normalized) ? normalized : null;
 }
 
 router.post("/registro", async (req, res) => {
@@ -33,7 +34,7 @@ router.post("/registro", async (req, res) => {
     password,
   } = req.body;
 
-  const roleFromBody = req.body.usuario_rol;
+  const roleFromBody = req.body.usuarioRol;
 
   if (!rut || !nombre || !apellido || !email || !password) {
     return res.status(400).json({
@@ -62,7 +63,7 @@ router.post("/registro", async (req, res) => {
 
   if (!role) {
     return res.status(400).json({
-      error: "usuario_rol invalido. Usa ESTUDIANTE, AYUDANTE o PROFESOR.",
+      error: "usuarioRol invalido. Usa ESTUDIANTE, AYUDANTE o PROFESOR.",
     });
   }
 
@@ -92,7 +93,7 @@ router.post("/registro", async (req, res) => {
         apellido: String(apellido).trim(),
         email: cleanEmail,
         password: hashPassword(cleanPassword),
-        ["usuario_rol"]: role,
+        usuarioRol: role,
       },
       select: {
         id: true,
@@ -100,8 +101,8 @@ router.post("/registro", async (req, res) => {
         nombre: true,
         apellido: true,
         email: true,
-        ["usuario_rol"]: true,
-        ["creado_en"]: true,
+        usuarioRol: true,
+        creadoEn: true,
       },
     });
 
