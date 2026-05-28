@@ -46,12 +46,14 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Generate Prisma client
-        run: npm run prisma:generate --workspace backend
+        run: npm run prisma:generate
+        working-directory: proy_constr/backend
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
 
       - name: Aplicar migracion de prisma a la base de datos de prueba
-        run: npx prisma migrate deploy --schema backend/prisma/schema.prisma
+        run: npx prisma migrate deploy
+        working-directory: proy_constr/backend
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
 
