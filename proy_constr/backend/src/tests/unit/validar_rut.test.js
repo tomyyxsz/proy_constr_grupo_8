@@ -1,5 +1,5 @@
 import {describe, it, expect } from "vitest";
-import { normalizeRut } from "../lib/validaciones";
+import { normalizeRut } from "../../lib/validaciones";
 
 describe("validar rut", () => {
     it("valida rut correcto con guion", () => {

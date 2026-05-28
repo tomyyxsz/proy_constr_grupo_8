@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { esContrasenaValida } from "../lib/validaciones";
+import { esContrasenaValida } from "../../lib/validaciones";
 
 describe("validar contraseña", () => {
     it("valida contraseña correcta", () => {
