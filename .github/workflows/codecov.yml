@@ -13,6 +13,20 @@ on:
 jobs:
   coverage:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14.1-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: proy_constr
@@ -33,9 +47,21 @@ jobs:
       - name: Run frontend coverage
         run: npm run coverage
 
-      - name: Upload coverage to Codecov
+      - name: Run backend coverage
+        run: npm run test:coverage --workspace backend
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
+
+      - name: Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           files: ./proy_constr/frontend/coverage/lcov.info
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload backend coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./proy_constr/backend/coverage/lcov.info
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
