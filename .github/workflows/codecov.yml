@@ -49,6 +49,12 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
 
+      - name: Apply Prisma migrations for backend
+        run: npx prisma migrate deploy
+        working-directory: proy_constr/backend
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
+
       - name: Run frontend coverage
         run: npm run coverage
 
