@@ -17,6 +17,11 @@ describe("validar registro en base de datos", () => {
 
     afterAll(async () => {
         await prisma.$disconnect();
+        // eliminar usuario de prueba
+        await prisma.$executeRaw`
+            DELETE FROM "Usuario"
+            WHERE email = ${testEmail}
+        `;
     });
     // formato usuario:
     // rut, nombre, apellido, email, password

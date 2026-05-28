@@ -24,6 +24,11 @@ describe("validar login en base de datos", () => {
 
 	afterAll(async () => {
 		await prisma.$disconnect();
+		// eliminar usuario de prueba
+		await prisma.$executeRaw`
+		  DELETE FROM "Usuario"
+		  WHERE email = ${testEmail}
+		`;
 	});
 
 	it("debería validar el login correctamente", async () => {
