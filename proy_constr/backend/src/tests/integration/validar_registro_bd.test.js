@@ -13,12 +13,9 @@ const testEmail = "<EMAIL>";
 describe("validar registro en base de datos", () => {
     beforeAll(async () => {
         await prisma.$connect();
-        await prisma.$executeRaw`DELETE FROM "Usuario" WHERE email = ${testEmail}`;
     });
 
     afterAll(async () => {
-        // eliminar usuario despues de las pruebas
-        await prisma.$executeRaw`DELETE FROM "Usuario" WHERE email = ${testEmail}`;
         await prisma.$disconnect();
     });
     // formato usuario:
@@ -27,18 +24,18 @@ describe("validar registro en base de datos", () => {
     it("debería crear un nuevo usuario en la base de datos de prueba", async () => {
                 const userId = crypto.randomUUID();
         const nuevoUsuario = {
-                        id: userId,
+            id: userId,
             rut: "12345678-9",
             nombre: "Test",
             apellido: "User",
             email: testEmail,
-                        password: "password123",
-                        usuarioRol: "ESTUDIANTE",
+            password: "password123",
+            usuarioRol: "ESTUDIANTE",
         };
 
-                await prisma.$executeRaw`
-                    INSERT INTO "Usuario" (id, rut, nombre, apellido, email, password, usuario_rol, creado_en, actualizado_en)
-                    VALUES (${nuevoUsuario.id}::uuid, ${nuevoUsuario.rut}, ${nuevoUsuario.nombre}, ${nuevoUsuario.apellido}, ${nuevoUsuario.email}, ${nuevoUsuario.password}, ${nuevoUsuario.usuarioRol}::"TipoRol", NOW(), NOW())
+            await prisma.$executeRaw`
+                INSERT INTO "Usuario" (id, rut, nombre, apellido, email, password, usuario_rol, creado_en, actualizado_en)
+                VALUES (${nuevoUsuario.id}::uuid, ${nuevoUsuario.rut}, ${nuevoUsuario.nombre}, ${nuevoUsuario.apellido}, ${nuevoUsuario.email}, ${nuevoUsuario.password}, ${nuevoUsuario.usuarioRol}::"TipoRol", NOW(), NOW())
                 `;
 
                 const rows = await prisma.$queryRaw`

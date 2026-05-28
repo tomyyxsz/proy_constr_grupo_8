@@ -14,7 +14,6 @@ const testEmail = "test_login@example.com";
 describe("validar login en base de datos", () => {
 	beforeAll(async () => {
 		await prisma.$connect();
-		await prisma.$executeRaw`DELETE FROM "Usuario" WHERE email = ${testEmail}`;
 
 		// crear usuario de prueba para validar login
 		await prisma.$executeRaw`
@@ -24,8 +23,6 @@ describe("validar login en base de datos", () => {
 	});
 
 	afterAll(async () => {
-		// eliminar usuario despues de las pruebas
-		await prisma.$executeRaw`DELETE FROM "Usuario" WHERE email = ${testEmail}`;
 		await prisma.$disconnect();
 	});
 
