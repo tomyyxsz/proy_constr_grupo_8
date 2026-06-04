@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:unit": "vitest run tests/unit",
     "test:coverage": "vitest run --coverage",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
