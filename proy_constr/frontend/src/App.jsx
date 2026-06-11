@@ -22,7 +22,7 @@ function App() {
       id: usuarioAutenticado.id,
       email: usuarioAutenticado.email,
       name: usuarioAutenticado.nombre,
-      role: usuarioAutenticado['usuario_rol'],
+      role: usuarioAutenticado['usuarioRol'],
     })
     setCurrentPage('home')
   }
@@ -32,7 +32,7 @@ function App() {
       id: usuarioRegistrado.id,
       email: usuarioRegistrado.email,
       name: usuarioRegistrado.nombre,
-      role: usuarioRegistrado['usuario_rol'],
+      role: usuarioRegistrado['usuarioRol'],
     })
     setCurrentPage('home')
   }

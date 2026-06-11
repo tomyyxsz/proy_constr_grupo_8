@@ -1,0 +1,304 @@
+.slide-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 0;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: width 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 0.5px solid var(--border);
+  background: var(--surface);
+  z-index: 1000;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.05);
+}
+
+.slide-panel.open {
+  width: 360px;
+}
+
+.slide-panel__inner {
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.slide-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--surface);
+  background: #c53333; 
+}
+
+.slide-panel__header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.slide-panel__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.slide-panel__close:hover {
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.slide-panel__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #ffffff; /* Un verde claro que combina con el éxito */
+}
+
+.slide-panel__section-label {
+  margin: 12px 0 -4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* Campos del formulario dentro del panel */
+.slide-panel__body .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.slide-panel__body .form-group label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.slide-panel__body .form-group input,
+.slide-panel__body .form-group select,
+.slide-panel__body .form-group textarea {
+  font-size: 0.88rem;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  color: var(--text-primary);
+  font-family: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.slide-panel__body .form-group input:focus,
+.slide-panel__body .form-group select:focus,
+.slide-panel__body .form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent-student);
+  box-shadow: 0 0 0 3px rgba(15, 110, 86, 0.12);
+}
+
+.slide-panel__body .form-group textarea {
+  min-height: 72px;
+  resize: vertical;
+}
+
+/* Fila de colores */
+.slide-panel__colors {
+  display: flex;
+  gap: 10px;
+}
+
+.slide-panel__color-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.slide-panel__color-item label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.slide-panel__color-item input[type="color"] {
+  width: 100%;
+  height: 38px;
+  padding: 2px 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  cursor: pointer;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.slide-panel__color-item input[type="color"]:focus {
+  outline: none;
+  border-color: var(--accent-student);
+}
+
+/* Error */
+.slide-panel__error {
+  padding: 10px 12px;
+  background: var(--status-rejected-bg);
+  border-left: 3px solid var(--status-rejected-text);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 0.85rem;
+  color: var(--status-rejected-text);
+}
+
+/* Footer con botones: se mantiene completamente estático al fondo */
+.slide-panel__footer {
+  display: flex;
+  gap: 8px;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+  background: #d7574b;
+}
+
+.slide-panel__footer .btn-cancel {
+  flex: 1;
+  padding: 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-family: inherit;
+  transition: background-color 0.15s;
+}
+
+.slide-panel__footer .btn-cancel:hover {
+  background: var(--surface-muted);
+  background: #ff0000; 
+}
+
+.slide-panel__footer .btn-submit {
+  flex: 2;
+  padding: 9px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent-student);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 500;
+  font-family: inherit;
+  transition: background-color 0.15s, transform 0.1s;
+}
+
+.slide-panel__footer .btn-submit:hover  { background: #085041; }
+.slide-panel__footer .btn-submit:active { transform: scale(0.98); }
+.slide-panel__footer .btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Éxito */
+.slide-panel__success {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 2rem;
+  text-align: center;
+  background: #e8f5e9; /* Un verde claro que combina con el éxito */
+}
+
+.slide-panel__success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent-student);
+  color: #fff;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.slide-panel__success p {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.slide-panel__success code {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--surface-muted);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  word-break: break-all;
+  
+}
+
+.slide-panel__hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.slide-panel__required {
+  color: #c62828;
+  margin-left: 2px;
+}
+
+.slide-panel__optional {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  font-weight: 400;
+}
+
+/* Responsive: bottom sheet en móvil */
+@media (max-width: 768px) {
+  .slide-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    width: 100% !important;
+    height: 0;
+    transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: none;
+    border-top: 1px solid var(--border);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .slide-panel.open {
+    width: 100% !important;
+    height: 90vh;
+  }
+
+  .slide-panel__inner {
+    width: 100%;
+  }
+}
