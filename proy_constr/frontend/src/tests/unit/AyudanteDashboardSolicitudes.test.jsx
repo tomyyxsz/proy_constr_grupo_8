@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import AyudanteDashboard from '../../components/dashboard/AyudanteDashboard'
 
 describe('AyudanteDashboard - solicitudes de impresión', () => {
@@ -19,9 +19,9 @@ describe('AyudanteDashboard - solicitudes de impresión', () => {
 
     render(<AyudanteDashboard solicitudes={solicitudes} />)
 
-   //expect(screen.getByRole('button', { name: /Solicitudes de impresión/i })).toBeInTheDocument()
+    //expect(screen.getByRole('button', { name: /Solicitudes de impresión/i })).toBeInTheDocument()
 
-   //fireEvent.click(screen.getByRole('button', { name: /Solicitudes de impresión/i }))
+    //fireEvent.click(screen.getByRole('button', { name: /Solicitudes de impresión/i }))
 
     //expect(screen.getByText(/Solicitudes de impresión/i)).toBeInTheDocument()
     expect(screen.getByText(/Agustin Valderrama/i)).toBeInTheDocument()

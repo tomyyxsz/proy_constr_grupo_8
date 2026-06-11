@@ -36,8 +36,6 @@ export default defineConfig([
       globals: {
         ...globals.jest,
       },
-      files: ['**/SolicitudImpresionForm.jsx'],
-      rules: { 'max-lines': 'off' }
     },
   },
 ])
