@@ -6,7 +6,7 @@ import './Dashboard.css'
 
 function StudentDashboard({ user }) {
   const [showSolicitudForm, setShowSolicitudForm] = useState(false)
-  const [showMisSolicitudes, setShowMisSolicitudes] = useState(false)
+
 
   const handleSolicitudSuccess = () => {
     console.log('Solicitud enviada exitosamente')
@@ -29,7 +29,7 @@ function StudentDashboard({ user }) {
             iconClass="icon-estudiante"
             title="Mis solicitudes"
             description="Revisa el estado de tus solicitudes"
-            onClick={() => setShowMisSolicitudes(true)}
+            onClick={() => {}}
           />
           <ActionCard
             icon="ti-school"
@@ -48,13 +48,6 @@ function StudentDashboard({ user }) {
         onClose={() => setShowSolicitudForm(false)}
         onSuccess={handleSolicitudSuccess}
       />
-
-      {showMisSolicitudes && (
-        <MisSolicitudesModal
-          user={user}
-          onClose={() => setShowMisSolicitudes(false)}
-        />
-      )}
     </div>
   )
 }

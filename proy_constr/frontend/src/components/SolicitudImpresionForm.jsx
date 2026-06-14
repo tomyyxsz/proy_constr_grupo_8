@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { crearSolicitudImpresion } from '../api/ApiSolicitudImpresion'
 import './SolicitudImpresionForm.css'
 
+
+// Componente para el formulario de solicitud de impresión, utilizado en el dashboard del estudiante
 function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     color1: '#000000',
@@ -16,7 +18,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [exito, setExito] = useState(null)
-
+  //maneja cambios en el formularo 
   const handleChange = (e) => {
     const { name, value } = e.target
     if (name === 'tipoSolicitud' && value === 'PERSONAL') {
@@ -25,7 +27,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
       setFormData(prev => ({ ...prev, [name]: value }))
     }
   }
-
+  //validamos que los campos esten completos y tengan un formato correcto 
   const validar = () => {
     if (!formData.urlModelo3d || !formData.urlModeloStl) {
       return 'Debes ingresar las URLs del modelo 3D y el archivo STL.'
@@ -179,7 +181,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
               </div>
             </form>
 
-            {/* El footer queda fuera del formulario para mantenerse siempre visible abajo */}
+  
             <div className="slide-panel__footer">
               <button type="button" className="btn-cancel" onClick={onClose}>Cancelar</button>
               <button type="submit" form="solicitud-form" className="btn-submit" disabled={loading}>
