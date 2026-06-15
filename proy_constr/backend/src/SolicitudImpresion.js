@@ -86,7 +86,6 @@ router.post("/crear", async (req, res) => {
     }
 
     let cursoRef = "5eb68c60-f502-4be8-9276-f706c33d31bc";
-    let cursoNombre = "Particular / Personal";
 
     // si la solicitud es academica, se debe verificar que el estudiante esta inscrito en ese curso
     if (tipoSolicitud === "ACADEMICA") {
@@ -120,15 +119,13 @@ router.post("/crear", async (req, res) => {
         solicitanteApellido: estudiante.apellido,
         solicitanteEmail: estudiante.email,
         solicitanteRut: estudiante.rut,
-        //refEstudiante: idEstudiante,
-        estudiante: {
-          connect: { id: idEstudiante }
-        },
-        curso: cursoRef ? { connect: { idCurso: cursoRef } } : undefined,
+
+        refEstudiante: idEstudiante,
+        refAyudante: null,
         tipoUsuario: "ESTUDIANTE",
         tipoSolicitud: tipoSolicitud,
-        nombreCurso: cursoNombre,
-        //refCurso: cursoRef,
+        nombreCurso: cursoRef.nombreCurso,
+        refCurso: cursoRef,
         colorOpcion1: color1,
         colorOpcion2: color2,
         colorOpcion3: color3,
