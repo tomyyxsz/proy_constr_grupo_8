@@ -85,20 +85,19 @@ router.post("/crear", async (req, res) => {
       });
     }
 
-    let cursoRef = null;
+    let cursoRef = "5eb68c60-f502-4be8-9276-f706c33d31bc";
+
     // si la solicitud es academica, se debe verificar que el estudiante esta inscrito en ese curso
     if (tipoSolicitud === "ACADEMICA") {
-      const inscripcion = await prisma.estudiante_curso.findUnique({
+      const inscripcion = await prisma.EstudianteCurso.findFirst({
         where: {
-          ["ref_Curso_ref_Estudiante"]: {
-            ["ref_Curso"]: refCurso,
-            ["ref_Estudiante"]: idEstudiante,
-          },
+          refCurso,
+          refEstudiante: idEstudiante,
         },
         include: {
           curso: {
             select: {
-              ["nombre_curso"]: true,
+              nombreCurso: true,
             },
           },
         },
@@ -116,30 +115,40 @@ router.post("/crear", async (req, res) => {
     // crear la impresion, estado inicial = "creado"
     const impresion = await prisma.impresion.create({
       data: {
-        ["solicitante_nombre"]: estudiante.nombre,
-        ["solicitante_apellido"]: estudiante.apellido,
-        ["solicitante_email"]: estudiante.email,
-        ["solicitante_rut"]: estudiante.rut,
-        ["ref_estudiante"]: idEstudiante,
-        ["ref_ayudante"]: null,
-        ["tipo_usuario"]: "ESTUDIANTE",
-        ["tipo_solicitud"]: tipoSolicitud,
-        ["ref_curso"]: cursoRef,
-        ["color_opcion1"]: color1,
-        ["color_opcion2"]: color2,
-        ["color_opcion3"]: color3,
-        ["comentario_usuario"]: comentario || null,
-        ["url_modelo_3d"]: urlModelo3d,
-        ["url_modelo_stl"]: urlModeloStl,
-        ["estado_impresion"]: "CREADO",
+        solicitanteNombre: estudiante.nombre,
+        solicitanteApellido: estudiante.apellido,
+        solicitanteEmail: estudiante.email,
+        solicitanteRut: estudiante.rut,
+
+        refEstudiante: idEstudiante,
+        refAyudante: null,
+        tipoUsuario: "ESTUDIANTE",
+        tipoSolicitud: tipoSolicitud,
+        nombreCurso: cursoRef.nombreCurso,
+        refCurso: cursoRef,
+        colorOpcion1: color1,
+        colorOpcion2: color2,
+        colorOpcion3: color3,
+        comentarioUsuario: comentario || null,
+        urlModelo3d: urlModelo3d,
+        urlModeloStl: urlModeloStl,
+        estadoImpresion: "PENDIENTE",
+        comentarioTecnico: "",
+        observacionAyudante: "",
+        tiempoEstimadoImpresion: "10 minutos",
+        ayudante: {
+          connect: {id : "da04e451-c392-4586-af69-cbba92d819a5"}
+        },
+        
+        
       },
       select: {
-        ["id_impresion"]: true,
-        ["solicitante_nombre"]: true,
-        ["solicitante_email"]: true,
-        ["tipo_solicitud"]: true,
-        ["estado_impresion"]: true,
-        ["creado_en"]: true,
+        idImpresion: true,
+        solicitanteNombre: true,
+        solicitanteEmail: true,
+        tipoSolicitud: true,
+        estadoImpresion: true,
+        creadoEn: true,
       },
     });
 
@@ -150,6 +159,111 @@ router.post("/crear", async (req, res) => {
   } catch (error) {
     console.error("Error al crear solicitud de impresión:", error);
     res.status(500).json({ error: "Error interno al crear solicitud." });
+  }
+});
+
+router.get("/estudiante/:idEstudiante", async (req, res) => {
+  const { idEstudiante } = req.params;
+
+  try {
+    // Buscar todas las solicitudes del estudiante
+    const solicitudes = await prisma.impresion.findMany({
+      where: {
+        refEstudiante: idEstudiante,
+      },
+      select: {
+        idImpresion: true,
+        solicitanteNombre: true,
+        solicitanteApellido: true,
+        solicitanteEmail: true,
+        solicitanteRut: true,
+        tipoSolicitud: true,
+        tipoUsuario: true,
+        nombreCurso: true,
+        colorOpcion1: true,
+        colorOpcion2: true,
+        colorOpcion3: true,
+        comentarioUsuario: true,
+        urlModelo3d: true,
+        urlModeloStl: true,
+        estadoImpresion: true,
+        observacionAyudante: true,
+        motivoRechazo: true,
+        tiempoEstimadoImpresion: true,
+        inicioImpresion: true,
+        creadoEn: true,
+      },
+      orderBy: {
+        creadoEn: "desc",
+      },
+    });
+
+    if (solicitudes.length === 0) {
+      return res.status(200).json({
+        message: "El estudiante no tiene solicitudes de impresión.",
+        solicitudes: [],
+      });
+    }
+
+    res.status(200).json({
+      message: "Solicitudes obtenidas correctamente.",
+      solicitudes,
+    });
+  } catch (error) {
+    console.error("Error al obtener solicitudes del estudiante:", error);
+    res.status(500).json({
+      error: "Error interno al obtener solicitudes.",
+    });
+  }
+});
+
+router.get("/", async (req, res) => {
+  try {
+    // Buscar todas las solicitudes de impresión
+    const solicitudes = await prisma.impresion.findMany({
+      select: {
+        idImpresion: true,
+        solicitanteNombre: true,
+        solicitanteApellido: true,
+        solicitanteEmail: true,
+        solicitanteRut: true,
+        tipoSolicitud: true,
+        tipoUsuario: true,
+        nombreCurso: true,
+        colorOpcion1: true,
+        colorOpcion2: true,
+        colorOpcion3: true,
+        comentarioUsuario: true,
+        urlModelo3d: true,
+        urlModeloStl: true,
+        estadoImpresion: true,
+        observacionAyudante: true,
+        motivoRechazo: true,
+        tiempoEstimadoImpresion: true,
+        inicioImpresion: true,
+        creadoEn: true,
+      },
+      orderBy: {
+        creadoEn: "desc",
+      },
+    });
+
+    if (solicitudes.length === 0) {
+      return res.status(200).json({
+        message: "No hay solicitudes de impresión.",
+        solicitudes: [],
+      });
+    }
+
+    res.status(200).json({
+      message: "Solicitudes obtenidas correctamente.",
+      solicitudes,
+    });
+  } catch (error) {
+    console.error("Error al obtener todas las solicitudes:", error);
+    res.status(500).json({
+      error: "Error interno al obtener solicitudes.",
+    });
   }
 });
 

@@ -45,7 +45,7 @@ router.post("/login", async (req, res) => { // ruta POST /login para iniciar ses
         nombre: true,
         apellido: true,
         email: true,
-        "usuario_rol": true,
+        usuarioRol: true,
         password: true,
       },
     });
@@ -69,7 +69,7 @@ router.post("/login", async (req, res) => { // ruta POST /login para iniciar ses
         nombre: user.nombre,
         apellido: user.apellido,
         email: user.email,
-        "usuario_rol": user.usuario_rol,
+        usuarioRol: user.usuarioRol,
       },
     });
   } catch (error) {

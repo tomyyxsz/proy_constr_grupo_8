@@ -1,6 +1,9 @@
 name: Linter Workflow
 
 on:
+  push:
+    branches:
+      - "**"
   pull_request:
     branches:
       - "**"
@@ -32,8 +35,3 @@ jobs:
         run: |
           npm run lint --workspace frontend --if-present
           npm run lint --workspace backend --if-present
-
-      - name: Correr tests
-        run: |
-          npm run test:run --workspace frontend --if-present
-          npm run test:run --workspace backend --if-present

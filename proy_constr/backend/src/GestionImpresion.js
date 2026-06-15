@@ -12,28 +12,28 @@ router.get("/", async (req, res) => {
   const where = {};
 
   if (estado) {
-    where["estado_impresion"] = estado.toUpperCase();
+    where.estadoImpresion = estado.toUpperCase();
   }
 
   if (idAyudante) {
-    where["ref_ayudante"] = idAyudante;
+    where.refAyudante = idAyudante;
   }
 
   try {
     const impresiones = await prisma.impresion.findMany({
       where,
       select: {
-        ["id_impresion"]: true,
-        ["solicitante_nombre"]: true,
-        ["solicitante_email"]: true,
-        ["tipo_solicitud"]: true,
-        ["estado_impresion"]: true,
-        ["ref_ayudante"]: true,
-        ["creado_en"]: true,
-        ["actualizado_en"]: true,
+        idImpresion: true,
+        solicitanteNombre: true,
+        solicitanteEmail: true,
+        tipoSolicitud: true,
+        estadoImpresion: true,
+        refAyudante: true,
+        creadoEn: true,
+        actualizadoEn: true,
       },
       orderBy: {
-        ["creado_en"]: "desc",
+        creadoEn: "desc",
       },
     });
 
@@ -51,7 +51,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const impresion = await prisma.impresion.findUnique({
-      where: { ["id_impresion"]: req.params.id },
+      where: { idImpresion: req.params.id },
       include: {
         estudiante: {
           select: {
@@ -100,7 +100,7 @@ router.put("/:id/aprobar", async (req, res) => {
 
     // Verificar que la impresión existe
     const impresion = await prisma.impresion.findUnique({
-      where: { ["id_impresion"]: req.params.id },
+      where: { idImpresion: req.params.id },
     });
 
     if (!impresion) {
@@ -109,7 +109,7 @@ router.put("/:id/aprobar", async (req, res) => {
       });
     }
 
-    if (impresion["estado_impresion"] !== "CREADO") {
+    if (impresion.estadoImpresion !== "CREADO") {
       return res.status(400).json({
         error: "Solo se pueden aprobar impresiones en estado CREADO.",
       });
@@ -117,18 +117,18 @@ router.put("/:id/aprobar", async (req, res) => {
 
     // Actualizar impresión
     const impresionActualizada = await prisma.impresion.update({
-      where: { ["id_impresion"]: req.params.id },
+      where: { idImpresion: req.params.id },
       data: {
-        ["estado_impresion"]: "APROBADO",
-        ["ref_ayudante"]: idAyudante,
-        ["observacion_ayudante"]: observacion || null,
+        estadoImpresion: "APROBADO",
+        refAyudante: idAyudante,
+        observacionAyudante: observacion || null,
       },
       select: {
-        ["id_impresion"]: true,
-        ["estado_impresion"]: true,
-        ["ref_ayudante"]: true,
-        ["observacion_ayudante"]: true,
-        ["actualizado_en"]: true,
+        idImpresion: true,
+        estadoImpresion: true,
+        refAyudante: true,
+        observacionAyudante: true,
+        actualizadoEn: true,
       },
     });
 
@@ -166,7 +166,7 @@ router.put("/:id/rechazar", async (req, res) => {
 
     // Verificar que la impresión existe
     const impresion = await prisma.impresion.findUnique({
-      where: { ["id_impresion"]: req.params.id },
+      where: { idImpresion: req.params.id },
     });
 
     if (!impresion) {
@@ -175,7 +175,7 @@ router.put("/:id/rechazar", async (req, res) => {
       });
     }
 
-    if (impresion["estado_impresion"] !== "CREADO") {
+    if (impresion.estadoImpresion !== "CREADO") {
       return res.status(400).json({
         error: "Solo se pueden rechazar impresiones en estado CREADO.",
       });
@@ -183,18 +183,18 @@ router.put("/:id/rechazar", async (req, res) => {
 
     // Actualizar impresión
     const impresionActualizada = await prisma.impresion.update({
-      where: { ["id_impresion"]: req.params.id },
+      where: { idImpresion: req.params.id },
       data: {
-        ["estado_impresion"]: "RECHAZADO",
-        ["ref_ayudante"]: idAyudante,
-        ["motivo_rechazo"]: motivo,
+        estadoImpresion: "RECHAZADO",
+        refAyudante: idAyudante,
+        motivoRechazo: motivo,
       },
       select: {
-        ["id_impresion"]: true,
-        ["estado_impresion"]: true,
-        ["ref_ayudante"]: true,
-        ["motivo_rechazo"]: true,
-        ["actualizado_en"]: true,
+        idImpresion: true,
+        estadoImpresion: true,
+        refAyudante: true,
+        motivoRechazo: true,
+        actualizadoEn: true,
       },
     });
 
@@ -221,7 +221,7 @@ router.put("/:id/observaciones", async (req, res) => {
   try {
     // Verificar que la impresión existe
     const impresion = await prisma.impresion.findUnique({
-      where: { ["id_impresion"]: req.params.id },
+      where: { idImpresion: req.params.id },
     });
 
     if (!impresion) {
@@ -232,14 +232,14 @@ router.put("/:id/observaciones", async (req, res) => {
 
     // Actualizar impresión
     const impresionActualizada = await prisma.impresion.update({
-      where: { ["id_impresion"]: req.params.id },
+      where: { idImpresion: req.params.id },
       data: {
-        ["observacion_ayudante"]: observacion,
+        observacionAyudante: observacion,
       },
       select: {
-        ["id_impresion"]: true,
-        ["observacion_ayudante"]: true,
-        ["actualizado_en"]: true,
+        idImpresion: true,
+        observacionAyudante: true,
+        actualizadoEn: true,
       },
     });
 

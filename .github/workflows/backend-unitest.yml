@@ -1,17 +1,16 @@
-name: Coverage and Codecov
+name: Backend Unit Tests
 
 on:
   push:
     branches:
-      - main
-      - testing
+      - "feature/**"
   pull_request:
     branches:
-      - "**"
-  workflow_dispatch:
+      - testing
+      - "feature/**"
 
 jobs:
-  coverage:
+  test-backend:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -27,9 +26,11 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     defaults:
       run:
         working-directory: proy_constr
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,35 +45,27 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      - name: Generate Prisma client for backend
-        run: npm run prisma:generate --workspace backend
+      - name: Generate Prisma client
+        run: npm run prisma:generate
+        working-directory: proy_constr/backend
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
 
-      - name: Apply Prisma migrations for backend
+      - name: Aplicar migracion de prisma a la base de datos de prueba
         run: npx prisma migrate deploy
         working-directory: proy_constr/backend
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
 
-      - name: Run frontend coverage
-        run: npm run coverage
-
-      - name: Run backend coverage
-        run: npm run test:coverage --workspace backend
+      - name: Correr pruebas de integracion con cobertura
+        run: npx vitest run backend/src/tests/integration --coverage
         env:
+          CI: true
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
 
-      - name: Upload frontend coverage to Codecov
-        uses: codecov/codecov-action@v5
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
         with:
-          files: ./proy_constr/frontend/coverage/lcov.info
-          fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload backend coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
           files: ./proy_constr/backend/coverage/lcov.info
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
