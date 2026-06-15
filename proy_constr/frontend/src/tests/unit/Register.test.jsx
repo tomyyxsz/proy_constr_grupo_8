@@ -8,6 +8,7 @@ vi.mock('../../api/ApiRegistro', () => ({
   registerUser: vi.fn(),
 }))
 
+// Mock de useNavigate para evitar errores de navegación en los tests
 describe('Register', () => {
   const onRegister = vi.fn()
   const onLoginClick = vi.fn()
@@ -16,6 +17,7 @@ describe('Register', () => {
     vi.clearAllMocks()
   })
 
+  // Test para verificar que el componente se renderiza correctamente
   it('sanitiza el RUT al escribir caracteres no permitidos', () => {
     render(<Register onRegister={onRegister} onLoginClick={onLoginClick} />)
 
@@ -25,6 +27,7 @@ describe('Register', () => {
     expect(rutInput).toHaveValue('12345678-K')
   })
 
+// Test para verificar que se muestra un error al enviar el formulario incompleto
   it('muestra un error cuando se envía el formulario incompleto', () => {
     render(<Register onRegister={onRegister} onLoginClick={onLoginClick} />)
 
@@ -34,6 +37,7 @@ describe('Register', () => {
     expect(onRegister).not.toHaveBeenCalled()
   })
 
+  // Test para verificar que se muestra un error cuando las contraseñas no coinciden
   it('permite mostrar y ocultar la contraseña', () => {
     render(<Register onRegister={onRegister} onLoginClick={onLoginClick} />)
 
