@@ -17,18 +17,21 @@ describe("validar login en base de datos", () => {
 
 		// crear usuario de prueba para validar login
 		await prisma.$executeRaw`
-		  INSERT INTO "Usuario" (id, rut, nombre, apellido, email, password, usuario_rol, creado_en, actualizado_en)
+		  INSERT INTO "Usuario" (id, rut, nombre, apellido, email, password, "usuarioRol", "creadoEn", "actualizadoEn")
 		  VALUES (${crypto.randomUUID()}::uuid, ${"22345678-5"}, ${"Test"}, ${"User"}, ${testEmail}, ${"password123"}, ${"ESTUDIANTE"}::"TipoRol", NOW(), NOW())
 		`;
+
+	
 	});
 
 	afterAll(async () => {
 		await prisma.$disconnect();
 		// eliminar usuario de prueba
+		/*q
 		await prisma.$executeRaw`
 		  DELETE FROM "Usuario"
 		  WHERE email = ${testEmail}
-		`;
+		`; */
 	});
 
 	it("debería validar el login correctamente", async () => {

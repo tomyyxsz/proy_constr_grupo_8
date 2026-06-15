@@ -39,7 +39,7 @@ describe("validar registro en base de datos", () => {
         };
 
             await prisma.$executeRaw`
-                INSERT INTO "Usuario" (id, rut, nombre, apellido, email, password, usuario_rol, creado_en, actualizado_en)
+                INSERT INTO "Usuario" (id, rut, nombre, apellido, email, password, "usuarioRol", "creadoEn", "actualizadoEn")
                 VALUES (${nuevoUsuario.id}::uuid, ${nuevoUsuario.rut}, ${nuevoUsuario.nombre}, ${nuevoUsuario.apellido}, ${nuevoUsuario.email}, ${nuevoUsuario.password}, ${nuevoUsuario.usuarioRol}::"TipoRol", NOW(), NOW())
                 `;
 

@@ -56,6 +56,8 @@ const { prisma } = await import("../../lib/prisma.js");
 describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
   beforeAll(async () => {
     await prisma.$connect();
+    // antes de comenzar crear un usuario en la base de datos luego usarlo
+    // para ejecutar las pruebas
   });
 
   afterAll(async () => {
@@ -65,9 +67,9 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
   it("debería crear una solicitud de impresión correctamente en la base de datos", async () => {
 
     // datos de prueba
-    const idEstudiante = "some-existing-uuid"; // reemplazar con un UUID válido de un estudiante existente en la base de datos
+    const idEstudiante = "f630ca7c-fb87-4281-bf87-b9cb0cdea471"; // reemplazar con un UUID válido de un estudiante existente en la base de datos
     const tipoSolicitud = "ACADEMICA";
-    const refCurso = "some-existing-curso-id"; // reemplazar con un ID válido de un curso existente en la base de datos
+    const refCurso = "2ffe8279-fbaf-4568-a9e6-59b39eab9883"; // reemplazar con un ID válido de un curso existente en la base de datos
     const urlModelo3d = "http://example.com/modelo3d.obj";
     const urlModeloStl = "http://example.com/modelo.stl";
 
@@ -75,42 +77,49 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
     const impresion = await prisma.impresion.create({
       data: {
         solicitanteNombre: "Test",
-        solicitanteApellido: "User",
-        solicitanteEmail: "<EMAIL>",
-        solicitanteRut: "12345678-9",
-        refEstudiante: idEstudiante,
-        refAyudante: null,
-        tipoUsuario: "ESTUDIANTE",
-        tipoSolicitud: tipoSolicitud,
-        nombreCurso: "Curso de Prueba",
-        refCurso: refCurso,
-        colorOpcion1: "Rojo",
-        colorOpcion2: "Verde",
-        colorOpcion3: "Azul",
-        comentarioUsuario: "Por favor imprimir con alta calidad.",
-        comentarioTecnico: null,
-        urlModelo3d: urlModelo3d,
-        urlModeloStl: urlModeloStl,
-        estado: "CREADO",
-        observacionAyudante: null,
-        motivoRechazo: null,
-        tiempoEstimadoImpresion: "2 horas",
-        inicioImpresion: null,
+        solicitanteApellido: "Integraciom",
+        solicitanteEmail: "integration@email.com",
+        solicitanteRut: "21857836-5",
         estudiante: {
           connect: { id: idEstudiante },
         },
-        curso: {
-          connect: { idCurso: refCurso },
+        ayudante: {
+          connect: { id: "354353d5-3a6c-42da-85a0-21919457a960" },
         },
-        ayudante: { connect: null },
+        curso: {
+          connect: { idCurso: refCurso},
+        },
+        nombreCurso: "Personal",
+        tipoUsuario: "ESTUDIANTE",
+        tipoSolicitud: tipoSolicitud,
+        nombreCurso: "Personal",
+        colorOpcion1: "#00000",
+        colorOpcion2: "#00000",
+        colorOpcion3: "#00000",
+        comentarioTecnico : "",
+        comentarioUsuario: "Por favor imprimir con alta calidad." || null,
+        observacionAyudante:"",
+        urlModelo3d: urlModelo3d,
+        urlModeloStl: urlModeloStl,
+        estadoImpresion: "PENDIENTE",
+        tiempoEstimadoImpresion:"10 minutos"
+        
+      },
+      select: {
+        idImpresion: true,
+        solicitanteNombre: true,
+        solicitanteEmail: true,
+        tipoSolicitud: true,
+        estadoImpresion: true,
+        creadoEn: true,
       },
     });
 
     expect(impresion).toHaveProperty("idImpresion");
     expect(impresion.solicitanteNombre).toBe("Test");
-    expect(impresion.solicitanteEmail).toBe("<EMAIL>");
+    expect(impresion.solicitanteEmail).toBe("integration@email.com");
     expect(impresion.tipoSolicitud).toBe(tipoSolicitud);
-    expect(impresion.estado).toBe("CREADO");
+    expect(impresion.estadoImpresion).toBe("PENDIENTE");
     expect(impresion.urlModelo3d).toBe(urlModelo3d);
     expect(impresion.urlModeloStl).toBe(urlModeloStl);
     expect(impresion.refEstudiante).toBe(idEstudiante);
@@ -120,8 +129,8 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
     expect(impresion.colorOpcion2).toBe("Verde");
     expect(impresion.colorOpcion3).toBe("Azul");
     expect(impresion.comentarioUsuario).toBe("Por favor imprimir con alta calidad.");
-    expect(impresion.comentarioTecnico).toBeNull();
-    expect(impresion.observacionAyudante).toBeNull();
+    expect(impresion.comentarioTecnico).toBe("");
+    expect(impresion.observacionAyudante).toBe("");
     expect(impresion.motivoRechazo).toBeNull();
     expect(impresion.tiempoEstimadoImpresion).toBe("2 horas");
     expect(impresion.inicioImpresion).toBeNull();
