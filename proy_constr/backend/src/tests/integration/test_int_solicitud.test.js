@@ -56,89 +56,154 @@ const { prisma } = await import("../../lib/prisma.js");
 describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
   beforeAll(async () => {
     await prisma.$connect();
-    // antes de comenzar crear un usuario en la base de datos luego usarlo
+    // antes de comenzar crear datos de prueba en la base de datos
+    // usuario estudiante, usuario ayudante, usuario profesor, semestre y curso
     // para ejecutar las pruebas
+    await prisma.usuario.create({
+      data: {
+        nombre: "Test", apellido: "Integracion", email: "usuariotest@example.com", rut: "21748641-6",
+        usuarioRol: "ESTUDIANTE",
+        password: "password123",
+      },
+    });
+
+    await prisma.usuario.create({
+      data: {
+        nombre: "Ayudante", apellido: "Integracion", email: "ayutest@example.com", rut: "21748641-7",
+        usuarioRol: "AYUDANTE",
+        password: "password123",
+      },
+    });
+
+    await prisma.usuario.create({
+      data: {
+        nombre: "Profesor", apellido: "Integracion", email: "proftest@example.com", rut: "21748641-8",
+        usuarioRol: "PROFESOR",
+        password: "password123",
+      },
+    });
+
+    await prisma.semestre.create({
+      // semestre tiene anio,periodo,fechainicio,fechafin,estadosemestre.
+      data: {
+        anio: 2024, periodo: 2, fechaInicio: new Date("2024-08-01"), fechaFin: new Date("2024-12-31"), estadoSemestre: "ACTIVO",
+      },
+    });
+
+    const semestre = await prisma.semestre.findFirst({
+      where: { anio: 2024, periodo: 2 },
+    });
+    const idSemestre = semestre.idSemestre;
+
+    const profesor = await prisma.usuario.findUnique({
+      where: { email: "proftest@example.com" },
+    });
+    const idProfesor = profesor.id;
+    await prisma.curso.create({
+      // curso tiene nombreCurso, refSemestre, refProfesor.
+      data: {
+        nombreCurso: "Curso de Prueba", refSemestre: idSemestre, refProfesor: idProfesor,
+      },
+    });
   });
 
   afterAll(async () => {
+    await prisma.impresion.deleteMany ({
+      where : { solicitanteEmail: "usuariotest@example.com" },
+    });
+    await prisma.usuario.deleteMany({
+      where: { email: "usuariotest@example.com" },
+    });
+    await prisma.curso.deleteMany({
+      where: { nombreCurso: "Curso de Prueba" },
+    });
+    await prisma.usuario.deleteMany({
+      where: { email: "ayutest@example.com" },
+    });
+    await prisma.usuario.deleteMany({
+      where: { email: "proftest@example.com" },
+    });
+    await prisma.semestre.deleteMany({
+      where: { anio: 2024, periodo: 2 },
+    });
+
     await prisma.$disconnect();
   });
 
   it("debería crear una solicitud de impresión correctamente en la base de datos", async () => {
+    // datos de prueba sacados de la base de datos
+    const usuarioTest = await prisma.usuario.findUnique({
+      where: { email: "usuariotest@example.com" },
+    });
+    const idEstudiante = usuarioTest.id;
 
-    // datos de prueba
-    const idEstudiante = "f630ca7c-fb87-4281-bf87-b9cb0cdea471"; // reemplazar con un UUID válido de un estudiante existente en la base de datos
+    const cursoTest = await prisma.curso.findFirst({
+      where: { nombreCurso: "Curso de Prueba" },
+    });
+    const idCurso = cursoTest.idCurso;
+
+    const ayudanteTest = await prisma.usuario.findUnique({
+      where: { email: "ayutest@example.com" },
+    });
+    const idAyudante = ayudanteTest.id;
+
+    // otros datos
     const tipoSolicitud = "ACADEMICA";
-    const refCurso = "2ffe8279-fbaf-4568-a9e6-59b39eab9883"; // reemplazar con un ID válido de un curso existente en la base de datos
-    const urlModelo3d = "http://example.com/modelo3d.obj";
-    const urlModeloStl = "http://example.com/modelo.stl";
 
     // crear la solicitud de impresion
     const impresion = await prisma.impresion.create({
       data: {
-        solicitanteNombre: "Test",
-        solicitanteApellido: "Integraciom",
-        solicitanteEmail: "integration@email.com",
-        solicitanteRut: "21857836-5",
+        solicitanteNombre: usuarioTest.nombre,
+        solicitanteApellido: usuarioTest.apellido,
+        solicitanteEmail: usuarioTest.email,
+        solicitanteRut: usuarioTest.rut,
         estudiante: {
           connect: { id: idEstudiante },
         },
         ayudante: {
-          connect: { id: "354353d5-3a6c-42da-85a0-21919457a960" },
+          connect: { id: idAyudante },
         },
         curso: {
-          connect: { idCurso: refCurso},
+          connect: { idCurso: idCurso },
         },
-        nombreCurso: "Personal",
-        tipoUsuario: "ESTUDIANTE",
+        nombreCurso: "Curso de Prueba",
+        tipoUsuario: usuarioTest.usuarioRol,
         tipoSolicitud: tipoSolicitud,
-        nombreCurso: "Personal",
         colorOpcion1: "#00000",
         colorOpcion2: "#00000",
         colorOpcion3: "#00000",
-        comentarioTecnico : "",
-        comentarioUsuario: "Por favor imprimir con alta calidad." || null,
-        observacionAyudante:"",
-        urlModelo3d: urlModelo3d,
-        urlModeloStl: urlModeloStl,
+        comentarioTecnico: "",
+        comentarioUsuario: "Por favor imprimir con alta calidad.",
+        observacionAyudante: "",
+        urlModelo3d: "http://example.com/modelo3d.obj",
+        urlModeloStl: "http://example.com/modelo.stl",
         estadoImpresion: "PENDIENTE",
-        tiempoEstimadoImpresion:"10 minutos"
-        
-      },
-      select: {
-        idImpresion: true,
-        solicitanteNombre: true,
-        solicitanteEmail: true,
-        tipoSolicitud: true,
-        estadoImpresion: true,
-        creadoEn: true,
+        tiempoEstimadoImpresion: "10 minutos",
       },
     });
 
     expect(impresion).toHaveProperty("idImpresion");
     expect(impresion.solicitanteNombre).toBe("Test");
-    expect(impresion.solicitanteEmail).toBe("integration@email.com");
+    expect(impresion.solicitanteEmail).toBe("usuariotest@example.com");
     expect(impresion.tipoSolicitud).toBe(tipoSolicitud);
     expect(impresion.estadoImpresion).toBe("PENDIENTE");
-    expect(impresion.urlModelo3d).toBe(urlModelo3d);
-    expect(impresion.urlModeloStl).toBe(urlModeloStl);
+    expect(impresion.urlModelo3d).toBe("http://example.com/modelo3d.obj");
+    expect(impresion.urlModeloStl).toBe("http://example.com/modelo.stl");
     expect(impresion.refEstudiante).toBe(idEstudiante);
     expect(impresion.nombreCurso).toBe("Curso de Prueba");
-    expect(impresion.refCurso).toBe(refCurso);
-    expect(impresion.colorOpcion1).toBe("Rojo");
-    expect(impresion.colorOpcion2).toBe("Verde");
-    expect(impresion.colorOpcion3).toBe("Azul");
-    expect(impresion.comentarioUsuario).toBe("Por favor imprimir con alta calidad.");
+    expect(impresion.refCurso).toBe(idCurso);
+    expect(impresion.colorOpcion1).toBe("#00000");
+    expect(impresion.colorOpcion2).toBe("#00000");
+    expect(impresion.colorOpcion3).toBe("#00000");
+    expect(impresion.comentarioUsuario).toBe(
+      "Por favor imprimir con alta calidad.",
+    );
     expect(impresion.comentarioTecnico).toBe("");
     expect(impresion.observacionAyudante).toBe("");
     expect(impresion.motivoRechazo).toBeNull();
-    expect(impresion.tiempoEstimadoImpresion).toBe("2 horas");
+    expect(impresion.tiempoEstimadoImpresion).toBe("10 minutos");
     expect(impresion.inicioImpresion).toBeNull();
-
   });
 
-  it("debería fallar al crear una solicitud de impresión con un id de estudiante no existente", async () => {
-    
-  });
+  it("debería fallar al crear una solicitud de impresión con un id de estudiante no existente", async () => {});
 });
-
