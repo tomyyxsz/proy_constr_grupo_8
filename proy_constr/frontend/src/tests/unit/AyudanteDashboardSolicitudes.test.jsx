@@ -1,33 +1,31 @@
 import { describe, expect, test } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import AyudanteDashboard from '../../components/dashboard/AyudanteDashboard'
+import SolicitudesAyudante from '../../components/SolicitudesAyudante'
 
-describe('AyudanteDashboard - solicitudes de impresión', () => {
+describe('SolicitudesAyudante - solicitudes de impresión', () => {
   test('debería mostrar las solicitudes enviadas por estudiantes', () => {
     const solicitudes = [
       {
-        idImpresion: 'imp-1',
-        solicitanteNombre: 'Agustin',
-        solicitanteApellido: 'Valderrama',
-        solicitanteEmail: 'tcorvalan@prueba.com',
-        tipoSolicitud: 'ACADEMICA',
-        nombreCurso: 'ICC',
-        estadoImpresion: 'PENDIENTE',
-        creadoEn: '2026-06-04T12:00:00Z',
+        id: 'imp-1',
+        solicitanteNombre: 'Agustin Valderrama',  // nombre único que no choca con headers
+        solicitanteEmail: 'est@est.com',
+        tipoSolicitud: 'PERSONAL',
+        urlModelo3d: 'https://Prueba.com',
+        estado: 'Pendiente',
       },
     ]
 
-    render(<AyudanteDashboard solicitudes={solicitudes} />)
+    render(
+      <SolicitudesAyudante
+        solicitudes={solicitudes}
+        onClose={() => {}}
+      />
+    )
 
-    //expect(screen.getByRole('button', { name: /Solicitudes de impresión/i })).toBeInTheDocument()
-
-    //fireEvent.click(screen.getByRole('button', { name: /Solicitudes de impresión/i }))
-
-    //expect(screen.getByText(/Solicitudes de impresión/i)).toBeInTheDocument()
     expect(screen.getByText(/Agustin Valderrama/i)).toBeInTheDocument()
-    expect(screen.getByText(/tcorvalan@prueba.com/i)).toBeInTheDocument()
-    expect(screen.getByText(/ACADEMICA/i)).toBeInTheDocument()
-    expect(screen.getByText(/PENDIENTE/i)).toBeInTheDocument()
-    expect(screen.getByText(/ICC/i)).toBeInTheDocument()
+    expect(screen.getByText(/https:\/\/Prueba.com/i)).toBeInTheDocument()
+    expect(screen.getByText(/est@est.com/i)).toBeInTheDocument()
+    expect(screen.getByText(/PERSONAL/i)).toBeInTheDocument()
+    expect(screen.getByText(/Pendiente/i)).toBeInTheDocument()
   })
 })

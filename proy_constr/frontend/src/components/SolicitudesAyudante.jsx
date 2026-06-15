@@ -40,7 +40,8 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null }) {
                   <th style={modalStyles.th}>ID</th>
                   <th style={modalStyles.th}>Estudiante</th>
                   <th style={modalStyles.th}>Modelo / Archivo</th>
-                  <th style={modalStyles.th}>Color(es)</th>
+                  <th style={modalStyles.th}>Email</th>
+                  <th style={modalStyles.th}>Tipo de Solicitud</th>
                   <th style={modalStyles.th}>Estado</th>
                 </tr>
               </thead>
@@ -51,23 +52,18 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null }) {
 
                   <tr key={solicitud.id} style={modalStyles.tr}>
                     <td style={modalStyles.td}><strong>#{solicitud.id}</strong></td>
-                    {/*Rescatamos el nombre del estudiante y lo mostramos*/}
                     <td style={modalStyles.td}>
                       {solicitud.solicitanteNombre|| 'No especificado'}
                     </td>
-                    {/* Mostramos url del modelo*/}
                     <td style={modalStyles.td}>
                       {solicitud.urlModelo3d }
                     </td>
-                    
-                    {/* Mostramos color elegido */}
                     <td style={modalStyles.td}>
-                      <span style={colorTextStyle(solicitud.colorOpcion1 || solicitud.colores)}>
-                        {solicitud.colorOpcion1}
-                      </span>
+                      {solicitud.solicitanteEmail || 'No especificado'}
                     </td>
-                    
-                    {/* Estado de la solicitud */}
+                    <td style={modalStyles.td}>
+                      {solicitud.tipoSolicitud}
+                    </td>
                     <td style={modalStyles.td}>
                       <span style={statusBadgeStyle(solicitud.estado)}>
                         {solicitud.estado || 'Pendiente'}
@@ -117,13 +113,4 @@ function statusBadgeStyle(status) {
     return { ...base, backgroundColor: '#f8d7da', color: '#721c24' };
   }
   return { ...base, backgroundColor: '#e2e3e5', color: '#383d41' };
-}
-
-// Estilo simple para resaltar el texto de los colores elegidos
-function colorTextStyle(color) {
-  return {
-    fontWeight: '500',
-    color: color ? '#444' : '#999',
-    fontStyle: color ? 'normal' : 'italic'
-  };
 }
