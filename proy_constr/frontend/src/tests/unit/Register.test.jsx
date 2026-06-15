@@ -27,7 +27,7 @@ describe('Register', () => {
     expect(rutInput).toHaveValue('12345678-K')
   })
 
-// Test para verificar que se muestra un error al enviar el formulario incompleto
+  // Test para verificar que se muestra un error al enviar el formulario incompleto
   it('muestra un error cuando se envía el formulario incompleto', () => {
     render(<Register onRegister={onRegister} onLoginClick={onLoginClick} />)
 
