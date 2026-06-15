@@ -10,6 +10,7 @@
     "test:run": "vitest run",
     "test:unit": "vitest run tests/unit",
     "test:coverage": "vitest run --coverage",
+    "test:int": "vitest run tests/integration",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "lint": "eslint . --ext .js,.ts --fix"
@@ -24,6 +25,7 @@
     "vitest": "^4.1.6"
   },
   "devDependencies": {
+    "dotenv-cli": "^11.0.0",
     "prisma": "^7.6.0"
   }
 }

@@ -118,10 +118,12 @@ router.post("/crear", async (req, res) => {
         solicitanteApellido: estudiante.apellido,
         solicitanteEmail: estudiante.email,
         solicitanteRut: estudiante.rut,
+
         refEstudiante: idEstudiante,
         refAyudante: null,
         tipoUsuario: "ESTUDIANTE",
         tipoSolicitud: tipoSolicitud,
+        nombreCurso: cursoRef.nombreCurso,
         refCurso: cursoRef,
         colorOpcion1: color1,
         colorOpcion2: color2,
