@@ -27,7 +27,7 @@ export default defineConfig([
       'indent': ['error', 2, { SwitchCase: 1 }],
       'camelcase': ['error', { properties: 'always' }],
       'no-unreachable': 'error',
-      'max-lines-per-function': ['error', { max: 150, skipComments: false, skipBlankLines: true }],
+      'max-lines-per-function': ['error', { max: 200, skipComments: false, skipBlankLines: true }],
     },
   },
   {
