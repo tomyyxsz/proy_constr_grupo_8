@@ -85,10 +85,12 @@ router.post("/crear", async (req, res) => {
       });
     }
 
-    let cursoRef = null;
+    let cursoRef = "5eb68c60-f502-4be8-9276-f706c33d31bc";
+    let cursoNombre = "Particular / Personal";
+
     // si la solicitud es academica, se debe verificar que el estudiante esta inscrito en ese curso
     if (tipoSolicitud === "ACADEMICA") {
-      const inscripcion = await prisma.estudianteCurso.findFirst({
+      const inscripcion = await prisma.EstudianteCurso.findFirst({
         where: {
           refCurso,
           refEstudiante: idEstudiante,
@@ -131,7 +133,15 @@ router.post("/crear", async (req, res) => {
         comentarioUsuario: comentario || null,
         urlModelo3d: urlModelo3d,
         urlModeloStl: urlModeloStl,
-        estadoImpresion: "CREADO",
+        estadoImpresion: "PENDIENTE",
+        comentarioTecnico: "",
+        observacionAyudante: "",
+        tiempoEstimadoImpresion: "10 minutos",
+        ayudante: {
+          connect: {id : "da04e451-c392-4586-af69-cbba92d819a5"}
+        },
+        
+        
       },
       select: {
         idImpresion: true,
@@ -150,6 +160,111 @@ router.post("/crear", async (req, res) => {
   } catch (error) {
     console.error("Error al crear solicitud de impresión:", error);
     res.status(500).json({ error: "Error interno al crear solicitud." });
+  }
+});
+
+router.get("/estudiante/:idEstudiante", async (req, res) => {
+  const { idEstudiante } = req.params;
+
+  try {
+    // Buscar todas las solicitudes del estudiante
+    const solicitudes = await prisma.impresion.findMany({
+      where: {
+        refEstudiante: idEstudiante,
+      },
+      select: {
+        idImpresion: true,
+        solicitanteNombre: true,
+        solicitanteApellido: true,
+        solicitanteEmail: true,
+        solicitanteRut: true,
+        tipoSolicitud: true,
+        tipoUsuario: true,
+        nombreCurso: true,
+        colorOpcion1: true,
+        colorOpcion2: true,
+        colorOpcion3: true,
+        comentarioUsuario: true,
+        urlModelo3d: true,
+        urlModeloStl: true,
+        estadoImpresion: true,
+        observacionAyudante: true,
+        motivoRechazo: true,
+        tiempoEstimadoImpresion: true,
+        inicioImpresion: true,
+        creadoEn: true,
+      },
+      orderBy: {
+        creadoEn: "desc",
+      },
+    });
+
+    if (solicitudes.length === 0) {
+      return res.status(200).json({
+        message: "El estudiante no tiene solicitudes de impresión.",
+        solicitudes: [],
+      });
+    }
+
+    res.status(200).json({
+      message: "Solicitudes obtenidas correctamente.",
+      solicitudes,
+    });
+  } catch (error) {
+    console.error("Error al obtener solicitudes del estudiante:", error);
+    res.status(500).json({
+      error: "Error interno al obtener solicitudes.",
+    });
+  }
+});
+
+router.get("/", async (req, res) => {
+  try {
+    // Buscar todas las solicitudes de impresión
+    const solicitudes = await prisma.impresion.findMany({
+      select: {
+        idImpresion: true,
+        solicitanteNombre: true,
+        solicitanteApellido: true,
+        solicitanteEmail: true,
+        solicitanteRut: true,
+        tipoSolicitud: true,
+        tipoUsuario: true,
+        nombreCurso: true,
+        colorOpcion1: true,
+        colorOpcion2: true,
+        colorOpcion3: true,
+        comentarioUsuario: true,
+        urlModelo3d: true,
+        urlModeloStl: true,
+        estadoImpresion: true,
+        observacionAyudante: true,
+        motivoRechazo: true,
+        tiempoEstimadoImpresion: true,
+        inicioImpresion: true,
+        creadoEn: true,
+      },
+      orderBy: {
+        creadoEn: "desc",
+      },
+    });
+
+    if (solicitudes.length === 0) {
+      return res.status(200).json({
+        message: "No hay solicitudes de impresión.",
+        solicitudes: [],
+      });
+    }
+
+    res.status(200).json({
+      message: "Solicitudes obtenidas correctamente.",
+      solicitudes,
+    });
+  } catch (error) {
+    console.error("Error al obtener todas las solicitudes:", error);
+    res.status(500).json({
+      error: "Error interno al obtener solicitudes.",
+    });
   }
 });
 
