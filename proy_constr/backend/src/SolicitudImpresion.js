@@ -86,7 +86,6 @@ router.post("/crear", async (req, res) => {
     }
 
     let cursoRef = "5eb68c60-f502-4be8-9276-f706c33d31bc";
-    let cursoNombre = "Particular / Personal";
 
     // si la solicitud es academica, se debe verificar que el estudiante esta inscrito en ese curso
     if (tipoSolicitud === "ACADEMICA") {
