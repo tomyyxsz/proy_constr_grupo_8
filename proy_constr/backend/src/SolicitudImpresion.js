@@ -10,7 +10,7 @@ const URL_REGEX = /^https?:\/\/.+/;
 const TIPOS_SOLICITUD = ["PERSONAL", "ACADEMICA"];
 
 router.post("/crear", async (req, res) => {
-  const {
+  let {
     idEstudiante,
     color1,
     color2,
@@ -54,6 +54,7 @@ router.post("/crear", async (req, res) => {
 
   // si es personal la solicitud, no es necesario ref curso
   if (tipoSolicitud === "PERSONAL" && refCurso) {
+    refCurso = undefined;
     return res.status(400).json({
       error: "Si tipoSolicitud es PERSONAL, no debes enviar refCurso.",
     });
@@ -85,7 +86,7 @@ router.post("/crear", async (req, res) => {
       });
     }
 
-    let cursoRef = "5eb68c60-f502-4be8-9276-f706c33d31bc";
+    //let cursoRef = "5eb68c60-f502-4be8-9276-f706c33d31bc";
 
     // si la solicitud es academica, se debe verificar que el estudiante esta inscrito en ese curso
     if (tipoSolicitud === "ACADEMICA") {
@@ -103,15 +104,26 @@ router.post("/crear", async (req, res) => {
         },
       });
 
+      if (!inscripcion.curso){
+        return res.status(404).json({
+          error: "El curso con ese ID no existe.",
+        });
+      }
       if (!inscripcion) {
         return res.status(403).json({
           error: "El estudiante no está inscrito en ese curso.",
         });
       }
 
-      cursoRef = refCurso;
     }
 
+    // recuperar nombre del curso
+    const cursoData = await prisma.curso.findUnique({
+      where: { idCurso: refCurso },
+      select: { nombreCurso: true },
+    });
+    const nombreCursoData = cursoData ? cursoData.nombreCurso : null;
+    
     // crear la impresion, estado inicial = "creado"
     const impresion = await prisma.impresion.create({
       data: {
@@ -124,21 +136,19 @@ router.post("/crear", async (req, res) => {
         refAyudante: null,
         tipoUsuario: "ESTUDIANTE",
         tipoSolicitud: tipoSolicitud,
-        nombreCurso: cursoRef.nombreCurso,
-        refCurso: cursoRef,
+        nombreCurso: nombreCursoData,
+        refCurso: refCurso,
+
         colorOpcion1: color1,
         colorOpcion2: color2,
         colorOpcion3: color3,
-        comentarioUsuario: comentario || null,
+        comentarioUsuario: comentario,
         urlModelo3d: urlModelo3d,
         urlModeloStl: urlModeloStl,
         estadoImpresion: "PENDIENTE",
         comentarioTecnico: "",
         observacionAyudante: "",
         tiempoEstimadoImpresion: "10 minutos",
-        ayudante: {
-          connect: {id : "da04e451-c392-4586-af69-cbba92d819a5"}
-        },
         
         
       },
