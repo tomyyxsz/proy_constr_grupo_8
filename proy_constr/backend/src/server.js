@@ -19,8 +19,8 @@ app.use("/api/usuarios", buscarUsuarioRouter);
 app.use("/api/usuarios", loginUsuarioRouter);
 app.use("/api/semestres", creacionSemestreRouter);
 app.use("/api/cursos", creacionCursoRouter);
-app.use("/api/solicitudes", solicitudImpresionRouter);
-app.use("/api/gestion", gestionImpresionRouter);
+app.use("/api/impresiones", solicitudImpresionRouter);
+app.use("/api/impresiones", gestionImpresionRouter);
 
 
 app.get("/health", (_req, res) => {

@@ -6,12 +6,12 @@ function AyudanteDashboard() {
   const [showSolicitudes, setShowSolicitudes] = useState(false)
   const [solicitudes, setSolicitudes] = useState(null) 
   const [error, setError] = useState(null)
-
+  const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/solicitudes`;
 
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/solicitudes') //conexion con el backend
+        const response = await fetch(`${API_BASE_URL}`) //conexion con el backend
         
         if (!response.ok) {
           throw new Error('Error al conectar con el servidor')//lanzar error
