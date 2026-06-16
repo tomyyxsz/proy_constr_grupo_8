@@ -1,20 +1,24 @@
-
-import { render, screen } from '@testing-library/react';
-import Footer from '../../components/Footer';  
+import React from 'react'
+import { render, screen } from '@testing-library/react'
+import { describe, expect, test } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import Footer from '../../components/Footer'
 
 describe('Footer Component', () => {
-  test('renders footer text', () => {
-    render(<Footer />);
-    expect(screen.getByText('2026 Construcción de Software - Grupo 8')).toBeInTheDocument();
-  });
+  // Test para verificar que el texto del footer se renderiza correctamente
+  test('renderiza el texto del footer correctamente', () => {
+    render(<Footer />)
+    
+    // Usamos regex (/.../i) para que ignore espacios extra al inicio o final y mayúsculas
+    expect(screen.getByText(/2026 Construcción de Software - Grupo 8/i)).toBeInTheDocument()
+  })
 
-  test('renders footer element', () => {
-    const { container } = render(<Footer />);
-    expect(container.querySelector('footer')).toBeInTheDocument();
-  });
-
-  test('footer has correct css class', () => {
-    const { container } = render(<Footer />);
-    expect(container.querySelector('footer')).toHaveClass('footer');
-  });
-});
+  // Test para verificar que el footer tiene la clase CSS correcta
+  test('renderiza la etiqueta HTML footer con su clase CSS', () => {
+    const { container } = render(<Footer />)
+    const footerElement = container.querySelector('footer')
+    
+    expect(footerElement).toBeInTheDocument()
+    expect(footerElement).toHaveClass('footer')
+  })
+})

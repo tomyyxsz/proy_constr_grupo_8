@@ -79,39 +79,39 @@ describe('Header y Home Integration', () => {
     expect(homeWrapper).toBeInTheDocument();
   });
 
-//Pruebas para cubrir casos extremos y ramas no cubiertas en Home.jsx
-describe('Casos Extremos y Cobertura', () => {
+  //Pruebas para cubrir casos extremos y ramas no cubiertas en Home.jsx
+  describe('Casos Extremos y Cobertura', () => {
   
-  // Test para verificar que se muestra un mensaje de error si el usuario tiene un rol no registrado
-  test('Mostrar mensaje de error si el usuario tiene un rol no registrado', () => {
-    const invalidUser = { name: 'Visitante', role: 'ADMINISTRADOR_FANTASMA' };
-    render(<Home user={invalidUser} />);
+    // Test para verificar que se muestra un mensaje de error si el usuario tiene un rol no registrado
+    test('Mostrar mensaje de error si el usuario tiene un rol no registrado', () => {
+      const invalidUser = { name: 'Visitante', role: 'ADMINISTRADOR_FANTASMA' };
+      render(<Home user={invalidUser} />);
     
-    expect(screen.getByText('Hola, Visitante')).toBeInTheDocument();
-    expect(screen.getByText('Rol no reconocido: ADMINISTRADOR_FANTASMA')).toBeInTheDocument();
-  });
+      expect(screen.getByText('Hola, Visitante')).toBeInTheDocument();
+      expect(screen.getByText('Rol no reconocido: ADMINISTRADOR_FANTASMA')).toBeInTheDocument();
+    });
 
-  // Test para verificar que no se rompe si el usuario es nulo o indefinido
-  test('No romperse si el usuario es nulo o indefinido', () => {
-    render(<Home user={null} />);
+    // Test para verificar que no se rompe si el usuario es nulo o indefinido
+    test('No romperse si el usuario es nulo o indefinido', () => {
+      render(<Home user={null} />);
     
-    // Debería renderizar "Hola, " sin el nombre, evitando un crasheo de la app
-    expect(screen.getByText('Hola,')).toBeInTheDocument();
-    // Al no haber rol, el Dashboard no se encuentra y cae en el fallback
-    expect(screen.getByText('Rol no reconocido:')).toBeInTheDocument();
-  });
+      // Debería renderizar "Hola, " sin el nombre, evitando un crasheo de la app
+      expect(screen.getByText('Hola,')).toBeInTheDocument();
+      // Al no haber rol, el Dashboard no se encuentra y cae en el fallback
+      expect(screen.getByText('Rol no reconocido:')).toBeInTheDocument();
+    });
 
-  // Aseguramos que los otros roles válidos también mapean bien
-  test('Procesar correctamente los roles PROFESOR y AYUDANTE sin renderizar error', () => {
-    const profeUser = { name: 'Profe Test', role: 'PROFESOR' };
-    const { unmount } = render(<Home user={profeUser} />);
-    expect(screen.queryByText(/Rol no reconocido/i)).not.toBeInTheDocument();
-    unmount(); // Limpiamos el DOM
+    // Aseguramos que los otros roles válidos también mapean bien
+    test('Procesar correctamente los roles PROFESOR y AYUDANTE sin renderizar error', () => {
+      const profeUser = { name: 'Profe Test', role: 'PROFESOR' };
+      const { unmount } = render(<Home user={profeUser} />);
+      expect(screen.queryByText(/Rol no reconocido/i)).not.toBeInTheDocument();
+      unmount(); // Limpiamos el DOM
 
-    const ayudanteUser = { name: 'Ayudante Test', role: 'AYUDANTE' };
-    render(<Home user={ayudanteUser} />);
-    expect(screen.queryByText(/Rol no reconocido/i)).not.toBeInTheDocument();
+      const ayudanteUser = { name: 'Ayudante Test', role: 'AYUDANTE' };
+      render(<Home user={ayudanteUser} />);
+      expect(screen.queryByText(/Rol no reconocido/i)).not.toBeInTheDocument();
+    });
   });
-});
 
 });
