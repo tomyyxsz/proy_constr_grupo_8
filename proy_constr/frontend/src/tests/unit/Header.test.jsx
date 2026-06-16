@@ -26,42 +26,42 @@ describe('Componentes Header', () => {
   });
 
 
-describe('Interacciones y botones', () => {
+  describe('Interacciones y botones', () => {
   // Test para verificar que se llama a onLoginClick al hacer clic en el botón de inicio de sesión
-  test('Llama a onLoginClick al hacer clic en Iniciar sesión', () => {
-    const mockOnLogin = vi.fn();
-    render(<Header isAuthenticated={false} onLoginClick={mockOnLogin} />);
-    fireEvent.click(screen.getByText('Iniciar sesión'));
-    expect(mockOnLogin).toHaveBeenCalledTimes(1);
+    test('Llama a onLoginClick al hacer clic en Iniciar sesión', () => {
+      const mockOnLogin = vi.fn();
+      render(<Header isAuthenticated={false} onLoginClick={mockOnLogin} />);
+      fireEvent.click(screen.getByText('Iniciar sesión'));
+      expect(mockOnLogin).toHaveBeenCalledTimes(1);
+    });
+
+    // Test para verificar que se llama a onRegisterClick al hacer clic en el botón de registro
+    test('Llama a onRegisterClick al hacer clic en Registrarse', () => {
+      const mockOnRegister = vi.fn();
+      render(<Header isAuthenticated={false} onRegisterClick={mockOnRegister} />);
+      fireEvent.click(screen.getByText('Registrarse'));
+      expect(mockOnRegister).toHaveBeenCalledTimes(1);
+    });
+
+    // Test para verificar que se llama a onLogout al hacer clic en Cerrar sesión
+    test('Abre el menú de usuario y llama a onLogout al hacer clic en Cerrar sesión', () => {
+      const mockOnLogout = vi.fn();
+      render(<Header isAuthenticated={true} user={{ name: 'Juan' }} onLogout={mockOnLogout} />);
+      const userButton = screen.getByRole('button', { name: /Juan/i });
+      fireEvent.click(userButton);
+      const logoutButton = screen.getByText('Cerrar sesión');
+      expect(logoutButton).toBeInTheDocument();
+      fireEvent.click(logoutButton);
+      expect(mockOnLogout).toHaveBeenCalledTimes(1);
+    });
   });
 
-  // Test para verificar que se llama a onRegisterClick al hacer clic en el botón de registro
-  test('Llama a onRegisterClick al hacer clic en Registrarse', () => {
-    const mockOnRegister = vi.fn();
-    render(<Header isAuthenticated={false} onRegisterClick={mockOnRegister} />);
-    fireEvent.click(screen.getByText('Registrarse'));
-    expect(mockOnRegister).toHaveBeenCalledTimes(1);
-  });
-
-  // Test para verificar que se llama a onLogout al hacer clic en Cerrar sesión
-  test('Abre el menú de usuario y llama a onLogout al hacer clic en Cerrar sesión', () => {
-    const mockOnLogout = vi.fn();
-    render(<Header isAuthenticated={true} user={{ name: 'Juan' }} onLogout={mockOnLogout} />);
-    const userButton = screen.getByRole('button', { name: /Juan/i });
-    fireEvent.click(userButton);
-    const logoutButton = screen.getByText('Cerrar sesión');
-    expect(logoutButton).toBeInTheDocument();
-    fireEvent.click(logoutButton);
-    expect(mockOnLogout).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe('Manejo de estados nulos', () => {
+  describe('Manejo de estados nulos', () => {
   // Test para verificar que el componente maneja correctamente un objeto user nulo
-  test('Muestra los valores por defecto si no se pasa el objeto user', () => {
-    render(<Header isAuthenticated={true} user={null} />);
-    expect(screen.getByText('U')).toBeInTheDocument();
-    expect(screen.getByText('Usuario')).toBeInTheDocument();
+    test('Muestra los valores por defecto si no se pasa el objeto user', () => {
+      render(<Header isAuthenticated={true} user={null} />);
+      expect(screen.getByText('U')).toBeInTheDocument();
+      expect(screen.getByText('Usuario')).toBeInTheDocument();
+    });
   });
-});
 });
