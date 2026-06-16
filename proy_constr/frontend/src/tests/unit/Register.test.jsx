@@ -61,11 +61,8 @@ describe('Register', () => {
     it('valida formato de correo', async () => {
       render(<Register onRegister={onRegister} onLoginClick={onLoginClick} />)
       fillForm({ email: 'correoinvalido' })
-      
-      // En lugar de hacer clic en el botón, buscamos el formulario a partir del botón y forzamos el submit
       const submitButton = screen.getByRole('button', { name: /registrarse/i })
       fireEvent.submit(submitButton.closest('form'))
-
       expect(await screen.findByRole('alert')).toHaveTextContent('Ingresa un correo válido')
     })
 
@@ -73,11 +70,8 @@ describe('Register', () => {
     it('valida longitud mínima de contraseña', async () => {
       render(<Register onRegister={onRegister} onLoginClick={onLoginClick} />)
       fillForm({ password: 'Corta1!', confirmPassword: 'Corta1!' })
-      
-      // En lugar de hacer clic en el botón, buscamos el formulario a partir del botón y forzamos el submit
       const submitButton = screen.getByRole('button', { name: /registrarse/i })
       fireEvent.submit(submitButton.closest('form'))
-
       expect(await screen.findByRole('alert')).toHaveTextContent('La contraseña debe tener al menos 8 caracteres')
     })
 
