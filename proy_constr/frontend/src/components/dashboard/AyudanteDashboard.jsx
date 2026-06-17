@@ -29,7 +29,7 @@ function AyudanteDashboard( ) {
     }
 
     fetchDatos()
-  }, []) 
+  }) 
 
   return (
     <>
