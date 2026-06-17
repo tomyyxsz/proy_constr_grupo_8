@@ -144,6 +144,7 @@ router.get("/:id", async (req, res) => {
 // PUT: Aprobar impresión
 router.put("/:id/aprobar", async (req, res) => {
   const { idAyudante, observacion } = req.body;
+  const idImpresion = req.params.id;
 
   if (!idAyudante) {
     return res.status(400).json({
@@ -153,7 +154,7 @@ router.put("/:id/aprobar", async (req, res) => {
 
   try {
     // Verificar que el ayudante existe
-    const ayudante = await prisma.usuario.findUnique({
+    const ayudante = await prisma.usuario.findFirst({
       where: { id: idAyudante },
     });
 
@@ -165,7 +166,7 @@ router.put("/:id/aprobar", async (req, res) => {
 
     // Verificar que la impresión existe
     const impresion = await prisma.impresion.findUnique({
-      where: { idImpresion: req.params.id },
+      where: { idImpresion: idImpresion },
     });
 
     if (!impresion) {
@@ -174,15 +175,15 @@ router.put("/:id/aprobar", async (req, res) => {
       });
     }
 
-    if (impresion.estadoImpresion !== "CREADO") {
-      return res.status(400).json({
-        error: "Solo se pueden aprobar impresiones en estado CREADO.",
-      });
-    }
+    // if (impresion.estadoImpresion !== "PENDIENTE") {
+    //   return res.status(400).json({
+    //     error: "Solo se pueden aprobar impresiones en estado PENDIENTE.",
+    //   });
+    // }
 
     // Actualizar impresión
     const impresionActualizada = await prisma.impresion.update({
-      where: { idImpresion: req.params.id },
+      where: { idImpresion: idImpresion },
       data: {
         estadoImpresion: "EN_PROGRESO",
         refAyudante: idAyudante,
@@ -193,7 +194,6 @@ router.put("/:id/aprobar", async (req, res) => {
         estadoImpresion: true,
         refAyudante: true,
         observacionAyudante: true,
-        actualizadoEn: true,
       },
     });
 
@@ -240,11 +240,11 @@ router.put("/:id/rechazar", async (req, res) => {
       });
     }
 
-    if (impresion.estadoImpresion !== "CREADO") {
-      return res.status(400).json({
-        error: "Solo se pueden rechazar impresiones en estado CREADO.",
-      });
-    }
+    // if (impresion.estadoImpresion !== "PENDIENTE") {
+    //   return res.status(400).json({
+    //     error: "Solo se pueden rechazar impresiones en estado PENDIENTE.",
+    //   });
+    // }
 
     // Actualizar impresión
     const impresionActualizada = await prisma.impresion.update({
@@ -259,7 +259,6 @@ router.put("/:id/rechazar", async (req, res) => {
         estadoImpresion: true,
         refAyudante: true,
         motivoRechazo: true,
-        actualizadoEn: true,
       },
     });
 
@@ -304,7 +303,6 @@ router.put("/:id/observaciones", async (req, res) => {
       select: {
         idImpresion: true,
         observacionAyudante: true,
-        actualizadoEn: true,
       },
     });
 

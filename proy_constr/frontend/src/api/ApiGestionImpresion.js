@@ -23,11 +23,11 @@ export async function aprobarSolicitud(idSolicitud, idAyudante, observacion) {
   // router.put("/:id/aprobar", recibe solo ayudante y observacion
   try {
     const response = await axios.put(`${API_BASE_URL}/${idSolicitud}/aprobar`, {
-      ayudante: idAyudante,
+      idAyudante: idAyudante,
       observacion: observacion,
       
     });
-    return response.data;
+    return response;
   } catch (error) {
     if (error.response) {
       throw new Error(
@@ -42,16 +42,17 @@ export async function aprobarSolicitud(idSolicitud, idAyudante, observacion) {
 
 export async function rechazarSolicitud(idSolicitud, idAyudante, motivo) {
   // router.put("/:id/rechazar",
+  console.log ("id ayudante:", idAyudante);
   try {
     const response = await axios.put(
       `${API_BASE_URL}/${idSolicitud}/rechazar`,
       {
-        estado: "RECHAZADA",
-        motivoRechazo: motivo,
-        ayudante: idAyudante,
+
+        motivo: motivo,
+        idAyudante: idAyudante,
       },
     );
-    return response.data;
+    return response;
   } catch (error) {
     if (error.response) {
       throw new Error(
@@ -69,11 +70,11 @@ export async function actualizarObservacionAyudante(idSolicitud, idAyudante, obs
     const response = await axios.put(
       `${API_BASE_URL}/${idSolicitud}/observaciones`,
       {
-        ayudante: idAyudante,
-        observacionAyudante: observacion,
+        idAyudante: idAyudante,
+        observacion: observacion,
       },
     );
-    return response.data;
+    return response;
   } catch (error) {
     if (error.response) {
       throw new Error(

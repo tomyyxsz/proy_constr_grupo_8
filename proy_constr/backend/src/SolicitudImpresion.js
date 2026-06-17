@@ -118,11 +118,11 @@ router.post("/crear", async (req, res) => {
     }
 
     // recuperar nombre del curso
-    const cursoData = await prisma.curso.findUnique({
+    const cursoData = await prisma.curso.findMany({
       where: { idCurso: refCurso },
       select: { nombreCurso: true },
     });
-    const nombreCursoData = cursoData ? cursoData.nombreCurso : null;
+    const nombreCursoData = cursoData ? cursoData[0].nombreCurso : null;
     
     // crear la impresion, estado inicial = "creado"
     const impresion = await prisma.impresion.create({
@@ -131,14 +131,10 @@ router.post("/crear", async (req, res) => {
         solicitanteApellido: estudiante.apellido,
         solicitanteEmail: estudiante.email,
         solicitanteRut: estudiante.rut,
-
         refEstudiante: idEstudiante,
-        refAyudante: null,
         tipoUsuario: "ESTUDIANTE",
         tipoSolicitud: tipoSolicitud,
         nombreCurso: nombreCursoData,
-        refCurso: refCurso,
-
         colorOpcion1: color1,
         colorOpcion2: color2,
         colorOpcion3: color3,

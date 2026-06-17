@@ -1,11 +1,9 @@
 generator client {
   provider = "prisma-client-js"
-  output = "../node_modules/@prisma/client"
 }
 
 datasource db {
   provider = "postgresql"
-
 }
 
 model Usuario {
@@ -177,16 +175,16 @@ model Impresion {
   colorOpcion2            String          @db.VarChar(50)
   colorOpcion3            String          @db.VarChar(50)
   comentarioTecnico       String          @db.VarChar(255)
-  comentarioUsuario       String          @db.VarChar(255)
+  comentarioUsuario       String?          @db.VarChar(255)
   creadoEn                DateTime        @default(now()) @db.Timestamp(6)
   estadoImpresion         EstadoImpresion @default(PENDIENTE)
   idImpresion             String          @id @default(uuid()) @db.Uuid
   inicioImpresion         DateTime?       @db.Timestamp(6)
   motivoRechazo           String?         @db.VarChar(255)
-  nombreCurso             String          @db.VarChar(100)
-  observacionAyudante     String          @db.VarChar(255)
+  nombreCurso             String?          @db.VarChar(100)
+  observacionAyudante     String?          @db.VarChar(255)
   refAyudante             String?         @db.Uuid
-  refCurso                String?         @db.Uuid
+  refCurso                String?          @db.Uuid
   refEstudiante           String          @db.Uuid
   solicitanteApellido     String          @db.VarChar(50)
   solicitanteEmail        String          @db.VarChar(100)
@@ -197,8 +195,8 @@ model Impresion {
   tipoUsuario             String          @db.VarChar(50)
   urlModelo3d             String          @db.VarChar(255)
   urlModeloStl            String          @db.VarChar(255)
-  ayudante                Usuario?        @relation("impresionAyudante", fields: [refAyudante], references: [id])
-  curso                   Curso?          @relation(fields: [refCurso], references: [idCurso])
+  ayudante                Usuario?         @relation("impresionAyudante", fields: [refAyudante], references: [id])
+  curso                   Curso?           @relation(fields: [refCurso], references: [idCurso])
   estudiante              Usuario         @relation("impresionEstudiante", fields: [refEstudiante], references: [id])
   usoImpresion            UsoImpresion[]
 }
