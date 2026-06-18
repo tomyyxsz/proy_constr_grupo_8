@@ -5,49 +5,114 @@ import { prisma } from "./lib/prisma.js";
 
 const router = express.Router();
 
-// GET: Listar impresiones (filtrable por estado)
-router.get("/", async (req, res) => {
-  const { estado, idAyudante } = req.query;
-
-  const where = {};
-
-  if (estado) {
-    where.estadoImpresion = estado.toUpperCase();
-  }
-
-  if (idAyudante) {
-    where.refAyudante = idAyudante;
-  }
+// GET: Listar impresiones por estudiante
+router.get("/estudiante/:idEstudiante", async (req, res) => {
+  const { idEstudiante } = req.params;
 
   try {
-    const impresiones = await prisma.impresion.findMany({
-      where,
+    // Buscar todas las solicitudes de un estudiante
+    const solicitudes = await prisma.impresion.findMany({
+      where: {
+        refEstudiante: idEstudiante,
+      },
       select: {
         idImpresion: true,
         solicitanteNombre: true,
+        solicitanteApellido: true,
         solicitanteEmail: true,
+        solicitanteRut: true,
         tipoSolicitud: true,
+        tipoUsuario: true,
+        nombreCurso: true,
+        colorOpcion1: true,
+        colorOpcion2: true,
+        colorOpcion3: true,
+        comentarioUsuario: true,
+        urlModelo3d: true,
+        urlModeloStl: true,
         estadoImpresion: true,
-        refAyudante: true,
+        observacionAyudante: true,
+        motivoRechazo: true,
+        tiempoEstimadoImpresion: true,
+        inicioImpresion: true,
         creadoEn: true,
-        actualizadoEn: true,
       },
       orderBy: {
         creadoEn: "desc",
       },
     });
 
-    res.json({
-      cantidad: impresiones.length,
-      impresiones,
+    if (solicitudes.length === 0) {
+      return res.status(200).json({
+        message: "El estudiante no tiene solicitudes de impresión.",
+        solicitudes: [],
+      });
+    }
+
+    res.status(200).json({
+      message: "Solicitudes obtenidas correctamente.",
+      solicitudes,
     });
   } catch (error) {
-    console.error("Error al listar impresiones:", error);
-    res.status(500).json({ error: "Error interno al listar impresiones." });
+    console.error("Error al obtener solicitudes del estudiante:", error);
+    res.status(500).json({
+      error: "Error interno al obtener solicitudes.",
+    });
   }
 });
 
-// GET: Obtener una impresión por ID
+//GET : Obtener todas las solicitudes (para el ayudante)
+router.get("/", async (req, res) => {
+  try {
+    // Buscar todas las solicitudes de impresión
+    const solicitudes = await prisma.impresion.findMany({
+      select: {
+        idImpresion: true,
+        solicitanteNombre: true,
+        solicitanteApellido: true,
+        solicitanteEmail: true,
+        solicitanteRut: true,
+        tipoSolicitud: true,
+        tipoUsuario: true,
+        nombreCurso: true,
+        colorOpcion1: true,
+        colorOpcion2: true,
+        colorOpcion3: true,
+        comentarioUsuario: true,
+        urlModelo3d: true,
+        urlModeloStl: true,
+        estadoImpresion: true,
+        observacionAyudante: true,
+        motivoRechazo: true,
+        tiempoEstimadoImpresion: true,
+        inicioImpresion: true,
+        creadoEn: true,
+      },
+      orderBy: {
+        creadoEn: "desc",
+      },
+    });
+
+    if (solicitudes.length === 0) {
+      return res.status(200).json({
+        message: "No hay solicitudes de impresión.",
+        solicitudes: [],
+      });
+    }
+
+    res.status(200).json({
+      message: "Solicitudes obtenidas correctamente.",
+      solicitudes,
+    });
+  } catch (error) {
+    console.error("Error al obtener todas las solicitudes:", error);
+    res.status(500).json({
+      error: "Error interno al obtener solicitudes.",
+    });
+  }
+});
+
+// GET: Obtener una impresion por ID
 router.get("/:id", async (req, res) => {
   try {
     const impresion = await prisma.impresion.findUnique({
@@ -79,6 +144,7 @@ router.get("/:id", async (req, res) => {
 // PUT: Aprobar impresión
 router.put("/:id/aprobar", async (req, res) => {
   const { idAyudante, observacion } = req.body;
+  const idImpresion = req.params.id;
 
   if (!idAyudante) {
     return res.status(400).json({
@@ -88,7 +154,7 @@ router.put("/:id/aprobar", async (req, res) => {
 
   try {
     // Verificar que el ayudante existe
-    const ayudante = await prisma.usuario.findUnique({
+    const ayudante = await prisma.usuario.findFirst({
       where: { id: idAyudante },
     });
 
@@ -100,7 +166,7 @@ router.put("/:id/aprobar", async (req, res) => {
 
     // Verificar que la impresión existe
     const impresion = await prisma.impresion.findUnique({
-      where: { idImpresion: req.params.id },
+      where: { idImpresion: idImpresion },
     });
 
     if (!impresion) {
@@ -109,17 +175,17 @@ router.put("/:id/aprobar", async (req, res) => {
       });
     }
 
-    if (impresion.estadoImpresion !== "CREADO") {
-      return res.status(400).json({
-        error: "Solo se pueden aprobar impresiones en estado CREADO.",
-      });
-    }
+    // if (impresion.estadoImpresion !== "PENDIENTE") {
+    //   return res.status(400).json({
+    //     error: "Solo se pueden aprobar impresiones en estado PENDIENTE.",
+    //   });
+    // }
 
     // Actualizar impresión
     const impresionActualizada = await prisma.impresion.update({
-      where: { idImpresion: req.params.id },
+      where: { idImpresion: idImpresion },
       data: {
-        estadoImpresion: "APROBADO",
+        estadoImpresion: "EN_PROGRESO",
         refAyudante: idAyudante,
         observacionAyudante: observacion || null,
       },
@@ -128,7 +194,6 @@ router.put("/:id/aprobar", async (req, res) => {
         estadoImpresion: true,
         refAyudante: true,
         observacionAyudante: true,
-        actualizadoEn: true,
       },
     });
 
@@ -175,17 +240,17 @@ router.put("/:id/rechazar", async (req, res) => {
       });
     }
 
-    if (impresion.estadoImpresion !== "CREADO") {
-      return res.status(400).json({
-        error: "Solo se pueden rechazar impresiones en estado CREADO.",
-      });
-    }
+    // if (impresion.estadoImpresion !== "PENDIENTE") {
+    //   return res.status(400).json({
+    //     error: "Solo se pueden rechazar impresiones en estado PENDIENTE.",
+    //   });
+    // }
 
     // Actualizar impresión
     const impresionActualizada = await prisma.impresion.update({
       where: { idImpresion: req.params.id },
       data: {
-        estadoImpresion: "RECHAZADO",
+        estadoImpresion: "RECHAZADA",
         refAyudante: idAyudante,
         motivoRechazo: motivo,
       },
@@ -194,7 +259,6 @@ router.put("/:id/rechazar", async (req, res) => {
         estadoImpresion: true,
         refAyudante: true,
         motivoRechazo: true,
-        actualizadoEn: true,
       },
     });
 
@@ -239,7 +303,6 @@ router.put("/:id/observaciones", async (req, res) => {
       select: {
         idImpresion: true,
         observacionAyudante: true,
-        actualizadoEn: true,
       },
     });
 

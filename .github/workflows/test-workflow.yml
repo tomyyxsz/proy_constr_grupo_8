@@ -1,0 +1,91 @@
+name: Test workflow
+on:
+    push:
+        branches:
+        - "feature/**"
+    pull_request:
+        branches:
+        - testing
+        - "feature/**"
+jobs: 
+    test-backend:
+        runs-on: ubuntu-latest
+        services:
+            postgres:
+                image: postgres:14.1-alpine
+                env:
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
+                    POSTGRES_DB: postgres
+                ports:
+                    - 5433:5432
+                options: >-
+                    --health-cmd "pg_isready -U postgres"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        defaults:
+            run:
+                working-directory: proy_constr
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
+                  cache-dependency-path: proy_constr/package-lock.json
+
+            - name: Install dependencies
+              run: npm ci --ignore-scripts
+
+            - name: Generate Prisma client for backend
+              run: npm run prisma:generate --workspace backend
+              env:
+                  DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
+
+            - name: Apply Prisma migrations for backend
+              run: npx prisma migrate deploy
+              working-directory: proy_constr/backend
+              env:
+                  DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
+
+            - name: Correr pruebas unitarias
+              working-directory: proy_constr/backend
+              run: npm run test:unit
+              env:
+                CI: true
+
+            - name: Correr pruebas de integracion
+              working-directory: proy_constr/backend
+              run: npm run test:int
+              env:
+                CI: true
+                DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
+    test-frontend:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: proy_constr
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
+                  cache-dependency-path: proy_constr/package-lock.json
+
+            - name: Install dependencies
+              run: npm ci --ignore-scripts
+
+            - name: Run frontend tests 
+              working-directory: proy_constr/frontend
+              run: npm run test

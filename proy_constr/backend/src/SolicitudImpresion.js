@@ -10,7 +10,7 @@ const URL_REGEX = /^https?:\/\/.+/;
 const TIPOS_SOLICITUD = ["PERSONAL", "ACADEMICA"];
 
 router.post("/crear", async (req, res) => {
-  const {
+  let {
     idEstudiante,
     color1,
     color2,
@@ -54,6 +54,7 @@ router.post("/crear", async (req, res) => {
 
   // si es personal la solicitud, no es necesario ref curso
   if (tipoSolicitud === "PERSONAL" && refCurso) {
+    refCurso = undefined;
     return res.status(400).json({
       error: "Si tipoSolicitud es PERSONAL, no debes enviar refCurso.",
     });
@@ -85,10 +86,15 @@ router.post("/crear", async (req, res) => {
       });
     }
 
-    let cursoRef = "5eb68c60-f502-4be8-9276-f706c33d31bc";
+    //let cursoRef = "5eb68c60-f502-4be8-9276-f706c33d31bc";
 
     // si la solicitud es academica, se debe verificar que el estudiante esta inscrito en ese curso
+    let nombreCursoData = "";
     if (tipoSolicitud === "ACADEMICA") {
+
+if (!refCurso || !idEstudiante) {
+    return res.status(400).json({ error: "Faltan datos de curso o estudiante." });
+}
       const inscripcion = await prisma.EstudianteCurso.findFirst({
         where: {
           refCurso,
@@ -102,16 +108,30 @@ router.post("/crear", async (req, res) => {
           },
         },
       });
-
       if (!inscripcion) {
         return res.status(403).json({
           error: "El estudiante no está inscrito en ese curso.",
         });
       }
 
-      cursoRef = refCurso;
+      if (!inscripcion.curso){
+        return res.status(404).json({
+          error: "El curso con ese ID no existe.",
+        });
+      }
+
+
+      const cursoData = await prisma.curso.findUnique({
+      where: { idCurso: refCurso },
+      select: { nombreCurso: true },
+      });
+      nombreCursoData = cursoData.nombreCurso;
+
     }
 
+    // recuperar nombre del curso
+
+    
     // crear la impresion, estado inicial = "creado"
     const impresion = await prisma.impresion.create({
       data: {
@@ -119,26 +139,21 @@ router.post("/crear", async (req, res) => {
         solicitanteApellido: estudiante.apellido,
         solicitanteEmail: estudiante.email,
         solicitanteRut: estudiante.rut,
-
         refEstudiante: idEstudiante,
-        refAyudante: null,
         tipoUsuario: "ESTUDIANTE",
         tipoSolicitud: tipoSolicitud,
-        nombreCurso: cursoRef.nombreCurso,
-        refCurso: cursoRef,
+        nombreCurso: nombreCursoData,
+        refCurso: refCurso,
         colorOpcion1: color1,
         colorOpcion2: color2,
         colorOpcion3: color3,
-        comentarioUsuario: comentario || null,
+        comentarioUsuario: comentario,
         urlModelo3d: urlModelo3d,
         urlModeloStl: urlModeloStl,
         estadoImpresion: "PENDIENTE",
         comentarioTecnico: "",
         observacionAyudante: "",
         tiempoEstimadoImpresion: "10 minutos",
-        ayudante: {
-          connect: {id : "da04e451-c392-4586-af69-cbba92d819a5"}
-        },
         
         
       },
@@ -151,6 +166,7 @@ router.post("/crear", async (req, res) => {
         creadoEn: true,
       },
     });
+
 
     res.status(201).json({
       message: "Solicitud de impresión creada correctamente.",
@@ -162,109 +178,6 @@ router.post("/crear", async (req, res) => {
   }
 });
 
-router.get("/estudiante/:idEstudiante", async (req, res) => {
-  const { idEstudiante } = req.params;
 
-  try {
-    // Buscar todas las solicitudes del estudiante
-    const solicitudes = await prisma.impresion.findMany({
-      where: {
-        refEstudiante: idEstudiante,
-      },
-      select: {
-        idImpresion: true,
-        solicitanteNombre: true,
-        solicitanteApellido: true,
-        solicitanteEmail: true,
-        solicitanteRut: true,
-        tipoSolicitud: true,
-        tipoUsuario: true,
-        nombreCurso: true,
-        colorOpcion1: true,
-        colorOpcion2: true,
-        colorOpcion3: true,
-        comentarioUsuario: true,
-        urlModelo3d: true,
-        urlModeloStl: true,
-        estadoImpresion: true,
-        observacionAyudante: true,
-        motivoRechazo: true,
-        tiempoEstimadoImpresion: true,
-        inicioImpresion: true,
-        creadoEn: true,
-      },
-      orderBy: {
-        creadoEn: "desc",
-      },
-    });
-
-    if (solicitudes.length === 0) {
-      return res.status(200).json({
-        message: "El estudiante no tiene solicitudes de impresión.",
-        solicitudes: [],
-      });
-    }
-
-    res.status(200).json({
-      message: "Solicitudes obtenidas correctamente.",
-      solicitudes,
-    });
-  } catch (error) {
-    console.error("Error al obtener solicitudes del estudiante:", error);
-    res.status(500).json({
-      error: "Error interno al obtener solicitudes.",
-    });
-  }
-});
-
-router.get("/", async (req, res) => {
-  try {
-    // Buscar todas las solicitudes de impresión
-    const solicitudes = await prisma.impresion.findMany({
-      select: {
-        idImpresion: true,
-        solicitanteNombre: true,
-        solicitanteApellido: true,
-        solicitanteEmail: true,
-        solicitanteRut: true,
-        tipoSolicitud: true,
-        tipoUsuario: true,
-        nombreCurso: true,
-        colorOpcion1: true,
-        colorOpcion2: true,
-        colorOpcion3: true,
-        comentarioUsuario: true,
-        urlModelo3d: true,
-        urlModeloStl: true,
-        estadoImpresion: true,
-        observacionAyudante: true,
-        motivoRechazo: true,
-        tiempoEstimadoImpresion: true,
-        inicioImpresion: true,
-        creadoEn: true,
-      },
-      orderBy: {
-        creadoEn: "desc",
-      },
-    });
-
-    if (solicitudes.length === 0) {
-      return res.status(200).json({
-        message: "No hay solicitudes de impresión.",
-        solicitudes: [],
-      });
-    }
-
-    res.status(200).json({
-      message: "Solicitudes obtenidas correctamente.",
-      solicitudes,
-    });
-  } catch (error) {
-    console.error("Error al obtener todas las solicitudes:", error);
-    res.status(500).json({
-      error: "Error interno al obtener solicitudes.",
-    });
-  }
-});
 
 export default router;

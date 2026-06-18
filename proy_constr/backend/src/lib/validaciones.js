@@ -1,6 +1,29 @@
+import crypto from "node:crypto";
+
 export function esCorreoValido(email) {
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return EMAIL_REGEX.test(String(email));
+}
+
+export function verifyPassword(plainPassword, storedPassword) { // verifica si la contrasena ingresada coincide con el hash almacenado en la base de datos.
+  if (!storedPassword || !storedPassword.includes(":")) {
+    return false;
+  }
+
+  const [salt, hashed] = storedPassword.split(":");
+  if (!salt || !hashed) {
+    return false;
+  }
+  
+  const passwordBuffer = Buffer.from(plainPassword, "utf-8");
+  const candidateBuffer = crypto.scryptSync(passwordBuffer, salt, 64);
+  const hashedBuffer = Buffer.from(hashed, "hex");
+
+  if (candidateBuffer.length !== hashedBuffer.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(candidateBuffer, hashedBuffer);
+
 }
 
 export function esContrasenaValida(password) {
