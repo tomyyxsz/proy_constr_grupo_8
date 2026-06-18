@@ -188,12 +188,14 @@ router.put("/:id/aprobar", async (req, res) => {
         estadoImpresion: "EN_PROGRESO",
         refAyudante: idAyudante,
         observacionAyudante: observacion || null,
+        inicioImpresion: new Date(),
       },
       select: {
         idImpresion: true,
         estadoImpresion: true,
         refAyudante: true,
         observacionAyudante: true,
+        inicioImpresion: true,
       },
     });
 

@@ -1,6 +1,6 @@
 // la solicitud viene de un solicitante o estudiante, el cual ingresa el url de los archivos para imprimir,
 // un comentario opcional, tipo de solicitud (personal o academica -> en este caso se debe asignar un curso)
-// 
+//
 import express from "express";
 import { prisma } from "./lib/prisma.js";
 
@@ -91,10 +91,11 @@ router.post("/crear", async (req, res) => {
     // si la solicitud es academica, se debe verificar que el estudiante esta inscrito en ese curso
     let nombreCursoData = "";
     if (tipoSolicitud === "ACADEMICA") {
-
-if (!refCurso || !idEstudiante) {
-    return res.status(400).json({ error: "Faltan datos de curso o estudiante." });
-}
+      if (!refCurso || !idEstudiante) {
+        return res
+          .status(400)
+          .json({ error: "Faltan datos de curso o estudiante." });
+      }
       const inscripcion = await prisma.EstudianteCurso.findFirst({
         where: {
           refCurso,
@@ -114,24 +115,21 @@ if (!refCurso || !idEstudiante) {
         });
       }
 
-      if (!inscripcion.curso){
+      if (!inscripcion.curso) {
         return res.status(404).json({
           error: "El curso con ese ID no existe.",
         });
       }
 
-
       const cursoData = await prisma.curso.findUnique({
-      where: { idCurso: refCurso },
-      select: { nombreCurso: true },
+        where: { idCurso: refCurso },
+        select: { nombreCurso: true },
       });
       nombreCursoData = cursoData.nombreCurso;
-
     }
 
     // recuperar nombre del curso
 
-    
     // crear la impresion, estado inicial = "creado"
     const impresion = await prisma.impresion.create({
       data: {
@@ -154,8 +152,6 @@ if (!refCurso || !idEstudiante) {
         comentarioTecnico: "",
         observacionAyudante: "",
         tiempoEstimadoImpresion: "10 minutos",
-        
-        
       },
       select: {
         idImpresion: true,
@@ -167,7 +163,6 @@ if (!refCurso || !idEstudiante) {
       },
     });
 
-
     res.status(201).json({
       message: "Solicitud de impresión creada correctamente.",
       impresion,
@@ -177,7 +172,5 @@ if (!refCurso || !idEstudiante) {
     res.status(500).json({ error: "Error interno al crear solicitud." });
   }
 });
-
-
 
 export default router;

@@ -42,6 +42,7 @@ export default function SolicitudesEstudiante({ onClose, solicitudes = null }) {
                   <th style={modalStyles.th}>Estado</th>
                   <th style ={modalStyles.th}>Observacion Ayudante</th>
                   <th style={modalStyles.th}>Comentario tecnico</th>
+                  <th style={modalStyles.th}>Fecha inicio Impresion</th>
                 </tr>
               </thead>
               <tbody>
@@ -58,8 +59,8 @@ export default function SolicitudesEstudiante({ onClose, solicitudes = null }) {
                       {solicitud.tipoSolicitud}
                     </td>
                     <td style={modalStyles.td}>
-                      <span style={statusBadgeStyle(solicitud.estado)}>
-                        {solicitud.estado || 'Pendiente'}
+                      <span style={statusBadgeStyle(solicitud.estadoImpresion)}>
+                        {solicitud.estadoImpresion || 'Pendiente'}
                       </span>
                     </td>
                     <td style={modalStyles.td}>
@@ -67,6 +68,11 @@ export default function SolicitudesEstudiante({ onClose, solicitudes = null }) {
                     </td>
                     <td style = {modalStyles.td}>
                       {solicitud.comentarioTecnico || 'No hay comentarios técnicos'}
+                    </td>
+                    <td style={modalStyles.td}>
+                      {solicitud.inicioImpresion
+                        ? new Date(solicitud.inicioImpresion).toLocaleString()
+                        : 'Sin actualizaciones'}
                     </td>
 
                   </tr>
