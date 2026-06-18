@@ -54,9 +54,18 @@ jobs:
               env:
                   DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
 
-            - name: Run backend tests
+            - name: Correr pruebas unitarias
               working-directory: proy_constr/backend
-              run: npm run test:run
+              run: npm run test:unit
+              env:
+                CI: true
+
+            - name: Correr pruebas de integracion
+              working-directory: proy_constr/backend
+              run: npm run test:int
+              env:
+                CI: true
+                DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
     test-frontend:
         runs-on: ubuntu-latest
         defaults:

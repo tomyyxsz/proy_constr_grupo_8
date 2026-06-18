@@ -103,7 +103,7 @@ describe("gestión de solicitudes de impresión", () => {
 
   it("validar que no hay solicitudes", async () => {
     // borrar todas las solicitudes
-    await prisma.$executeRaw`TRUNCATE TABLE "Usuario" CASCADE;`;
+    await prisma.impresion.deleteMany();
     const response = await request(app).get("/");
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("message");
