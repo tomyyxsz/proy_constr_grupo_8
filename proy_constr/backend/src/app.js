@@ -4,6 +4,7 @@ import loginRouter from "./LoginUsuario.js";
 import registroRouter from "./RegistroUsuario.js";
 import solicitudImpresionRouter from "./SolicitudImpresion.js";
 import gestionImpresionRouter from "./GestionImpresion.js";
+import buscarUsuarioRouter from "./BuscarUsuario.js";
 const app = express();
 app.use(express.json());
 
@@ -12,5 +13,6 @@ app.use(loginRouter);
 app.use(registroRouter);
 app.use(solicitudImpresionRouter);
 app.use(gestionImpresionRouter);
+app.use("/api/usuarios", buscarUsuarioRouter);
 
 export default app;
