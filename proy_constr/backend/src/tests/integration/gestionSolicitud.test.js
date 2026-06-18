@@ -7,14 +7,20 @@ dotenv.config({ path: new URL("../../../.env.test", import.meta.url) });
 
 const { prisma } = await import("../../lib/prisma.js");
 
-let idEstudiante ="";
+let idEstudiante = "";
 let idSolicitud = "";
 let idEstudiante2 = "";
 let dataEstudiante = {};
 let idAyudante = "";
-describe  ("gestión de solicitudes de impresión", () => {
+describe("gestión de solicitudes de impresión", () => {
   beforeAll(async () => {
     await prisma.$connect();
+    // borrar datos de pruebas anteriores
+    await prisma.impresion.deleteMany();
+    await prisma.estudianteCurso.deleteMany();
+    await prisma.curso.deleteMany();
+    await prisma.usuario.deleteMany();
+    await prisma.semestre.deleteMany();
 
     // crear estudiante de prueba, curso, profesor, ayudante, semestre y la solicitud de impresión de tipo personal
 
@@ -33,8 +39,7 @@ describe  ("gestión de solicitudes de impresión", () => {
         rut: "12345678-9",
       },
     });
-        idEstudiante = estudiante1.id;
-
+    idEstudiante = estudiante1.id;
 
     dataEstudiante = {
       id: estudiante1.id,
@@ -67,13 +72,12 @@ describe  ("gestión de solicitudes de impresión", () => {
       },
     });
     idAyudante = ayudante.id;
-
   });
 
   beforeEach(async () => {
     // insertar una solicitud
-            // crear la solicitud
-        const solicitud1 = await prisma.impresion.create({
+    // crear la solicitud
+    const solicitud1 = await prisma.impresion.create({
       data: {
         solicitanteNombre: dataEstudiante.nombre,
         solicitanteApellido: dataEstudiante.apellido,
@@ -98,19 +102,13 @@ describe  ("gestión de solicitudes de impresión", () => {
       },
     });
     idSolicitud = solicitud1.idImpresion;
-});
-
-
-
+  });
 
   afterAll(async () => {
     await prisma.$disconnect();
   });
 
-
-
-
-    it("validar que no hay solicitudes", async () => {
+  it("validar que no hay solicitudes", async () => {
     // borrar todas las solicitudes
     await prisma.impresion.deleteMany();
     const response = await request(app).get("/");
@@ -121,10 +119,7 @@ describe  ("gestión de solicitudes de impresión", () => {
     expect(response.body.solicitudes.length).toBe(0);
   });
 
-    it("deberia recuperar todas las solicitudes de impresion" , async () => {
-
-
-
+  it("deberia recuperar todas las solicitudes de impresion", async () => {
     const response = await request(app).get("/");
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("message");
@@ -147,116 +142,122 @@ describe  ("gestión de solicitudes de impresión", () => {
     expect(response.body).toHaveProperty("solicitudes");
     expect(Array.isArray(response.body.solicitudes)).toBe(true);
     expect(response.body.solicitudes.length).toBe(0);
-
-
   });
 
-    it("deberia recuperar una solicitud segun su id", async () => {
-
-     const response = await request(app).get(`/${idSolicitud}`);
-     expect(response.status).toBe(200);
+  it("deberia recuperar una solicitud segun su id", async () => {
+    const response = await request(app).get(`/${idSolicitud}`);
+    expect(response.status).toBe(200);
   });
-    it("deberia validar que no encuentra una solicitud segun su id", async () => {
-        const response = await request(app).get(`/00000000-0000-0000-0000-000000000000`);
-        expect(response.status).toBe(404);
-    });
-    it("un ayudante deberia poder actualizar el estado de la solicitud mediante un put, a EN_PROGRESO", async () => {
-        const response = await request(app).put(`/${idSolicitud}/aprobar`).send({
-            idAyudante: idAyudante,
-            observacion: "Solicitud aprobada, comenzando impresión.",
-        });
-        expect(response.status).toBe(200);
-        // cambiar nuevamente a pendiente para que no afecte a otros test
-        await prisma.impresion.update({
-            where: { idImpresion: idSolicitud },
-            data: { estadoImpresion: "PENDIENTE"},
-        });
-    });
-
-
-    it("si idAyudante va vacio, no se debe poder recuperar", async () => {
-        const response = await request(app).put(`/${idSolicitud}/aprobar`).send({
-            idAyudante: "",
-            observacion: "Solicitud aprobada, comenzando impresión.",
-        });
-        expect(response.status).toBe(400);
-
+  it("deberia validar que no encuentra una solicitud segun su id", async () => {
+    const response = await request(app).get(
+      `/00000000-0000-0000-0000-000000000000`,
+    );
+    expect(response.status).toBe(404);
   });
-    it("si idAyudante no existe, no se debe poder recuperar", async () => {
-        const response = await request(app).put(`/${idSolicitud}/aprobar`).send({
-            idAyudante: "00000000-0000-0000-0000-000000000000",
-            observacion: "Solicitud aprobada, comenzando impresión.",
-        });
-        expect(response.status).toBe(404);
+  it("un ayudante deberia poder actualizar el estado de la solicitud mediante un put, a EN_PROGRESO", async () => {
+    const response = await request(app).put(`/${idSolicitud}/aprobar`).send({
+      idAyudante: idAyudante,
+      observacion: "Solicitud aprobada, comenzando impresión.",
     });
-
-    it("si idSolicitud no existe, no se debe poder recuperar", async () => {
-        const response = await request(app).put(`/00000000-0000-0000-0000-000000000000/aprobar`).send({
-            idAyudante: idAyudante,
-            observacion: "Solicitud aprobada, comenzando impresión.",
-        });
-        expect(response.status).toBe(404);
+    expect(response.status).toBe(200);
+    // cambiar nuevamente a pendiente para que no afecte a otros test
+    await prisma.impresion.update({
+      where: { idImpresion: idSolicitud },
+      data: { estadoImpresion: "PENDIENTE" },
     });
+  });
 
-    it ("un ayudante puede rechazar una solicitud mediante un put, cambiando el estado a RECHAZADA", async () => {
-        const response = await request(app).put(`/${idSolicitud}/rechazar`).send({
-            idAyudante: idAyudante,
-            motivo: "El modelo 3D no cumple con los requisitos de impresión.",
-        });
-        expect(response.status).toBe(200);
-        // cambiar nuevamente a pendiente para que no afecte a otros test
-        await prisma.impresion.update({
-            where: { idImpresion: idSolicitud },
-            data: { estadoImpresion: "PENDIENTE"},
-        });
+  it("si idAyudante va vacio, no se debe poder recuperar", async () => {
+    const response = await request(app).put(`/${idSolicitud}/aprobar`).send({
+      idAyudante: "",
+      observacion: "Solicitud aprobada, comenzando impresión.",
     });
-
-        it("si idAyudante va vacio, no se debe poder rechazar", async () => {
-        const response = await request(app).put(`/${idSolicitud}/rechazar`).send({
-            idAyudante: "",
-            motivo: "El modelo 3D no cumple con los requisitos de impresión.",
-        });
-        expect(response.status).toBe(400);
+    expect(response.status).toBe(400);
+  });
+  it("si idAyudante no existe, no se debe poder recuperar", async () => {
+    const response = await request(app).put(`/${idSolicitud}/aprobar`).send({
+      idAyudante: "00000000-0000-0000-0000-000000000000",
+      observacion: "Solicitud aprobada, comenzando impresión.",
     });
+    expect(response.status).toBe(404);
+  });
 
-    it("si idAyudante no existe, no se debe poder rechazar", async () => {
-        const response = await request(app).put(`/${idSolicitud}/rechazar`).send({
-            idAyudante: "00000000-0000-0000-0000-000000000000",
-            motivo: "El modelo 3D no cumple con los requisitos de impresión.",
-        });
-        expect(response.status).toBe(404);
+  it("si idSolicitud no existe, no se debe poder recuperar", async () => {
+    const response = await request(app)
+      .put(`/00000000-0000-0000-0000-000000000000/aprobar`)
+      .send({
+        idAyudante: idAyudante,
+        observacion: "Solicitud aprobada, comenzando impresión.",
+      });
+    expect(response.status).toBe(404);
+  });
+
+  it("un ayudante puede rechazar una solicitud mediante un put, cambiando el estado a RECHAZADA", async () => {
+    const response = await request(app).put(`/${idSolicitud}/rechazar`).send({
+      idAyudante: idAyudante,
+      motivo: "El modelo 3D no cumple con los requisitos de impresión.",
     });
-
-    it("si idSolicitud no existe, no se debe poder rechazar", async () => {
-        const response = await request(app).put(`/00000000-0000-0000-0000-000000000000/rechazar`).send({
-            idAyudante: idAyudante,
-            motivo: "El modelo 3D no cumple con los requisitos de impresión.",
-        });
-        expect(response.status).toBe(404);
+    expect(response.status).toBe(200);
+    // cambiar nuevamente a pendiente para que no afecte a otros test
+    await prisma.impresion.update({
+      where: { idImpresion: idSolicitud },
+      data: { estadoImpresion: "PENDIENTE" },
     });
+  });
 
-    it("un ayudante puede actualizar sus observaciones de una solicitud mediante un put", async () => {
-        const response = await request(app).put(`/${idSolicitud}/observaciones`).send({
-            idAyudante: idAyudante,
-            observacion: "Observación actualizada por el ayudante.",
-        });
-        expect(response.status).toBe(200);
+  it("si idAyudante va vacio, no se debe poder rechazar", async () => {
+    const response = await request(app).put(`/${idSolicitud}/rechazar`).send({
+      idAyudante: "",
+      motivo: "El modelo 3D no cumple con los requisitos de impresión.",
     });
+    expect(response.status).toBe(400);
+  });
 
-    it("si idAyudante va vacio, no se debe poder actualizar observaciones", async () => {
-        const response = await request(app).put(`/${idSolicitud}/observaciones`).send({
-            idAyudante: "",
-            observacion: "Observación actualizada por el ayudante.",
-        });
-        expect(response.status).toBe(400);
+  it("si idAyudante no existe, no se debe poder rechazar", async () => {
+    const response = await request(app).put(`/${idSolicitud}/rechazar`).send({
+      idAyudante: "00000000-0000-0000-0000-000000000000",
+      motivo: "El modelo 3D no cumple con los requisitos de impresión.",
     });
+    expect(response.status).toBe(404);
+  });
 
-    it("si idSolicitud no existe, no se debe poder actualizar observaciones", async () => {
-        const response = await request(app).put(`/00000000-0000-0000-0000-000000000000/observaciones`).send({
-            idAyudante: idAyudante,
-            observacion: "Observación actualizada por el ayudante.",
-        });
-        expect(response.status).toBe(404);
-    });
+  it("si idSolicitud no existe, no se debe poder rechazar", async () => {
+    const response = await request(app)
+      .put(`/00000000-0000-0000-0000-000000000000/rechazar`)
+      .send({
+        idAyudante: idAyudante,
+        motivo: "El modelo 3D no cumple con los requisitos de impresión.",
+      });
+    expect(response.status).toBe(404);
+  });
 
+  it("un ayudante puede actualizar sus observaciones de una solicitud mediante un put", async () => {
+    const response = await request(app)
+      .put(`/${idSolicitud}/observaciones`)
+      .send({
+        idAyudante: idAyudante,
+        observacion: "Observación actualizada por el ayudante.",
+      });
+    expect(response.status).toBe(200);
+  });
+
+  it("si idAyudante va vacio, no se debe poder actualizar observaciones", async () => {
+    const response = await request(app)
+      .put(`/${idSolicitud}/observaciones`)
+      .send({
+        idAyudante: "",
+        observacion: "Observación actualizada por el ayudante.",
+      });
+    expect(response.status).toBe(400);
+  });
+
+  it("si idSolicitud no existe, no se debe poder actualizar observaciones", async () => {
+    const response = await request(app)
+      .put(`/00000000-0000-0000-0000-000000000000/observaciones`)
+      .send({
+        idAyudante: idAyudante,
+        observacion: "Observación actualizada por el ayudante.",
+      });
+    expect(response.status).toBe(404);
+  });
 });

@@ -1,4 +1,3 @@
-
 import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it, beforeEach } from "vitest";
 import app from "../../appTest.js";
@@ -10,12 +9,19 @@ const { prisma } = await import("../../lib/prisma.js");
 
 describe("Creación de Curso", () => {
   beforeAll(async () => {
+    await prisma.$connect();
+    // borrar datos de pruebas anteriores
+    await prisma.impresion.deleteMany();
+    await prisma.estudianteCurso.deleteMany();
+    await prisma.curso.deleteMany();
+    await prisma.usuario.deleteMany();
+    await prisma.semestre.deleteMany();
 
     // crear profesor de prueba y tambien semestre
-    const profesor =await prisma.usuario.create({
+    const profesor = await prisma.usuario.create({
       data: {
         nombre: "Profesor Test",
-        apellido:"doctor",
+        apellido: "doctor",
         email: "profesor.creacioncurso@example.com",
         password: "password123",
         usuarioRol: "PROFESOR",
@@ -26,13 +32,10 @@ describe("Creación de Curso", () => {
       data: {
         anio: 2026,
         periodo: 2,
-        fechaInicio: new Date('2026-08-01'),
-        fechaFin: new Date('2026-12-31'),
+        fechaInicio: new Date("2026-08-01"),
+        fechaFin: new Date("2026-12-31"),
       },
     });
-
-
-    await prisma.$connect();
   });
 
   afterAll(async () => {
@@ -40,7 +43,7 @@ describe("Creación de Curso", () => {
     await prisma.curso.deleteMany({
       where: {
         nombreCurso: "CursoenCreacionCurso",
-        },
+      },
     });
 
     await prisma.usuario.deleteMany({
@@ -56,23 +59,20 @@ describe("Creación de Curso", () => {
     });
 
     await prisma.$disconnect();
-
   });
 
-  it ("debería crear un curso correctamente", async () => {
+  it("debería crear un curso correctamente", async () => {
     const profesor = await prisma.usuario.findUnique({
       where: { email: "profesor.creacioncurso@example.com" },
     });
     const semestre = await prisma.semestre.findFirst({
       where: { anio: 2026, periodo: 2 },
     });
-    const response = await request(app)
-      .post("/crear-curso")
-      .send({
-        nombreCurso: "CursoenCreacionCurso",
-        idProfesor: profesor.id,
-        idSemestre: semestre.idSemestre,
-      });
+    const response = await request(app).post("/crear-curso").send({
+      nombreCurso: "CursoenCreacionCurso",
+      idProfesor: profesor.id,
+      idSemestre: semestre.idSemestre,
+    });
     expect(response.status).toBe(201);
   });
 
@@ -80,13 +80,11 @@ describe("Creación de Curso", () => {
     const semestre = await prisma.semestre.findFirst({
       where: { anio: 2026, periodo: 2 },
     });
-    const response = await request(app)
-      .post("/crear-curso")
-      .send({
-        nombreCurso: "Curso de Prueba",
-        idProfesor: "00000000-0000-0000-0000-000000000000", // ID de profesor que no existe
-        idSemestre: semestre.idSemestre,
-      });
+    const response = await request(app).post("/crear-curso").send({
+      nombreCurso: "Curso de Prueba",
+      idProfesor: "00000000-0000-0000-0000-000000000000", // ID de profesor que no existe
+      idSemestre: semestre.idSemestre,
+    });
     expect(response.status).toBe(404);
   });
 
@@ -94,13 +92,11 @@ describe("Creación de Curso", () => {
     const profesor = await prisma.usuario.findUnique({
       where: { email: "profesor.creacioncurso@example.com" },
     });
-    const response = await request(app)
-      .post("/crear-curso")
-      .send({
-        nombreCurso: "Curso de Prueba",
-        idProfesor: profesor.id,
-        idSemestre: "00000000-0000-0000-0000-000000000000", // ID de semestre que no existe
-      });
+    const response = await request(app).post("/crear-curso").send({
+      nombreCurso: "Curso de Prueba",
+      idProfesor: profesor.id,
+      idSemestre: "00000000-0000-0000-0000-000000000000", // ID de semestre que no existe
+    });
     expect(response.status).toBe(404);
   });
 });
