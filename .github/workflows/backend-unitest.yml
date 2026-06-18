@@ -58,7 +58,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
 
       - name: Correr pruebas de integracion con cobertura
-        run: npx vitest run backend/src/tests/integration --coverage
+        run: npx vitest run backend/src --coverage
         env:
           CI: true
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public

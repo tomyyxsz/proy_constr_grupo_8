@@ -1,4 +1,4 @@
-import express from "express";
+
 // importar ruta de login en app.js de prueba para poder testear
 import loginRouter from "./LoginUsuario.js";
 import registroRouter from "./RegistroUsuario.js";

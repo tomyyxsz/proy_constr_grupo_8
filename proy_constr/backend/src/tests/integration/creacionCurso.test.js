@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { afterAll, beforeAll, describe, expect, it, beforeEach } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import app from "../../appTest.js";
 import request from "supertest";
 
@@ -13,7 +13,7 @@ describe("Creación de Curso", () => {
     await prisma.$connect();
 
     // crear profesor de prueba y tambien semestre
-    const profesor = await prisma.usuario.create({
+    await prisma.usuario.create({
       data: {
         nombre: "Profesor Test",
         apellido: "doctor",
@@ -23,7 +23,7 @@ describe("Creación de Curso", () => {
         rut: "11223344-5",
       },
     });
-    const semestre = await prisma.semestre.create({
+    await prisma.semestre.create({
       data: {
         anio: 2026,
         periodo: 2,

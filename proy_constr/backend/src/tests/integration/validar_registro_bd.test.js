@@ -94,6 +94,7 @@ describe("validar registro en base de datos", () => {
       email: "invalid-email-format",
       password: "APIpassword1!",
     });
+    expect(response.status).toBe(400);
   });
   it("validar que la contraseña no cumple con los requisitos", async () => {
     const response = await request(app).post("/registro").send({
@@ -103,6 +104,7 @@ describe("validar registro en base de datos", () => {
       email: "testAPI@example.com",
       password: "LOLITOFERNANDEZ!",
     });
+    expect(response.status).toBe(400);
   });
   it("validar rol invalido al registrarse", async () => {
     const response = await request(app).post("/registro").send({
@@ -113,6 +115,7 @@ describe("validar registro en base de datos", () => {
       password: "APIpassword1!",
       usuarioRol: "INVALIDROLE",
     });
+    expect(response.status).toBe(400);
   });
   it("validar rut invalido", async () => {
     const response = await request(app).post("/registro").send({
@@ -122,6 +125,7 @@ describe("validar registro en base de datos", () => {
       email: "testAPI@example.com",
       password: "APIpassword1!",
     });
+    expect(response.status).toBe(400);
   });
   it("validar que ya hay un usuario registrado con rut ya usado", async () => {
     const response = await request(app).post("/registro").send({
@@ -131,5 +135,6 @@ describe("validar registro en base de datos", () => {
       email: "testAPI2@example.com",
       password: "APIpassword1!",
     });
+    expect(response.status).toBe(400);
   });
 });

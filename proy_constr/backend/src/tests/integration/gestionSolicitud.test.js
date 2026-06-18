@@ -3,6 +3,9 @@ import { afterAll, beforeAll, describe, expect, it, beforeEach } from "vitest";
 import app from "../../appTest.js";
 import request from "supertest";
 
+// desactivar max lines per function para pruebas de integración que pueden ser largas
+/* eslint-disable max-lines-per-function */
+
 dotenv.config({ path: new URL("../../../.env.test", import.meta.url) });
 
 const { prisma } = await import("../../lib/prisma.js");

@@ -1,6 +1,6 @@
 // validar algunas de las funcionalidades de la clase buscarUsuario que se usan para Login tambien.
 import dotenv from "dotenv";
-import { afterAll, beforeAll, describe, expect, it, beforeEach } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import app from "../../appTest.js";
 import request from "supertest";
 
