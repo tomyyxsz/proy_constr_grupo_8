@@ -54,8 +54,9 @@ jobs:
               env:
                   DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
 
-            - name: Run backend tests with coverage
-              run: npm run test --pool=forks --no-file-parallelism --workspace backend
+            - name: Run backend tests
+              working-directory: proy_constr/backend
+              run: npm run test:run
     test-frontend:
         runs-on: ubuntu-latest
         defaults:
@@ -76,5 +77,6 @@ jobs:
             - name: Install dependencies
               run: npm ci --ignore-scripts
 
-            - name: Run frontend tests with coverage
-              run: npm run test --workspace frontend
+            - name: Run frontend tests 
+              working-directory: proy_constr/frontend
+              run: npm run test
