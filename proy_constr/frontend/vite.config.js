@@ -5,6 +5,7 @@ import babel from '@rolldown/plugin-babel'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
@@ -12,10 +13,12 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/tests/setupTests.js',
-    exclude: ['/src/api/**', '/src/lib/**', '/src/server/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
+      exclude: [
+        'src/api/**'
+      ]
     },
   },
 })
