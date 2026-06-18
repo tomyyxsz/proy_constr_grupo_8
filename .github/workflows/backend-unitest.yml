@@ -64,9 +64,3 @@ jobs:
           CI: true
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./proy_constr/backend/coverage/lcov.info
-          fail_ci_if_error: true
