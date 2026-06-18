@@ -110,7 +110,7 @@ router.post("/registro", async (req, res) => {
       message: "Usuario registrado correctamente.",
       usuario: newUser,
     });
-  } catch (error) {
+  } catch (error) { // doble validacion de error unico para rut y email, aunque prisma ya lo hace, esto es para dar un mensaje mas amigable al usuario
     if (error?.code === "P2002") {
       const uniqueField = Array.isArray(error.meta?.target) ? error.meta.target[0] : null;
 

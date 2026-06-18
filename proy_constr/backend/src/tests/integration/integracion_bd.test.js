@@ -17,7 +17,8 @@ describe("conexión a la base de datos", () => {
     });
 
     it("debería conectarse correctamente a la base de datos de Docker", async () => {
-        const resultado = await prisma.$queryRaw`SELECT 1 AS ok`;
+        // recoger cualquiera consulta simple para verificar la conexión
+       const resultado = await prisma.$queryRaw`SELECT 1 AS ok`;
 
         expect(resultado).toHaveLength(1);
         expect(resultado[0]).toMatchObject({ ok: 1 });

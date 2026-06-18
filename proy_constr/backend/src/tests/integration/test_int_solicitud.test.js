@@ -48,10 +48,15 @@ hay que tener en cuenta que impresion tiene muchos campos:
 
 import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import app from "../../app.js";
+import request from "supertest";
 
 dotenv.config({ path: new URL("../../../.env.test", import.meta.url) });
 
 const { prisma } = await import("../../lib/prisma.js");
+
+
+let contexto = {};
 
 describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
   beforeAll(async () => {
@@ -59,6 +64,7 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
     // antes de comenzar crear datos de prueba en la base de datos
     // usuario estudiante, usuario ayudante, usuario profesor, semestre y curso
     // para ejecutar las pruebas
+
     await prisma.usuario.create({
       data: {
         nombre: "Test", apellido: "Integracion", email: "usuariotest@example.com", rut: "21748641-6",
@@ -105,18 +111,62 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
         nombreCurso: "Curso de Prueba", refSemestre: idSemestre, refProfesor: idProfesor,
       },
     });
+
+    await prisma.curso.create({
+      // curso tiene nombreCurso, refSemestre, refProfesor.
+      data: {
+        nombreCurso: "Curso de Prueba EST no inscrito", refSemestre: idSemestre, refProfesor: idProfesor,
+      }
+    });
+
+
+
+    const [usuario, curso, ayudante, curso2] = await Promise.all([
+    prisma.usuario.findUnique({ where: { email: "usuariotest@example.com" } }),
+    prisma.curso.findFirst({ where: { nombreCurso: "Curso de Prueba" } }),
+    prisma.usuario.findUnique({ where: { email: "ayutest@example.com" } }),
+    prisma.curso.findFirst({ where: { nombreCurso: "Curso de Prueba EST no inscrito" } })
+    ]);
+
+    contexto = {
+      estudiante: usuario,
+      curso: curso,
+      ayudante: ayudante,
+      estudianteCurso: null,
+      curso2: curso2
+    }
+
+        await prisma.EstudianteCurso.create({
+      data: {
+        refCurso: contexto.curso.idCurso,
+        refEstudiante: contexto.estudiante.id
+      }});
+
+
   });
 
   afterAll(async () => {
-    await prisma.impresion.deleteMany ({
+
+
+    await prisma.EstudianteCurso.deleteMany({
+    });
+
+    await prisma.impresion.deleteMany({
       where : { solicitanteEmail: "usuariotest@example.com" },
+    });
+        await prisma.curso.deleteMany({
+      where: { nombreCurso: "Curso de Prueba" },
+    });
+    await prisma.curso.deleteMany({
+      where: { nombreCurso: "Curso de Prueba EST no inscrito" },
+     });
+    await prisma.semestre.deleteMany({
+      where: { anio: 2024, periodo: 2 },
     });
     await prisma.usuario.deleteMany({
       where: { email: "usuariotest@example.com" },
     });
-    await prisma.curso.deleteMany({
-      where: { nombreCurso: "Curso de Prueba" },
-    });
+
     await prisma.usuario.deleteMany({
       where: { email: "ayutest@example.com" },
     });
@@ -130,22 +180,10 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
     await prisma.$disconnect();
   });
 
+
+  
   it("debería crear una solicitud de impresión correctamente en la base de datos", async () => {
-    // datos de prueba sacados de la base de datos
-    const usuarioTest = await prisma.usuario.findUnique({
-      where: { email: "usuariotest@example.com" },
-    });
-    const idEstudiante = usuarioTest.id;
 
-    const cursoTest = await prisma.curso.findFirst({
-      where: { nombreCurso: "Curso de Prueba" },
-    });
-    const idCurso = cursoTest.idCurso;
-
-    const ayudanteTest = await prisma.usuario.findUnique({
-      where: { email: "ayutest@example.com" },
-    });
-    const idAyudante = ayudanteTest.id;
 
     // otros datos
     const tipoSolicitud = "ACADEMICA";
@@ -153,21 +191,21 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
     // crear la solicitud de impresion
     const impresion = await prisma.impresion.create({
       data: {
-        solicitanteNombre: usuarioTest.nombre,
-        solicitanteApellido: usuarioTest.apellido,
-        solicitanteEmail: usuarioTest.email,
-        solicitanteRut: usuarioTest.rut,
+        solicitanteNombre: contexto.estudiante.nombre,
+        solicitanteApellido: contexto.estudiante.apellido,
+        solicitanteEmail: contexto.estudiante.email,
+        solicitanteRut: contexto.estudiante.rut,
         estudiante: {
-          connect: { id: idEstudiante },
+          connect: { id: contexto.estudiante.id },
         },
         ayudante: {
-          connect: { id: idAyudante },
+          connect: { id: contexto.ayudante.id },
         },
         curso: {
-          connect: { idCurso: idCurso },
+          connect: { idCurso: contexto.curso.idCurso },
         },
         nombreCurso: "Curso de Prueba",
-        tipoUsuario: usuarioTest.usuarioRol,
+        tipoUsuario: contexto.estudiante.usuarioRol,
         tipoSolicitud: tipoSolicitud,
         colorOpcion1: "#00000",
         colorOpcion2: "#00000",
@@ -189,9 +227,9 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
     expect(impresion.estadoImpresion).toBe("PENDIENTE");
     expect(impresion.urlModelo3d).toBe("http://example.com/modelo3d.obj");
     expect(impresion.urlModeloStl).toBe("http://example.com/modelo.stl");
-    expect(impresion.refEstudiante).toBe(idEstudiante);
+    expect(impresion.refEstudiante).toBe(contexto.estudiante.id);
     expect(impresion.nombreCurso).toBe("Curso de Prueba");
-    expect(impresion.refCurso).toBe(idCurso);
+    expect(impresion.refCurso).toBe(contexto.curso.idCurso);
     expect(impresion.colorOpcion1).toBe("#00000");
     expect(impresion.colorOpcion2).toBe("#00000");
     expect(impresion.colorOpcion3).toBe("#00000");
@@ -205,5 +243,118 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
     expect(impresion.inicioImpresion).toBeNull();
   });
 
-  it("debería fallar al crear una solicitud de impresión con un id de estudiante no existente", async () => {});
+  it("validar creacion correcta de solicitud personal usando rutas POST", async () => {
+    const response = await request(app).post("/crear").send({
+      idEstudiante: contexto.estudiante.id,
+      color1: "#00000",
+      color2: "#00000",
+      color3: "#00000",
+      tipoSolicitud: "ACADEMICA",
+      comentario: "Por favor imprimir con alta calidad.",
+      urlModelo3d: "http://example.com/modelo3d.obj",
+      urlModeloStl: "http://example.com/modelo.stl",
+      refCurso: contexto.curso.idCurso,
+    });
+    expect(response.status).toBe(201);
+  });
+  it("validar tipo de solicitud", async () => {
+      const response = await request(app).post("/crear").send({
+        idEstudiante: contexto.estudiante.id,
+        color1: "#00000",
+        color2: "#00000",
+        color3: "#00000",
+        tipoSolicitud: "INVALIDA",
+        comentario: "Por favor imprimir con alta calidad.",
+        urlModelo3d: "http://example.com/modelo3d.obj",
+        urlModeloStl: "http://example.com/modelo.stl",
+        refCurso: contexto.curso.idCurso,
+      });
+      expect(response.status).toBe(400);
+    });
+
+  it("validar campos obligatorios", async () => {
+    const response = await request(app).post("/crear").send({
+      idEstudiante: contexto.estudiante.id,
+      // color1 falta
+      color2: "#00000",
+      color3: "#00000",
+      tipoSolicitud: "ACADEMICA",
+      comentario: "Por favor imprimir con alta calidad.",
+      urlModelo3d: "http://example.com/modelo3d.obj",
+      urlModeloStl: "http://example.com/modelo.stl",
+      refCurso: contexto.curso.idCurso,
+    });
+    expect(response.status).toBe(400);
+  });
+
+  it("validar si es personal, no se necesita refcurso", async () => {
+    const response = await request(app).post("/crear").send({
+      idEstudiante: contexto.estudiante.id,
+      color1: "#00000",
+      color2: "#00000",
+      color3: "#00000",
+      tipoSolicitud: "PERSONAL",
+      comentario: "Por favor imprimir con alta calidad.",
+      urlModelo3d: "http://example.com/modelo3d.obj",
+      urlModeloStl: "http://example.com/modelo.stl",
+      // refCurso no se incluye para solicitud personal
+    });
+    expect(response.status).toBe(201);
+  });
+  it("validar formato url", async () => {
+    const response = await request(app).post("/crear").send({
+      idEstudiante: contexto.estudiante.id,
+      color1: "#00000",
+      color2: "#00000",
+      color3: "#00000",
+      tipoSolicitud: "ACADEMICA",
+      comentario: "Por favor imprimir con alta calidad.",
+      urlModelo3d: "invalid-url",
+      urlModeloStl: "http://example.com/modelo.stl",
+      refCurso: contexto.curso.idCurso,
+    });
+    expect(response.status).toBe(400);
+  });
+  it("validar que estudiante no existe", async () => {
+    const response = await request(app).post("/crear").send({
+      idEstudiante: "non-existent-id",
+      color1: "#00000",
+      color2: "#00000",
+      color3: "#00000",
+      tipoSolicitud: "PERSONAL",
+      comentario: "Por favor imprimir con alta calidad.",
+      urlModelo3d: "http://example.com/modelo3d.obj",
+      urlModeloStl: "http://example.com/modelo.stl",
+      refCurso: contexto.curso.idCurso,
+    });
+    expect(response.status).toBe(400);
+  });
+  it("validar que estudiante no esta inscrito en el curso", async () => {
+    const response = await request(app).post("/crear").send({
+      idEstudiante: contexto.estudiante.id,
+      color1: "#00000",
+      color2: "#00000",
+      color3: "#00000",
+      tipoSolicitud: "ACADEMICA",
+      comentario: "Por favor imprimir con alta calidad.",
+      urlModelo3d: "http://example.com/modelo3d.obj",
+      urlModeloStl: "http://example.com/modelo.stl",
+      refCurso: contexto.curso2.idCurso, // curso donde el estudiante no esta inscrito
+  });
+    expect(response.status).toBe(403);
+   });
+  it("validar que el curso no existe", async () => {
+    const response = await request(app).post("/crear").send({
+      idEstudiante: contexto.estudiante.id,
+      color1: "#00000",
+      color2: "#00000",
+      color3: "#00000",
+      tipoSolicitud: "ACADEMICA",
+      comentario: "Por favor imprimir con alta calidad.",
+      urlModelo3d: "http://example.com/modelo3d.obj",
+      urlModeloStl: "http://example.com/modelo.stl",
+      refCurso: "00000000-0000-0000-0000-000000000000", // curso que no existe
+    });
+    expect(response.status).toBe(403);
+  });
 });

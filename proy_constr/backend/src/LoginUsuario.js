@@ -1,28 +1,15 @@
-import crypto from "node:crypto";
+
 import express from "express";
 import { prisma } from "./lib/prisma.js";
-
+import { verifyPassword } from "./lib/validaciones.js";
 const router = express.Router();
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function verifyPassword(plainPassword, storedPassword) { // verifica si la contrasena ingresada coincide con el hash almacenado en la base de datos.
-  if (!storedPassword || !storedPassword.includes(":")) {
-    return false;
-  }
 
-  const [salt, hashed] = storedPassword.split(":");
-  if (!salt || !hashed) {
-    return false;
-  }
-
-  const candidate = crypto.scryptSync(String(plainPassword), salt, 64).toString("hex");
-  return crypto.timingSafeEqual(Buffer.from(candidate, "hex"), Buffer.from(hashed, "hex"));
-}
 
 router.post("/login", async (req, res) => { // ruta POST /login para iniciar sesion de un usuario existente
   const { email, password } = req.body;
-
   if (!email || !password) {
     return res.status(400).json({
       error: "Debes enviar email y password para iniciar sesion.",
@@ -49,7 +36,6 @@ router.post("/login", async (req, res) => { // ruta POST /login para iniciar ses
         password: true,
       },
     });
-
     if (!user) {
       return res.status(404).json({ // 404 = usuario no encontrado
         error: "Usuario no encontrado. Debes registrarte primero.",

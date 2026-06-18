@@ -89,7 +89,12 @@ router.post("/crear", async (req, res) => {
     //let cursoRef = "5eb68c60-f502-4be8-9276-f706c33d31bc";
 
     // si la solicitud es academica, se debe verificar que el estudiante esta inscrito en ese curso
+    let nombreCursoData = "";
     if (tipoSolicitud === "ACADEMICA") {
+
+if (!refCurso || !idEstudiante) {
+    return res.status(400).json({ error: "Faltan datos de curso o estudiante." });
+}
       const inscripcion = await prisma.EstudianteCurso.findFirst({
         where: {
           refCurso,
@@ -103,26 +108,29 @@ router.post("/crear", async (req, res) => {
           },
         },
       });
-
-      if (!inscripcion.curso){
-        return res.status(404).json({
-          error: "El curso con ese ID no existe.",
-        });
-      }
       if (!inscripcion) {
         return res.status(403).json({
           error: "El estudiante no está inscrito en ese curso.",
         });
       }
 
+      if (!inscripcion.curso){
+        return res.status(404).json({
+          error: "El curso con ese ID no existe.",
+        });
+      }
+
+
+      const cursoData = await prisma.curso.findUnique({
+      where: { idCurso: refCurso },
+      select: { nombreCurso: true },
+      });
+      nombreCursoData = cursoData.nombreCurso;
+
     }
 
     // recuperar nombre del curso
-    const cursoData = await prisma.curso.findMany({
-      where: { idCurso: refCurso },
-      select: { nombreCurso: true },
-    });
-    const nombreCursoData = cursoData ? cursoData[0].nombreCurso : null;
+
     
     // crear la impresion, estado inicial = "creado"
     const impresion = await prisma.impresion.create({
@@ -135,6 +143,7 @@ router.post("/crear", async (req, res) => {
         tipoUsuario: "ESTUDIANTE",
         tipoSolicitud: tipoSolicitud,
         nombreCurso: nombreCursoData,
+        refCurso: refCurso,
         colorOpcion1: color1,
         colorOpcion2: color2,
         colorOpcion3: color3,
@@ -157,6 +166,7 @@ router.post("/crear", async (req, res) => {
         creadoEn: true,
       },
     });
+
 
     res.status(201).json({
       message: "Solicitud de impresión creada correctamente.",
