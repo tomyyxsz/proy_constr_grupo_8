@@ -1,3 +1,4 @@
+// rutas principales
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -27,6 +28,10 @@ app.get("/health", (_req, res) => {
   res.json({ ok: true, service: "backend" });
 });
 
-app.listen(port, () => {
-  console.info(`Backend running on http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(port, () => {
+    console.info(`Backend running on http://localhost:${port}`);
+  });
+}
+
+export default app;

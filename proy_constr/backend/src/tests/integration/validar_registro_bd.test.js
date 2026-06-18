@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import crypto from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import request from "supertest";
-import app from "../../app.js";
+import app from "../../appTest.js";
 
 dotenv.config({ path: new URL("../../../.env.test", import.meta.url) });
 
@@ -22,7 +22,7 @@ describe("validar registro en base de datos", () => {
             where: { email: testEmail },
         });
         await prisma.usuario.deleteMany({
-            where: { rut : "21684893-6" },
+            where: { email : "amigos@example.com" },
         });
         await prisma.$disconnect();
         // eliminar usuario de prueba
@@ -68,7 +68,7 @@ describe("validar registro en base de datos", () => {
             rut: "21857836-5",
             nombre: "TestAPI",
             apellido: "UserAPI",
-            email: "testAPI@example.com",
+            email: "amigos@example.com",
             password: "APIpassword1!",
         });
         console.log("Response body:", response.body);
@@ -84,6 +84,7 @@ describe("validar registro en base de datos", () => {
         });
         expect(response.status).toBe(400);
      });
+
     it ( "validar que el correo no tiene un formato valido",async () => {
         const response = await request(app).post("/registro").send({
             rut: "21684893-6",

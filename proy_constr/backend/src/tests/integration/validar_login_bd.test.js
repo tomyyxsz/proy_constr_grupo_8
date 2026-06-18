@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import crypto from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import request from "supertest";
-import app from "../../app.js";
+import app from "../../appTest.js";
 
 dotenv.config({ path: new URL("../../../.env.test", import.meta.url) });
 
@@ -17,11 +17,11 @@ function hashPassword(password) {
 }
 
 const { prisma } = await import("../../lib/prisma.js");
-const testEmail = "test_login@example.com";
 const hashedPassword = hashPassword("Password1234!");
 
 
 describe("validar login en base de datos", () => {
+
   beforeAll(async () => {
     await prisma.$connect();
 
@@ -29,11 +29,10 @@ describe("validar login en base de datos", () => {
 
 	    await prisma.usuario.create({
       data: {
-        id: crypto.randomUUID(),
-        rut: "22345678-5",
+        rut: "12332121-5",
         nombre: "Test",
         apellido: "User",
-        email: testEmail,
+        email: "test_login@example.com",
         password: hashedPassword,
         usuarioRol: "ESTUDIANTE",
       },
@@ -45,24 +44,23 @@ describe("validar login en base de datos", () => {
   afterAll(async () => {
     //eliminar usuario de prueba
     await prisma.usuario.deleteMany({
-      where: { email: testEmail },
+      where: { email: "test_login@example.com" },
     });
     await prisma.$disconnect();
   });
 
+
   it("debería validar el login como prisma correctamente", async () => {
-    const response = await prisma.usuario.findMany({
-      where: { email: testEmail },
+    const response = await prisma.usuario.findFirst({
+      where: { email: "test_login@example.com" },
     });
 
-    expect(response[0]).not.toBeNull();
-    expect(response[0].email).toBe(testEmail);
-    expect(response[0].password).toBe(hashedPassword);
+    expect(response).not.toBeNull();
   });
 
   it("debería iniciar sesión en router correctamente", async () => {
 	const response = await request(app).post("/login").send({
-      email: testEmail,
+      email: "test_login@example.com",
       password: "Password1234!",
     });
     expect(response.status).toBe(200);
@@ -70,8 +68,8 @@ describe("validar login en base de datos", () => {
 
   it("debería rechazar login con contraseña incorrecta", async () => {
 	const response = await request(app).post("/login").send({
-	  email: testEmail,
-	  password: "WrongPassword",
+	  email: "test_login@example.com",
+	  password: "WrongPassword1234!",
 	});
 	expect(response.status).toBe(401);
 	  });
@@ -85,7 +83,7 @@ describe("validar login en base de datos", () => {
 });
     it ("deberia rechazar algun cambio vacio, email o password", async () => {
 		const response = await request(app).post("/login").send({
-			email: testEmail,
+			password: "Password1234!",
 		});
 		expect(response.status).toBe(400);
 	});

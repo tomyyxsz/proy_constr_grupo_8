@@ -48,7 +48,7 @@ hay que tener en cuenta que impresion tiene muchos campos:
 
 import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import app from "../../app.js";
+import app from "../../appTest.js";
 import request from "supertest";
 
 dotenv.config({ path: new URL("../../../.env.test", import.meta.url) });
@@ -92,12 +92,12 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
     await prisma.semestre.create({
       // semestre tiene anio,periodo,fechainicio,fechafin,estadosemestre.
       data: {
-        anio: 2024, periodo: 2, fechaInicio: new Date("2024-08-01"), fechaFin: new Date("2024-12-31"), estadoSemestre: "ACTIVO",
+        anio: 2025, periodo: 2, fechaInicio: new Date("2024-08-01"), fechaFin: new Date("2024-12-31"), estadoSemestre: "ACTIVO",
       },
     });
 
     const semestre = await prisma.semestre.findFirst({
-      where: { anio: 2024, periodo: 2 },
+      where: { anio: 2025, periodo: 2 },
     });
     const idSemestre = semestre.idSemestre;
 

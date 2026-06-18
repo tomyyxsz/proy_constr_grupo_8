@@ -1,7 +1,7 @@
 // validar algunas de las funcionalidades de la clase buscarUsuario que se usan para Login tambien.
 import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it, beforeEach } from "vitest";
-import app from "../../app.js";
+import app from "../../appTest.js";
 import request from "supertest";
 
 dotenv.config({ path: new URL("../../../.env.test", import.meta.url) });
@@ -15,7 +15,7 @@ describe("busqueda de usuarios", () => {
         await prisma.usuario.create({
             data: {
                 id: crypto.randomUUID(),
-                rut: "99999999-9",
+                rut: "87783738-9",
                 nombre: "Test",
                 apellido: "Busqueda",
                 email: "busqueda@example.com",
@@ -42,7 +42,7 @@ describe("busqueda de usuarios", () => {
   //const filters = [];
         const response = await request(app)
             .get("/api/usuarios/buscar")
-            .query({ email: "busqueda@example.com", rut: "99999999-9", rol: "ESTUDIANTE", nombre: "Test", apellido: "Busqueda" });
+            .query({ email: "busqueda@example.com", rut: "87783738-9", rol: "ESTUDIANTE", nombre: "Test", apellido: "Busqueda" });
         expect(response.status).toBe(200);
     });
 
@@ -56,7 +56,7 @@ describe("busqueda de usuarios", () => {
     it("el usuario a buscar debe tener un rol valido", async () => {
         const response = await request(app)
             .get("/api/usuarios/buscar")
-            .query({ email: "busqueda@example.com", rut: "99999999-9", rol: "INVALIDO", nombre: "Test", apellido: "Busqueda" });
+            .query({ email: "busqueda@example.com", rut: "87783738-9", rol: "INVALIDO", nombre: "Test", apellido: "Busqueda" });
         expect(response.status).toBe(400);
     });
 

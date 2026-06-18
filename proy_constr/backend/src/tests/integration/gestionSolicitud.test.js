@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it, beforeEach } from "vitest";
-import app from "../../app.js";
+import app from "../../appTest.js";
 import request from "supertest";
 
 dotenv.config({ path: new URL("../../../.env.test", import.meta.url) });
