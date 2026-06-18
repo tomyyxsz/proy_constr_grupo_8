@@ -35,7 +35,7 @@ describe("Solicitud de Impresion - Validaciones", () => {
   });
 });
 
-describe ("Solicitud de Impresion - Validaciones de Campos", () => {
+describe("Solicitud de Impresion - Validaciones de Campos", () => {
   it("debería fallar si falta el idEstudiante", () => {
     const solicitud = {
       color1: "#FF0000",
@@ -64,32 +64,30 @@ describe ("Solicitud de Impresion - Validaciones de Campos", () => {
     expect(solicitud.tipoSolicitud).toBeUndefined();
   });
   it("debería fallar si es una solicitud académica sin refCurso", () => {
-      const solicitud = {
-          idEstudiante: "123e4567-e89b-12d3-a456-426614174000",
-          color1: "#FF0000",
-          color2: "#00FF00",
-          color3: "#0000FF",
-          tipoSolicitud: "ACADEMICA",
-          comentario: "Solicitud para proyecto final",
-          urlModelo3d: "http://example.com/modelo3d.obj",
-          urlModeloStl: "http://example.com/modelo.stl",
-      };
-      expect(solicitud.refCurso).toBeUndefined(); 
-    });
+    const solicitud = {
+      idEstudiante: "123e4567-e89b-12d3-a456-426614174000",
+      color1: "#FF0000",
+      color2: "#00FF00",
+      color3: "#0000FF",
+      tipoSolicitud: "ACADEMICA",
+      comentario: "Solicitud para proyecto final",
+      urlModelo3d: "http://example.com/modelo3d.obj",
+      urlModeloStl: "http://example.com/modelo.stl",
+    };
+    expect(solicitud.refCurso).toBeUndefined();
+  });
 
-    it("debería validar una solicitud de tipo PERSONAL sin refCurso", () => {
-        const solicitud = {
-            idEstudiante: "123e4567-e89b-12d3-a456-426614174000",
-            color1: "#FF0000",
-            color2: "#00FF00",
-            color3: "#0000FF",
-            tipoSolicitud: "PERSONAL",
-            comentario: "Solicitud para proyecto personal",
-            urlModelo3d: "http://example.com/modelo3d.obj",
-            urlModeloStl: "http://example.com/modelo.stl",
-        };
-        expect(solicitud).toBeDefined();
-    });
-
+  it("debería validar una solicitud de tipo PERSONAL sin refCurso", () => {
+    const solicitud = {
+      idEstudiante: "123e4567-e89b-12d3-a456-426614174000",
+      color1: "#FF0000",
+      color2: "#00FF00",
+      color3: "#0000FF",
+      tipoSolicitud: "PERSONAL",
+      comentario: "Solicitud para proyecto personal",
+      urlModelo3d: "http://example.com/modelo3d.obj",
+      urlModeloStl: "http://example.com/modelo.stl",
+    };
+    expect(solicitud).toBeDefined();
+  });
 });
-
