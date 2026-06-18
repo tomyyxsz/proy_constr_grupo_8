@@ -10,7 +10,7 @@ const { prisma } = await import("../../lib/prisma.js");
 
 describe("busqueda de usuarios", () => {
 
-    
+    // comentario de prueba XD
     beforeAll(async () => {
         await prisma.$connect();
         // borrar si habian datos de pruebas anteriores
