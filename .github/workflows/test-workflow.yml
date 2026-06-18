@@ -55,7 +55,7 @@ jobs:
                   DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
 
             - name: Run backend tests with coverage
-              run: npm run test --workspace backend
+              run: npm run test --pool=forks --no-file-parallelism --workspace backend
     test-frontend:
         runs-on: ubuntu-latest
         defaults:
