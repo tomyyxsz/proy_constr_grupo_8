@@ -10,7 +10,7 @@
     "test:run": "vitest run",
     "test:unit": "vitest run tests/unit",
     "test:coverage": "vitest run --coverage --pool=forks --no-file-parallelism",
-    "test:int": "vitest run tests/integration",
+    "test:int": "vitest run tests/integration --pool=forks --no-file-parallelism",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "lint": "eslint . --ext .js,.ts --fix"

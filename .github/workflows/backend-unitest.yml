@@ -59,7 +59,7 @@ jobs:
 
       - name: Correr pruebas de integracion
         working-directory: proy_constr/backend
-        run: npm run test:run
+        run: npm run test:int
         env:
           CI: true
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
