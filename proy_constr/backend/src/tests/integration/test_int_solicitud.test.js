@@ -10,18 +10,14 @@ const { prisma } = await import("../../lib/prisma.js");
 let contexto = {};
 
 describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
+  
+  
   beforeAll(async () => {
     await prisma.$connect();
     // antes de comenzar crear datos de prueba en la base de datos
     // usuario estudiante, usuario ayudante, usuario profesor, semestre y curso
     // para ejecutar las pruebas
 
-    // borrar datos de pruebas anteriores
-    await prisma.impresion.deleteMany();
-    await prisma.estudianteCurso.deleteMany();
-    await prisma.curso.deleteMany();
-    await prisma.usuario.deleteMany();
-    await prisma.semestre.deleteMany();
 
     await prisma.usuario.create({
       data: {

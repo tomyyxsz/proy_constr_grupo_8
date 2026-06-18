@@ -19,15 +19,9 @@ const { prisma } = await import("../../lib/prisma.js");
 const hashedPassword = hashPassword("Password1234!");
 
 describe("validar login en base de datos", () => {
+  
   beforeAll(async () => {
     await prisma.$connect();
-
-    // borrar datos de pruebas anteriores
-    await prisma.impresion.deleteMany();
-    await prisma.estudianteCurso.deleteMany();
-    await prisma.curso.deleteMany();
-    await prisma.usuario.deleteMany();
-    await prisma.semestre.deleteMany();
 
     // crear usuario de prueba para validar login
 

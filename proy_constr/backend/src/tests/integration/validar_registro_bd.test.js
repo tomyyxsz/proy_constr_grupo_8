@@ -15,12 +15,7 @@ const testEmail = "testregistro@example.com";
 describe("validar registro en base de datos", () => {
   beforeAll(async () => {
     await prisma.$connect();
-    // borrar datos de pruebas anteriores
-    await prisma.impresion.deleteMany();
-    await prisma.estudianteCurso.deleteMany();
-    await prisma.curso.deleteMany();
-    await prisma.usuario.deleteMany();
-    await prisma.semestre.deleteMany();
+
   });
 
   afterAll(async () => {

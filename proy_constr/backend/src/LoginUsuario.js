@@ -10,6 +10,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 router.post("/login", async (req, res) => { // ruta POST /login para iniciar sesion de un usuario existente
   const { email, password } = req.body;
+
   if (!email || !password) {
     return res.status(400).json({
       error: "Debes enviar email y password para iniciar sesion.",

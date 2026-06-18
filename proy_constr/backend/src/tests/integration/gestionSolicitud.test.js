@@ -13,22 +13,12 @@ let idEstudiante2 = "";
 let dataEstudiante = {};
 let idAyudante = "";
 describe("gestión de solicitudes de impresión", () => {
+  
+  
   beforeAll(async () => {
     await prisma.$connect();
-    // borrar datos de pruebas anteriores
-    await prisma.impresion.deleteMany();
-    await prisma.estudianteCurso.deleteMany();
-    await prisma.curso.deleteMany();
-    await prisma.usuario.deleteMany();
-    await prisma.semestre.deleteMany();
 
     // crear estudiante de prueba, curso, profesor, ayudante, semestre y la solicitud de impresión de tipo personal
-
-    //borrar
-    await prisma.impresion.deleteMany();
-    await prisma.usuario.deleteMany();
-    await prisma.curso.deleteMany();
-    await prisma.semestre.deleteMany();
 
     const estudiante1 = await prisma.usuario.create({
       data: {

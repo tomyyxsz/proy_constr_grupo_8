@@ -8,14 +8,11 @@ dotenv.config({ path: new URL("../../../.env.test", import.meta.url) });
 const { prisma } = await import("../../lib/prisma.js");
 
 describe("conexión a la base de datos", () => {
+
+
+
   beforeAll(async () => {
     await prisma.$connect();
-    // borrar datos de pruebas anteriores
-    await prisma.impresion.deleteMany();
-    await prisma.estudianteCurso.deleteMany();
-    await prisma.curso.deleteMany();
-    await prisma.usuario.deleteMany();
-    await prisma.semestre.deleteMany();
   });
 
   afterAll(async () => {

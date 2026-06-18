@@ -8,14 +8,9 @@ dotenv.config({ path: new URL("../../../.env.test", import.meta.url) });
 const { prisma } = await import("../../lib/prisma.js");
 
 describe("Creación de Curso", () => {
+
   beforeAll(async () => {
     await prisma.$connect();
-    // borrar datos de pruebas anteriores
-    await prisma.impresion.deleteMany();
-    await prisma.estudianteCurso.deleteMany();
-    await prisma.curso.deleteMany();
-    await prisma.usuario.deleteMany();
-    await prisma.semestre.deleteMany();
 
     // crear profesor de prueba y tambien semestre
     const profesor = await prisma.usuario.create({
