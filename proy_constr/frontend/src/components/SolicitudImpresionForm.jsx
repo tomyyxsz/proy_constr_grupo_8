@@ -8,6 +8,9 @@ const supabase = createClient('https://kywbczhepfqbgtlpxemr.supabase.co', 'sb_pu
 // Componente para el formulario de solicitud de impresión, utilizado en el dashboard del estudiante
 function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
 
+  console.log(user.rut)
+  console.log(user.id)
+  console.log(user)
   const [formData, setFormData] = useState({
     color1: '#000000',
     color2: '#ffffff',
@@ -19,6 +22,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
     refCurso: '',
   })
   const [archivoStl, setArchivoStl] = useState(null)
+  const [archivoModelo3D, setArchivoModelo3d] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [exito, setExito] = useState(null)
@@ -33,11 +37,8 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
   }
   //validamos que los campos esten completos y tengan un formato correcto 
   const validar = () => {
-    if (!formData.urlModelo3d) {
-      return 'Debes ingresar las URLs del modelo 3D '
-    }
-    if (!/^https?:\/\/.+/.test(formData.urlModelo3d)) {
-      return 'La URL del modelo 3D no es válida (debe empezar con http:// o https://).'
+    if (!archivoModelo3D) {
+      return 'Debes adjuntar el archivo modelo 3D'
     }
     if (!archivoStl) {
       return 'Debes adjuntar el archivo STL'
@@ -61,19 +62,37 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
 
     setLoading(true)
     try {
-      const extensionNombreArchivo = archivoStl.name.split('').pop()
-      const nombreUnicoArchivo = `${Date.now()}-${Math.random().toString(36).substring(7)}.${extensionNombreArchivo}` 
+      // configurar el url del archivo stl para la BD
+      const nombreLimpioArchivo = archivoStl.name.replace(/[^a-zA-Z0-9.]/g, '_')
 
+
+      const rutaArchivo = `estudiantes/${user.email}/${Date.now()}_${nombreLimpioArchivo}` // la ruta del archivo se deberia crear en la carpeta estudiantes/[rut del estudiante]/nombrearchivo
       const { error: storageError } = await supabase.storage
         .from("archivos-subidos")
-        .upload(`estudiantes/${nombreUnicoArchivo}`, archivoStl);
-      if (storageError) throw new Error ('Error al subir el archivo' + storageError);
+        .upload(rutaArchivo, archivoStl);
+      if (storageError) throw new Error ('Error al subir el archivo STL' + storageError.message);
 
       const { data: urlData } = supabase.storage
-        .from('modelos-3d')
-        .getPublicUrl(`estudiantes/${nombreUnicoArchivo}`)
+        .from('archivos-subidos')
+        .getPublicUrl(rutaArchivo)
 
       const urlPublicaStl = urlData.publicUrl
+
+      // configurar el url del archivo modelo3D para la BD
+      const nombreLimpioArchivo3D = archivoStl.name.replace(/[^a-zA-Z0-9.]/g, '_')
+      const rutaArchivo2 = `estudiantes/${user.email}/${Date.now()}_${nombreLimpioArchivo3D}`
+
+      const { error: storageError3D } = await supabase.storage
+        .from("archivos-subidos")
+        .upload(rutaArchivo2, archivoModelo3D);
+      if (storageError3D)
+        throw new Error("Error al subir el archivo 3D" + storageError3D.message);
+
+      const { data: urlData3D } = supabase.storage
+        .from("modelos-3d")
+        .getPublicUrl(rutaArchivo2);
+
+      const urlPublica3D = urlData3D.publicUrl
 
       const data = await crearSolicitudImpresion({
         idEstudiante: user.id,
@@ -82,7 +101,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
         color3: formData.color3,
         tipoSolicitud: formData.tipoSolicitud,
         comentario: formData.comentario || undefined,
-        urlModelo3d: formData.urlModelo3d,
+        urlModelo3d: urlPublica3D,
         urlModeloStl: urlPublicaStl,
         refCurso: formData.tipoSolicitud === 'ACADEMICA' ? formData.refCurso : undefined,
       })
@@ -164,14 +183,12 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
               <p className="slide-panel__section-label">Archivos</p>
 
               <div className="form-group">
-                <label htmlFor="modelo3d">URL del modelo 3D <span className="slide-panel__required">*</span></label>
+                <label htmlFor="modelo3d">Archivo Modelo 3D<span className="slide-panel__required">*</span></label>
                 <input
                   id="modelo3d"
-                  type="url"
-                  name="urlModelo3d"
-                  value={formData.urlModelo3d}
-                  onChange={handleChange}
-                  placeholder="https://ejemplo.com/modelo.glb"
+                  type="file"
+                  accept="*" // se crea con accept = "*" para probar, pero deberia ser accept = ".3d"
+                  onChange={(e) => setArchivoModelo3d(e.target.files[0])}
                 />
               </div>
 
