@@ -5,12 +5,13 @@ import SolicitudImpresionForm from "../SolicitudImpresionForm";
 import "./Dashboard.css";
 import SolicitudesEstudiante from "../SolicitudesEstudiante";
 
+const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/impresiones`;
+
 function StudentDashboard({ user }) {
   const [showSolicitudForm, setShowSolicitudForm] = useState(false);
   const [showSolicitudes, setShowSolicitudes] = useState(false);
   const [solicitudesEstudiante, setSolicitudesEstudiante] = useState(null);
   const [error, setError] = useState(null);
-  const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/impresiones`;
 
   useEffect(() => {
     const fetchSolicitudes = async () => {
