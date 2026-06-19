@@ -67,14 +67,9 @@ describe('SolicitudesAyudante', () => {
       />
     )
 
-    // El menú no debería estar visible inicialmente
     expect(screen.queryByText('Cambiar estado:')).not.toBeInTheDocument()
-
-    // Hacemos clic en el botón de estado "PENDIENTE" (que incluye el texto del estado)
     const botonEstado = screen.getByText(/PENDIENTE/)
     fireEvent.click(botonEstado)
-
-    // Ahora el menú debe estar visible con las opciones
     expect(screen.getByText('Cambiar estado:')).toBeInTheDocument()
     expect(screen.getByText('EN_PROGRESO')).toBeInTheDocument()
     expect(screen.getByText('RECHAZADA')).toBeInTheDocument()

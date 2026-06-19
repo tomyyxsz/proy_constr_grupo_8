@@ -34,7 +34,7 @@ vi.mock('../../components/ActionCard', () => ({
   )
 }))
 
-describe('Unitario: StudentDashboard', () => {
+describe('StudentDashboard', () => {
   const mockUser = { id: 1, name: 'Estudiante Test', role: 'ESTUDIANTE' }
 
   beforeEach(() => {

@@ -21,7 +21,7 @@ vi.mock('../../api/ApiGestionImpresion.js', () => ({
   obtenerTodasLasSolicitudes: vi.fn()
 }))
 
-describe('Unitario: AyudanteDashboard', () => {
+describe('AyudanteDashboard', () => {
   // Configuración del usuario simulado en localStorage
   const mockUser = { id: 99, nombre: 'Ayudante Test', rol: 'ayudante' }
 

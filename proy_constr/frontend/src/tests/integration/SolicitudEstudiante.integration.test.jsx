@@ -82,7 +82,6 @@ describe('Componente: SolicitudesEstudiante', () => {
 
   //Test para verificar que el componente maneja correctamente datos anidados dentro del atributo "data"
   it('maneja correctamente datos anidados dentro del atributo "data"', () => {
-    // Simulando cómo Axios a veces envuelve la respuesta en res.data
     const datosAnidados = {
       data: [
         {
@@ -98,8 +97,8 @@ describe('Componente: SolicitudesEstudiante', () => {
     expect(screen.getByText('https://ejemplo.com/anidado.stl')).toBeInTheDocument()
   })
 
-  it('renderiza correctamente los colores (badges) para todos los estados posibles', () => {
-    // Creamos un arreglo que cubra cada uno de los "if" de la función statusBadgeStyle
+  //Test para verificar los colores y los estados
+  it('renderiza correctamente los colores para todos los estados posibles', () => {
     const solicitudesTodosLosEstados = [
       { id: 10, urlModelo3d: 'url1', tipoSolicitud: 'PERSONAL', estado: 'Aprobado' },
       { id: 11, urlModelo3d: 'url2', tipoSolicitud: 'PERSONAL', estado: 'Pendiente' },
@@ -109,10 +108,13 @@ describe('Componente: SolicitudesEstudiante', () => {
 
     render(<SolicitudesEstudiante onClose={mockOnClose} solicitudes={solicitudesTodosLosEstados} />)
 
-    // Verificamos que se hayan renderizado todos en pantalla
-    expect(screen.getByText('Aprobado')).toBeInTheDocument()
-    expect(screen.getByText('Pendiente')).toBeInTheDocument()
-    expect(screen.getByText('Imprimiendo')).toBeInTheDocument()
-    expect(screen.getByText('Rechazado')).toBeInTheDocument()
+    // Verificamos que exista el texto Y que tenga el estilo correcto
+    expect(screen.getByText('Aprobado')).toHaveStyle({ backgroundColor: '#d4edda', color: '#155724' })
+    
+    expect(screen.getByText('Pendiente')).toHaveStyle({ backgroundColor: '#fff3cd', color: '#856404' })
+    
+    expect(screen.getByText('Imprimiendo')).toHaveStyle({ backgroundColor: '#cce5ff', color: '#004085' })
+    
+    expect(screen.getByText('Rechazado')).toHaveStyle({ backgroundColor: '#f8d7da', color: '#721c24' })
   })
 })
