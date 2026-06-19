@@ -16,6 +16,7 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
 
   const [casillaEstados, setCasillaEstados] = useState(null);
   const [estadoActualizandose, setEstadoActualizandose] = useState(null);
+  
 
 
   const isLoading = solicitudes === null;
@@ -31,7 +32,7 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
 
 
         
-  const handleCambiarEstado = async (id, nuevoEstado, estadoActual) => {
+  const handleCambiarEstado = async (id, nuevoEstado, estadoActual, emailEnviar) => {
     // Si hacen clic en el mismo estado, cerramos y no hacemos nada.
     if (nuevoEstado === estadoActual) {
       setCasillaEstados(null);
@@ -39,7 +40,7 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
       
     }
     setCasillaEstados(null); // menu cerrado x default
-    setEstadoActualizandose(solicitudes.estado); // se marca la fila
+    setEstadoActualizandose(id); // se marca la fila
     try {
       let response;
 
@@ -57,7 +58,7 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
           return
         }
 
-        response = await rechazarSolicitud(id, idAyudante, motivo);
+        response = await rechazarSolicitud(id, idAyudante, motivo, emailEnviar);
       }
       if (nuevoEstado === ESTADOS_DISPONIBLES[1] || nuevoEstado === ESTADOS_DISPONIBLES[0]) { // EN_PROGRESO
         const { value : observacion } = await Swal.fire({
@@ -71,7 +72,7 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
         });
         console.log("estado actual:" , estadoActual);
         console.log ("estado antiguo:" , nuevoEstado);
-        response = await aprobarSolicitud(id, idAyudante, observacion);
+        response = await aprobarSolicitud(id, idAyudante, observacion, emailEnviar);
       }
       if (response.status === 200){
         console.log("Solicitud actualizada correctamente.");
@@ -186,7 +187,7 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
                             {ESTADOS_DISPONIBLES.map((estadoOpcion) => (
                               <button
                                 key={estadoOpcion}
-                                onClick={() => handleCambiarEstado(solicitud.idImpresion, estadoOpcion, solicitud.estado)}
+                                onClick={() => handleCambiarEstado(solicitud.idImpresion, estadoOpcion, solicitud.estado, solicitud.solicitanteEmail)}
                                 style={{
                                   fontWeight: estadoOpcion === solicitud.estado ? "bold" : "normal",
                                   backgroundColor: estadoOpcion === solicitud.estado ? "#f0f0f0" : "transparent",

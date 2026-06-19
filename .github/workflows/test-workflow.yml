@@ -7,7 +7,30 @@ on:
         branches:
         - testing
         - "feature/**"
-jobs: 
+jobs:
+    test-frontend:
+      runs-on: ubuntu-latest
+      defaults:
+          run:
+            working-directory: proy_constr
+
+      steps:
+          - name: Checkout
+            uses: actions/checkout@v4
+
+          - name: Setup Node.js
+            uses: actions/setup-node@v4
+            with:
+                node-version: 22
+                cache: npm
+                cache-dependency-path: proy_constr/package-lock.json
+
+          - name: Install dependencies
+            run: npm ci --ignore-scripts
+
+          - name: Run frontend tests 
+            working-directory: proy_constr/frontend
+            run: npm run test
     test-backend:
         runs-on: ubuntu-latest
         services:
@@ -66,26 +89,4 @@ jobs:
               env:
                 CI: true
                 DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
-    test-frontend:
-        runs-on: ubuntu-latest
-        defaults:
-            run:
-                working-directory: proy_constr
 
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 22
-                  cache: npm
-                  cache-dependency-path: proy_constr/package-lock.json
-
-            - name: Install dependencies
-              run: npm ci --ignore-scripts
-
-            - name: Run frontend tests 
-              working-directory: proy_constr/frontend
-              run: npm run test
