@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import { crearSolicitudImpresion } from '../api/ApiSolicitudImpresion'
 import './SolicitudImpresionForm.css'
+import { createClient } from '@supabase/supabase-js'
 
+const supabase = createClient('https://kywbczhepfqbgtlpxemr.supabase.co', 'sb_publishable_oVCW7zdncy0aEPbw_ed9FQ_uo-FS4to');
 
 // Componente para el formulario de solicitud de impresión, utilizado en el dashboard del estudiante
 function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
+
   const [formData, setFormData] = useState({
     color1: '#000000',
     color2: '#ffffff',
@@ -15,6 +18,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
     urlModeloStl: '',
     refCurso: '',
   })
+  const [archivoStl, setArchivoStl] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [exito, setExito] = useState(null)
@@ -29,14 +33,14 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
   }
   //validamos que los campos esten completos y tengan un formato correcto 
   const validar = () => {
-    if (!formData.urlModelo3d || !formData.urlModeloStl) {
-      return 'Debes ingresar las URLs del modelo 3D y el archivo STL.'
+    if (!formData.urlModelo3d) {
+      return 'Debes ingresar las URLs del modelo 3D '
     }
     if (!/^https?:\/\/.+/.test(formData.urlModelo3d)) {
       return 'La URL del modelo 3D no es válida (debe empezar con http:// o https://).'
     }
-    if (!/^https?:\/\/.+/.test(formData.urlModeloStl)) {
-      return 'La URL del archivo STL no es válida (debe empezar con http:// o https://).'
+    if (!archivoStl) {
+      return 'Debes adjuntar el archivo STL'
     }
     if (formData.tipoSolicitud === 'ACADEMICA' && !formData.refCurso.trim()) {
       return 'Para una solicitud académica debes ingresar el código del curso.'
@@ -57,6 +61,20 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
 
     setLoading(true)
     try {
+      const extensionNombreArchivo = archivoStl.name.split('').pop()
+      const nombreUnicoArchivo = `${Date.now()}-${Math.random().toString(36).substring(7)}.${extensionNombreArchivo}` 
+
+      const { error: storageError } = await supabase.storage
+        .from("archivos-subidos")
+        .upload(`estudiantes/${nombreUnicoArchivo}`, archivoStl);
+      if (storageError) throw new Error ('Error al subir el archivo' + storageError);
+
+      const { data: urlData } = supabase.storage
+        .from('modelos-3d')
+        .getPublicUrl(`estudiantes/${nombreUnicoArchivo}`)
+
+      const urlPublicaStl = urlData.publicUrl
+
       const data = await crearSolicitudImpresion({
         idEstudiante: user.id,
         color1: formData.color1,
@@ -65,7 +83,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
         tipoSolicitud: formData.tipoSolicitud,
         comentario: formData.comentario || undefined,
         urlModelo3d: formData.urlModelo3d,
-        urlModeloStl: formData.urlModeloStl,
+        urlModeloStl: urlPublicaStl,
         refCurso: formData.tipoSolicitud === 'ACADEMICA' ? formData.refCurso : undefined,
       })
 
@@ -158,14 +176,12 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
               </div>
 
               <div className="form-group">
-                <label htmlFor="stl">URL del archivo STL <span className="slide-panel__required">*</span></label>
+                <label htmlFor="stl">Archivo Stl<span className="slide-panel__required">*</span></label>
                 <input
                   id="stl"
-                  type="url"
-                  name="urlModeloStl"
-                  value={formData.urlModeloStl}
-                  onChange={handleChange}
-                  placeholder="https://ejemplo.com/archivo.stl"
+                  type="file"
+                  accept="*" // se crea con accept = "*" para probar, pero deberia ser accept = ".stl"
+                  onChange={(e) => setArchivoStl(e.target.files[0])}
                 />
               </div>
 
