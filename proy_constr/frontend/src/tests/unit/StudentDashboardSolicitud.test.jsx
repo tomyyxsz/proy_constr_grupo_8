@@ -4,6 +4,7 @@ import StudentDashboard from '../../components/dashboard/StudentDashboard'
 
 describe('StudentDashboard - solicitud de impresión', () => {
   test('debería abrir un formulario de solicitud de impresión con los campos del schema', () => {
+    // comentario de prueba
     render(<StudentDashboard user={{ id: '1', role: 'ESTUDIANTE', name: 'Test User' }} />)
 
     expect(screen.getByRole('button', { name: /Solicitar impresión/i })).toBeInTheDocument()
