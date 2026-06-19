@@ -89,7 +89,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
         throw new Error("Error al subir el archivo 3D" + storageError3D.message);
 
       const { data: urlData3D } = supabase.storage
-        .from("modelos-3d")
+        .from("archivos-subidos")
         .getPublicUrl(rutaArchivo2);
 
       const urlPublica3D = urlData3D.publicUrl
