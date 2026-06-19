@@ -23,7 +23,7 @@ export const enviarNotificacionEstado = async(emailDestino, nuevoEstado, motivoO
 
   try {
     await transportador.sendMail(mailData);
-    console.log("Correo enviado con exito a", emailDestino)
+    console.warn("Correo enviado con exito a", emailDestino)
 
   } catch (error){
     console.error ("Error enviando al correo", error)
