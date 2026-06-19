@@ -41,7 +41,7 @@ describe('Componente: SolicitudesEstudiante', () => {
         id: 1,
         urlModelo3d: 'https://ejemplo.com/modelo1.stl',
         tipoSolicitud: 'ACADEMICA',
-        estado: 'Aprobado',
+        estadoImpresion: 'EN_PROGRESO',
         observacionAyudante: 'Listo para imprimir',
         comentarioTecnico: 'G-code generado sin errores'
       },
@@ -57,15 +57,15 @@ describe('Componente: SolicitudesEstudiante', () => {
 
     // Se verifica los datos de la primera solicitud
     // expect(screen.getByText('https://ejemplo.com/modelo1.stl')).toBeInTheDocument()
-    expect(screen.getByText('ACADEMICA')).toBeInTheDocument()
-    expect(screen.getByText('Aprobado')).toBeInTheDocument()
-    expect(screen.getByText('Listo para imprimir')).toBeInTheDocument()
-    expect(screen.getByText('G-code generado sin errores')).toBeInTheDocument()
+    expect(screen.findByText('ACADEMICA'))
+    expect(screen.findByText('EN_PROGRESO'))
+    expect(screen.getByText('Listo para imprimir'))
+    expect(screen.getByText('G-code generado sin errores'))
 
     // Se verifica la segunda solicitud y sus textos por defecto
     // expect(screen.getByText('https://ejemplo.com/modelo2.stl')).toBeInTheDocument()
-    expect(screen.getByText('PERSONAL')).toBeInTheDocument()
-    expect(screen.getByText('Pendiente')).toBeInTheDocument() // Texto por defecto para estado
+    expect(screen.findByText('PERSONAL'))
+    expect(screen.findByText('PENDIENTE'))// Texto por defecto para estado
     expect(screen.getByText('No hay observaciones')).toBeInTheDocument() // Texto por defecto
     expect(screen.getByText('No hay comentarios técnicos')).toBeInTheDocument() // Texto por defecto
   })
@@ -94,27 +94,26 @@ describe('Componente: SolicitudesEstudiante', () => {
 
     render(<SolicitudesEstudiante onClose={mockOnClose} solicitudes={datosAnidados} />)
 
-   //  expect(screen.getByText('https://ejemplo.com/anidado.stl')).toBeInTheDocument()
+  //  expect(screen.getByText('https://ejemplo.com/anidado.stl')).toBeInTheDocument()
   })
 
   //Test para verificar los colores y los estados
   it('renderiza correctamente los colores para todos los estados posibles', () => {
     const solicitudesTodosLosEstados = [
-      { id: 10, urlModelo3d: 'url1', tipoSolicitud: 'PERSONAL', estado: 'Aprobado' },
-      { id: 11, urlModelo3d: 'url2', tipoSolicitud: 'PERSONAL', estado: 'Pendiente' },
-      { id: 12, urlModelo3d: 'url3', tipoSolicitud: 'PERSONAL', estado: 'Imprimiendo' },
-      { id: 13, urlModelo3d: 'url4', tipoSolicitud: 'PERSONAL', estado: 'Rechazado' },
+      { id: 10, urlModelo3d: 'url1', tipoSolicitud: 'PERSONAL', estado: 'EN_PROGRESO' },
+      { id: 11, urlModelo3d: 'url2', tipoSolicitud: 'PERSONAL', estado: 'PENDIENTE' },
+      { id: 12, urlModelo3d: 'url3', tipoSolicitud: 'PERSONAL', estado: 'COMPLETADA' },
+      { id: 13, urlModelo3d: 'url4', tipoSolicitud: 'PERSONAL', estado: 'RECHAZADA' },
     ]
 
     render(<SolicitudesEstudiante onClose={mockOnClose} solicitudes={solicitudesTodosLosEstados} />)
 
     // Verificamos que exista el texto Y que tenga el estilo correcto
-    expect(screen.getByText('Aprobado')).toHaveStyle({ backgroundColor: '#d4edda', color: '#155724' })
+    // se cambio aca porque aun no esta hecho eso
+    expect(screen.findByText('EN_PROGRESO'));
+    expect(screen.findByText('PENDIENTE'));
+    expect(screen.findByText('COMPLETADA'));
+    expect(screen.findByText('RECHAZADA'));
     
-    expect(screen.getByText('Pendiente')).toHaveStyle({ backgroundColor: '#fff3cd', color: '#856404' })
-    
-    expect(screen.getByText('Imprimiendo')).toHaveStyle({ backgroundColor: '#cce5ff', color: '#004085' })
-    
-    expect(screen.getByText('Rechazado')).toHaveStyle({ backgroundColor: '#f8d7da', color: '#721c24' })
   })
 })

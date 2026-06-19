@@ -9,8 +9,20 @@ vi.mock('../../api/ApiSolicitudImpresion', () => ({
   crearSolicitudImpresion: vi.fn(),
 }))
 
+// Mock para simular que se suben archivos a Supabase
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn(() => ({
+    storage: {
+      from: vi.fn(() => ({
+        upload: vi.fn().mockResolvedValue({ error: null }),
+        getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'https://supabase.mock/archivo.ext' } })
+      }))
+    }
+  }))
+}))
+
 describe('SolicitudImpresionForm', () => {
-  const mockUser = { id: 1, nombre: 'Estudiante Test' }
+  const mockUser = { id: 1, rut: '12.345.678-9', email: 'test@estudiante.cl', nombre: 'Estudiante Test' }
   const mockOnClose = vi.fn()
   const mockOnSuccess = vi.fn()
 
@@ -35,14 +47,14 @@ describe('SolicitudImpresionForm', () => {
   }
 
   // Testeamos la renderización y comportamiento del formulario
-  it('renderiza correctamente el formulario por defecto (Académica)', () => {
+  it('renderiza correctamente el formulario por defecto', () => {
     renderComponent()
     
     expect(screen.getByText('Nueva solicitud de impresión')).toBeInTheDocument()
     expect(screen.getByLabelText(/Tipo de solicitud/i)).toHaveValue('ACADEMICA')
     expect(screen.getByLabelText(/Código del curso/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/URL del modelo 3D/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/URL del archivo STL/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Archivo Modelo 3D/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Archivo Stl/i)).toBeInTheDocument()
   })
 
   // Testeamos el cambio de tipo de solicitud y la aparición/desaparición del campo de código de curso
@@ -56,35 +68,24 @@ describe('SolicitudImpresionForm', () => {
   })
 
   describe('Validaciones', () => {
-    // Testeamos que se muestren errores si los campos obligatorios no están completos o son inválidos
-    it('muestra error si los campos de URL están vacíos al enviar', async () => {
+    // Testeamos que pida los archivos si no se han subido
+    it('muestra error si no se adjuntan los archivos al enviar', async () => {
       const { container } = renderComponent()
       const form = container.querySelector('#solicitud-form')
       fireEvent.submit(form)
 
-      expect(screen.getByText('Debes ingresar las URLs del modelo 3D y el archivo STL.')).toBeInTheDocument()
+      expect(screen.getByText('Debes adjuntar el archivo modelo 3D')).toBeInTheDocument()
       expect(crearSolicitudImpresion).not.toHaveBeenCalled()
-    })
-
-    // Testeamos que se muestren errores si las URLs no son válidas
-    it('muestra error si la URL no comienza con http o https', async () => {
-      const { container } = renderComponent()
-      
-      fireEvent.change(screen.getByLabelText(/URL del modelo 3D/i), { target: { value: 'www.modelo.com' } })
-      fireEvent.change(screen.getByLabelText(/URL del archivo STL/i), { target: { value: 'https://ejemplo.com/archivo.stl' } })
-      
-      const form = container.querySelector('#solicitud-form')
-      fireEvent.submit(form)
-
-      expect(screen.getByText('La URL del modelo 3D no es válida (debe empezar con http:// o https://).')).toBeInTheDocument()
     })
 
     // Testeamos que se muestre error si es solicitud académica y falta el código del curso
     it('muestra error si es académica y falta el código del curso', async () => {
       const { container } = renderComponent()
+      const file3D = new File(['3d content'], 'modelo.glb', { type: 'model/gltf-binary' })
+      const fileStl = new File(['stl content'], 'modelo.stl', { type: 'application/sla' })
       
-      fireEvent.change(screen.getByLabelText(/URL del modelo 3D/i), { target: { value: 'https://ejemplo.com/mod.glb' } })
-      fireEvent.change(screen.getByLabelText(/URL del archivo STL/i), { target: { value: 'https://ejemplo.com/mod.stl' } })
+      fireEvent.change(screen.getByLabelText(/Archivo Modelo 3D/i), { target: { files: [file3D] } })
+      fireEvent.change(screen.getByLabelText(/Archivo Stl/i), { target: { files: [fileStl] } })
       
       const form = container.querySelector('#solicitud-form')
       fireEvent.submit(form)
@@ -94,15 +95,17 @@ describe('SolicitudImpresionForm', () => {
   })
 
   describe('Envío exitoso', () => {
-    // Testeamos que al enviar un formulario válido se llame a la API, se muestre el mensaje de éxito y se ejecuten los callbacks correspondientes
+    // Testeamos el flujo completo de éxito con archivos
     it('llama a la API, muestra éxito y ejecuta callbacks tras el timeout', async () => {
       crearSolicitudImpresion.mockResolvedValueOnce({
         impresion: { idImpresion: 'IMP-123' }
       })
-
       const { container } = renderComponent()
-      //fireEvent.change(screen.getByLabelText(/URL del modelo 3D/i), { target: { value: 'https://ejemplo.com/modelo.glb' } })
-      //fireEvent.change(screen.getByLabelText(/URL del archivo STL/i), { target: { value: 'https://ejemplo.com/archivo.stl' } })
+      const file3D = new File(['3d content'], 'modelo.glb', { type: 'model/gltf-binary' })
+      const fileStl = new File(['stl content'], 'modelo.stl', { type: 'application/sla' })
+      
+      fireEvent.change(screen.getByLabelText(/Archivo Modelo 3D/i), { target: { files: [file3D] } })
+      fireEvent.change(screen.getByLabelText(/Archivo Stl/i), { target: { files: [fileStl] } })
       fireEvent.change(screen.getByLabelText(/Código del curso/i), { target: { value: 'INF123' } })
       fireEvent.change(screen.getByLabelText(/Comentario/i), { target: { value: 'Impresión de prueba' } })
 
@@ -110,14 +113,18 @@ describe('SolicitudImpresionForm', () => {
       await act(async () => {
         fireEvent.submit(form)
       })
-      expect(screen.getByText('¡Solicitud enviada correctamente!')).toBeInTheDocument()
       
-      // Verificamos que se llamó a la API con los datos correctos
+      expect(screen.getByText('¡Solicitud enviada correctamente!')).toBeInTheDocument()
+
       expect(crearSolicitudImpresion).toHaveBeenCalledWith(expect.objectContaining({
         idEstudiante: mockUser.id,
+        color1: '#000000',
+        color2: '#ffffff',
+        color3: '#ff0000',
         tipoSolicitud: 'ACADEMICA',
-        urlModelo3d: 'https://ejemplo.com/modelo.glb',
-        urlModeloStl: 'https://ejemplo.com/archivo.stl',
+        comentario: 'Impresión de prueba',
+        urlModelo3d: 'https://supabase.mock/archivo.ext', 
+        urlModeloStl: 'https://supabase.mock/archivo.ext',
         refCurso: 'INF123',
       }))
 

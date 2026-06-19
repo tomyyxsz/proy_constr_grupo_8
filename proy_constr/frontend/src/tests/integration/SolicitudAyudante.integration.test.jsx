@@ -29,10 +29,11 @@ describe('SolicitudesAyudante', () => {
       idImpresion: 101, 
       solicitanteNombre: 'Estudiante Prueba',
       solicitanteEmail: 'estudiante@test.com',
+      urlModeloStl:'',
       urlModelo3d: 'https://ejemplo.com/modelo.stl',
       tipoSolicitud: 'ACADEMICA',
       estadoImpresion: 'PENDIENTE',
-      estado: 'PENDIENTE',
+      //estado: 'PENDIENTE',
     },
   ]
 
@@ -98,7 +99,8 @@ describe('SolicitudesAyudante', () => {
       expect(Swal.fire).toHaveBeenCalledTimes(1)
 
       await waitFor(() => {
-        expect(aprobarSolicitud).toHaveBeenCalledWith(101, mockIdAyudante, 'Empezando a imprimir pronto')
+        expect(aprobarSolicitud).toHaveBeenCalledWith(101, mockIdAyudante, 'Empezando a imprimir pronto', 'estudiante@test.com'
+        )
         expect(mockOnRefresh).toHaveBeenCalledTimes(1)
       })
     })
@@ -124,7 +126,7 @@ describe('SolicitudesAyudante', () => {
       expect(Swal.fire).toHaveBeenCalledTimes(1)
 
       await waitFor(() => {
-        expect(rechazarSolicitud).toHaveBeenCalledWith(101, mockIdAyudante, 'Archivo corrupto')
+        expect(rechazarSolicitud).toHaveBeenCalledWith(101, mockIdAyudante, 'Archivo corrupto', 'estudiante@test.com')
         expect(mockOnRefresh).toHaveBeenCalledTimes(1)
       })
     })
