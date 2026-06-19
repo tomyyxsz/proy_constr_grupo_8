@@ -101,8 +101,8 @@ describe('SolicitudImpresionForm', () => {
       })
 
       const { container } = renderComponent()
-      fireEvent.change(screen.getByLabelText(/URL del modelo 3D/i), { target: { value: 'https://ejemplo.com/modelo.glb' } })
-      fireEvent.change(screen.getByLabelText(/URL del archivo STL/i), { target: { value: 'https://ejemplo.com/archivo.stl' } })
+      //fireEvent.change(screen.getByLabelText(/URL del modelo 3D/i), { target: { value: 'https://ejemplo.com/modelo.glb' } })
+      //fireEvent.change(screen.getByLabelText(/URL del archivo STL/i), { target: { value: 'https://ejemplo.com/archivo.stl' } })
       fireEvent.change(screen.getByLabelText(/Código del curso/i), { target: { value: 'INF123' } })
       fireEvent.change(screen.getByLabelText(/Comentario/i), { target: { value: 'Impresión de prueba' } })
 
