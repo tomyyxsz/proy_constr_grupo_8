@@ -1,55 +1,101 @@
 // dashboard para estudiante con acciones especificas de estudiante
-import { useState } from 'react'
-import ActionCard from '../ActionCard'
-import SolicitudImpresionForm from '../SolicitudImpresionForm'
-import './Dashboard.css'
+import { useState, useEffect } from "react";
+import ActionCard from "../ActionCard";
+import SolicitudImpresionForm from "../SolicitudImpresionForm";
+import "./Dashboard.css";
+import SolicitudesEstudiante from "../SolicitudesEstudiante";
+
+const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/impresiones`;
 
 function StudentDashboard({ user }) {
-  const [showSolicitudForm, setShowSolicitudForm] = useState(false)
+  const [showSolicitudForm, setShowSolicitudForm] = useState(false);
+  const [showSolicitudes, setShowSolicitudes] = useState(false);
+  const [solicitudesEstudiante, setSolicitudesEstudiante] = useState(null);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const fetchSolicitudes = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/estudiante/${user.id}`); //conexion con el backend
+        console.log("URL de la API:", `${API_BASE_URL}/estudiante/${user.id}`);
+        if (!response.ok) {
+          throw new Error("Error al conectar con el servidor");
+        }
+        const data = await response.json();
+        setSolicitudesEstudiante(data);
+      } catch (err) {
+        setError(err.message);
+        setSolicitudesEstudiante([]);
+      }
+    };
+
+    fetchSolicitudes();
+  }, [user.id]);
 
   const handleSolicitudSuccess = () => {
-    console.log('Solicitud enviada exitosamente')
-  }
+    console.log("Solicitud enviada exitosamente");
+  };
 
   return (
-    <div className="dashboard-with-panel">
-
-      <div className="dashboard-main">
-        <div className="dashboard-grid">
-          <ActionCard
-            icon="ti-3d-cube-sphere"
-            iconClass="icon-estudiante"
-            title="Solicitar impresión"
-            description="Crea una nueva solicitud de impresión 3D"
-            onClick={() => setShowSolicitudForm(true)}
-          />
-          <ActionCard
-            icon="ti-clipboard-list"
-            iconClass="icon-estudiante"
-            title="Mis solicitudes"
-            description="Revisa el estado de tus solicitudes"
-            onClick={() => {}}
-          />
-          <ActionCard
-            icon="ti-school"
-            iconClass="icon-estudiante"
-            title="Inscribirse en ayudantía"
-            description="Postula a una ayudantía disponible"
-            onClick={() => {}}
-          />
+    <>
+      {error && (
+        <div
+          style={{
+            color: "red",
+            padding: "10px",
+            backgroundColor: "#fde8e8",
+            marginBottom: "15px",
+            borderRadius: "5px",
+          }}
+        >
+          No se pudieron sincronizar los datos: {error}
         </div>
-      </div>
+      )}
 
-   
-      <SolicitudImpresionForm
-        user={user}
-        isOpen={showSolicitudForm}
-        onClose={() => setShowSolicitudForm(false)}
-        onSuccess={handleSolicitudSuccess}
-      />
-    </div>
-  )
+      <div className="dashboard-with-panel">
+        <div className="dashboard-main">
+          <div className="dashboard-grid">
+            <ActionCard
+              icon="ti-3d-cube-sphere"
+              iconClass="icon-estudiante"
+              title="Solicitar impresión"
+              description="Crea una nueva solicitud de impresión 3D"
+              onClick={() => setShowSolicitudForm(true)}
+            />
+            <ActionCard
+              icon="ti-clipboard-list"
+              iconClass="icon-estudiante"
+              title="Mis solicitudes"
+              description="Revisa el estado de tus solicitudes"
+              onClick={() => setShowSolicitudes(true)}
+            />
+            <ActionCard
+              icon="ti-school"
+              iconClass="icon-estudiante"
+              title="Inscribirse en ayudantía"
+              description="Postula a una ayudantía disponible"
+              onClick={() => {}}
+            />
+          </div>
+        </div>
+
+        {showSolicitudes && (
+          <SolicitudesEstudiante
+            onClose={() => setShowSolicitudes(false)}
+            solicitudes={solicitudesEstudiante}
+          />
+        )}
+        {showSolicitudForm && (
+          <SolicitudImpresionForm
+            user={user}
+            isOpen={showSolicitudForm}
+            onClose={() => setShowSolicitudForm(false)}
+            onSuccess={handleSolicitudSuccess}
+          />
+        )}
+      </div>
+    </>
+  );
 }
 
-export default StudentDashboard
+export default StudentDashboard;

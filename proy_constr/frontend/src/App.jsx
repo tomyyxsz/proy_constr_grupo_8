@@ -4,6 +4,7 @@ import Register from './pages/Register'
 import Home from './pages/Home'
 import Footer from './components/Footer'
 import { Header } from './components/Header'
+import AyudanteDashboard from './components/dashboard/AyudanteDashboard.jsx'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -18,22 +19,29 @@ function App() {
   }, [currentPage])
 
   const handleLogin = (usuarioAutenticado) => {
-    setUser({
+    const newUser = {
       id: usuarioAutenticado.id,
       email: usuarioAutenticado.email,
       name: usuarioAutenticado.nombre,
       role: usuarioAutenticado['usuarioRol'],
-    })
+    };
+    setUser(newUser);
+    console.log("Guardando en localStorage:", newUser);
+    localStorage.setItem('user', JSON.stringify(newUser))
+
     setCurrentPage('home')
   }
 
   const handleRegister = (usuarioRegistrado) => {
-    setUser({
+    const newUser = {
       id: usuarioRegistrado.id,
       email: usuarioRegistrado.email,
       name: usuarioRegistrado.nombre,
       role: usuarioRegistrado['usuarioRol'],
-    })
+    };
+    setUser(newUser);
+    console.log("Guardando en localStorage:", newUser);
+    localStorage.setItem('user', JSON.stringify(newUser))
     setCurrentPage('home')
   }
 
@@ -57,6 +65,7 @@ function App() {
 
   const isAuthenticated = Boolean(user)
 
+  // renderizado condicional
   const renderPage = () => {
     if (currentPage === 'login') {
       return <Login onLogin={handleLogin} onRegisterClick={handleRegisterClick} />
@@ -70,7 +79,9 @@ function App() {
       return <Login onLogin={handleLogin} onRegisterClick={handleRegisterClick} />
     }
 
-    return <Home user={user} onLogout={handleLogout} onGoHome={handleGoHome} />
+
+
+    return (<Home user={user} onLogout={handleLogout} onGoHome={handleGoHome} />);
   }
 
   return (
@@ -87,6 +98,7 @@ function App() {
       </main>
       <Footer />
     </div>
+  
   )
 }
 

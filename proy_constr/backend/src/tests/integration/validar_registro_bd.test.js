@@ -4,59 +4,137 @@
 import dotenv from "dotenv";
 import crypto from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import request from "supertest";
+import app from "../../appTest.js";
 
 dotenv.config({ path: new URL("../../../.env.test", import.meta.url) });
 
 const { prisma } = await import("../../lib/prisma.js");
-const testEmail = "<EMAIL>";
+const testEmail = "testregistro@example.com";
 
 describe("validar registro en base de datos", () => {
-    beforeAll(async () => {
-        await prisma.$connect();
+  beforeAll(async () => {
+    await prisma.$connect();
+
+  });
+
+  afterAll(async () => {
+    await prisma.usuario.deleteMany({
+      where: { email: testEmail },
+    });
+    await prisma.usuario.deleteMany({
+      where: { email: "amigos@example.com" },
+    });
+    await prisma.$disconnect();
+    // eliminar usuario de prueba
+    await prisma.usuario.deleteMany({
+      where: { email: "testAPI@example.com" },
+    });
+  });
+  // formato usuario:
+  // rut, nombre, apellido, email, password
+
+  it("debería crear un nuevo usuario en la base de datos de prueba", async () => {
+    const userId = crypto.randomUUID();
+    const nuevoUsuario = {
+      id: userId,
+      rut: "16887941-5",
+      nombre: "Test",
+      apellido: "User",
+      email: testEmail,
+      password: "password123",
+      usuarioRol: "ESTUDIANTE",
+    };
+
+    await prisma.usuario.create({
+      data: nuevoUsuario,
     });
 
-    afterAll(async () => {
-        await prisma.$disconnect();
-        // eliminar usuario de prueba
-        await prisma.$executeRaw`
-            DELETE FROM "Usuario"
-            WHERE email = ${testEmail}
-        `;
+    const response = await prisma.usuario.findMany({
+      where: { email: testEmail },
     });
-    // formato usuario:
-    // rut, nombre, apellido, email, password
 
-    it("debería crear un nuevo usuario en la base de datos de prueba", async () => {
-                const userId = crypto.randomUUID();
-        const nuevoUsuario = {
-            id: userId,
-            rut: "12345678-9",
-            nombre: "Test",
-            apellido: "User",
-            email: testEmail,
-            password: "password123",
-            usuarioRol: "ESTUDIANTE",
-        };
-
-            await prisma.$executeRaw`
-                INSERT INTO "Usuario" (id, rut, nombre, apellido, email, password, "usuarioRol", "creadoEn", "actualizadoEn")
-                VALUES (${nuevoUsuario.id}::uuid, ${nuevoUsuario.rut}, ${nuevoUsuario.nombre}, ${nuevoUsuario.apellido}, ${nuevoUsuario.email}, ${nuevoUsuario.password}, ${nuevoUsuario.usuarioRol}::"TipoRol", NOW(), NOW())
-                `;
-
-                const rows = await prisma.$queryRaw`
-                    SELECT rut, nombre, apellido, email, password
-                    FROM "Usuario"
-                    WHERE email = ${testEmail}
-                    LIMIT 1
-                `;
-
-                expect(rows).toHaveLength(1);
-                expect(rows[0]).toMatchObject({
-                    rut: nuevoUsuario.rut,
-                    nombre: nuevoUsuario.nombre,
-                    apellido: nuevoUsuario.apellido,
-                    email: nuevoUsuario.email,
-                    password: nuevoUsuario.password,
-                });
+    expect(response).toHaveLength(1);
+    expect(response[0]).toMatchObject({
+      rut: nuevoUsuario.rut,
+      nombre: nuevoUsuario.nombre,
+      apellido: nuevoUsuario.apellido,
+      email: nuevoUsuario.email,
+      password: nuevoUsuario.password,
     });
+  });
+
+  it("validar registro pero usando rutas de la API", async () => {
+    const response = await request(app).post("/registro").send({
+      rut: "21857836-5",
+      nombre: "TestAPI",
+      apellido: "UserAPI",
+      email: "amigos@example.com",
+      password: "APIpassword1!",
+    });
+    console.log("Response body:", response.body);
+
+    expect(response.status).toBe(201);
+  });
+  it("validar que falta un campo al momento de registrar", async () => {
+    const response = await request(app).post("/registro").send({
+      rut: "21684893-6",
+      nombre: "TestAPI",
+      apellido: "UserAPI",
+      email: "testAPI@example.com",
+    });
+    expect(response.status).toBe(400);
+  });
+
+  it("validar que el correo no tiene un formato valido", async () => {
+    const response = await request(app).post("/registro").send({
+      rut: "21684893-6",
+      nombre: "TestAPI",
+      apellido: "UserAPI",
+      email: "invalid-email-format",
+      password: "APIpassword1!",
+    });
+    expect(response.status).toBe(400);
+  });
+  it("validar que la contraseña no cumple con los requisitos", async () => {
+    const response = await request(app).post("/registro").send({
+      rut: "21684893-6",
+      nombre: "TestAPI",
+      apellido: "UserAPI",
+      email: "testAPI@example.com",
+      password: "LOLITOFERNANDEZ!",
+    });
+    expect(response.status).toBe(400);
+  });
+  it("validar rol invalido al registrarse", async () => {
+    const response = await request(app).post("/registro").send({
+      rut: "21684893-6",
+      nombre: "TestAPI",
+      apellido: "UserAPI",
+      email: "testAPI@example.com",
+      password: "APIpassword1!",
+      usuarioRol: "INVALIDROLE",
+    });
+    expect(response.status).toBe(400);
+  });
+  it("validar rut invalido", async () => {
+    const response = await request(app).post("/registro").send({
+      rut: "21684893-5",
+      nombre: "TestAPI",
+      apellido: "UserAPI",
+      email: "testAPI@example.com",
+      password: "APIpassword1!",
+    });
+    expect(response.status).toBe(400);
+  });
+  it("validar que ya hay un usuario registrado con rut ya usado", async () => {
+    const response = await request(app).post("/registro").send({
+      rut: "21684893-6",
+      nombre: "TestAPI",
+      apellido: "UserAPI",
+      email: "testAPI2@example.com",
+      password: "APIpassword1!",
+    });
+    expect(response.status).toBe(400);
+  });
 });

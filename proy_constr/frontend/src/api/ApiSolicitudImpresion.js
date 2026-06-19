@@ -1,7 +1,9 @@
 // API para crear solicitudes de impresión
 import axios from "axios";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/solicitudes`;
+const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/impresiones`;
+
+
 export async function crearSolicitudImpresion({
   idEstudiante,
   color1,
@@ -40,21 +42,6 @@ export async function crearSolicitudImpresion({
 export async function obtenerSolicitudesEstudiante(idEstudiante) {
   try {
     const response = await axios.get(`${API_BASE_URL}/estudiante/${idEstudiante}`);
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      throw new Error(
-        error.response.data.error || "Error al obtener solicitudes.",
-      );
-    } else {
-      throw new Error("Error de red al obtener solicitudes.");
-    }
-  }
-}
-
-export async function obtenerTodasLasSolicitudes() {
-  try {
-    const response = await axios.get(`${API_BASE_URL}`);
     return response.data;
   } catch (error) {
     if (error.response) {
