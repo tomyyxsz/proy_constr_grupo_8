@@ -2,6 +2,7 @@
 // el estado de su solicitud (creada, aprobada, rechazada) y las observaciones del ayudante
 import express from "express";
 import { prisma } from "./lib/prisma.js";
+import { enviarNotificacionEstado } from "./lib/mailer.js";
 
 const router = express.Router();
 
@@ -143,7 +144,7 @@ router.get("/:id", async (req, res) => {
 
 // PUT: Aprobar impresión
 router.put("/:id/aprobar", async (req, res) => {
-  const { idAyudante, observacion } = req.body;
+  const { idAyudante, observacion, emailEstudiante } = req.body;
   const idImpresion = req.params.id;
 
   if (!idAyudante) {
@@ -198,6 +199,9 @@ router.put("/:id/aprobar", async (req, res) => {
         inicioImpresion: true,
       },
     });
+    if (emailEstudiante){
+      enviarNotificacionEstado(emailEstudiante, "EN PROGRESO", observacion);
+    }
 
     res.json({
       message: "Impresión aprobada correctamente.",
@@ -211,7 +215,7 @@ router.put("/:id/aprobar", async (req, res) => {
 
 // PUT: Rechazar impresión
 router.put("/:id/rechazar", async (req, res) => {
-  const { idAyudante, motivo } = req.body;
+  const { idAyudante, motivo, emailEstudiante } = req.body;
 
   if (!idAyudante || !motivo) {
     return res.status(400).json({
@@ -263,6 +267,9 @@ router.put("/:id/rechazar", async (req, res) => {
         motivoRechazo: true,
       },
     });
+    if(emailEstudiante){
+      enviarNotificacionEstado(emailEstudiante, "RECHAZADA", motivo);
+    }
 
     res.json({
       message: "Impresión rechazada correctamente.",

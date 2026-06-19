@@ -19,12 +19,13 @@ export async function obtenerTodasLasSolicitudes() {
   }
 }
 
-export async function aprobarSolicitud(idSolicitud, idAyudante, observacion) {
-  // router.put("/:id/aprobar", recibe solo ayudante y observacion
+export async function aprobarSolicitud(idSolicitud, idAyudante, observacion, emailEstudiante) {
+  // router.put("/:id/aprobar", recibe solo ayudante y observacion y email estudiante
   try {
     const response = await axios.put(`${API_BASE_URL}/${idSolicitud}/aprobar`, {
       idAyudante: idAyudante,
       observacion: observacion,
+      emailEstudiante: emailEstudiante
       
     });
     return response;
@@ -40,7 +41,7 @@ export async function aprobarSolicitud(idSolicitud, idAyudante, observacion) {
   }
 }
 
-export async function rechazarSolicitud(idSolicitud, idAyudante, motivo) {
+export async function rechazarSolicitud(idSolicitud, idAyudante, motivo, emailEstudiante) {
   // router.put("/:id/rechazar",
   console.log ("id ayudante:", idAyudante);
   try {
@@ -50,6 +51,7 @@ export async function rechazarSolicitud(idSolicitud, idAyudante, motivo) {
 
         motivo: motivo,
         idAyudante: idAyudante,
+        emailEstudiante: emailEstudiante
       },
     );
     return response;
