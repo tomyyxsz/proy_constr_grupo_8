@@ -325,4 +325,29 @@ router.put("/:id/observaciones", async (req, res) => {
   }
 });
 
+// borrar una solicitud
+router.delete("/borrar/:id", async (req, res) => {
+  try {
+    const impresion = await prisma.impresion.findUnique({
+      where: { idImpresion: req.params.id },
+    });
+
+    if (!impresion) {
+      return res.status(404).json({
+        error: "Impresión no encontrada.",
+      });
+    }
+
+    await prisma.impresion.deleteMany({
+      where: { idImpresion: req.params.id },
+    });
+
+    res.json({
+      message: "Impresión eliminada correctamente.",
+    });
+  } catch (error) {
+    console.error("Error al eliminar impresión:", error);
+    res.status(500).json({ error: "Error interno al eliminar impresión." });
+  }
+});
 export default router;
