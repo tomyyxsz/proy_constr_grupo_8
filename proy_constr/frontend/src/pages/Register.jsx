@@ -151,7 +151,7 @@ function Register({ onRegister, onLoginClick }) {
               onChange={(e) => setRole(e.target.value)}
             >
               <option value="">Selecciona tu rol</option>
-              <option value="estudiante">Estudiante</option>
+              <option value="estudiante">Solicitante</option>
               <option value="profesor">Profesor</option>
               <option value="ayudante">Ayudante</option>
             </select>
