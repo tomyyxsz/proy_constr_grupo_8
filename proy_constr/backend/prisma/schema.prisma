@@ -16,7 +16,7 @@ model Usuario {
   actualizadoEn           DateTime               @updatedAt @db.Timestamp(6)
   borradoEn               DateTime?              @db.Timestamp(6)
   creadoEn                DateTime               @default(now()) @db.Timestamp(6)
-  usuarioRol              TipoRol                @default(ESTUDIANTE)
+  usuarioRol              TipoRol                @default(SOLICITANTE)
   ayudantias              Ayudantia[]
   cursosComoProfesor      Curso[]
   estudianteCurso         EstudianteCurso[]
@@ -223,6 +223,7 @@ enum TipoRol {
   AYUDANTE
   ESTUDIANTE
   ADMINISTRADOR
+  SOLICITANTE
 }
 
 enum EstadoAyudantia {

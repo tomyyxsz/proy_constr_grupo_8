@@ -14,7 +14,7 @@ const USER_SELECT = {
   actualizadoEn: true,
 };
 
-const ALLOWED_ROLES = ["ESTUDIANTE", "AYUDANTE", "PROFESOR"];
+const ALLOWED_ROLES = ["ESTUDIANTE", "AYUDANTE", "PROFESOR", "ADMINISTRADOR", "SOLICITANTE"];
 
 function normalizeRole(role) {
   if (!role) {
@@ -41,7 +41,7 @@ router.get("/buscar", async (req, res) => {
     const normalizedRole = normalizeRole(rol);
     if (!normalizedRole) {
       return res.status(400).json({
-        error: "Rol de usuario invalido. Usa ESTUDIANTE, AYUDANTE o PROFESOR.",
+        error: "Rol de usuario invalido. Usa ESTUDIANTE, AYUDANTE, PROFESOR, ADMINISTRADOR O SOLICITANTE.",
       });
     }
 
