@@ -195,22 +195,22 @@ export default simulation((setUp) => {
     .exec (
       group ("Borrar solicitudes del usuario").on (
         http("Borrar solicitudes del usuario")
-        .delete((session) => `/api/impresiones/borrar/${session.get("idSolicitud")}`)
-        .check(status().is(200)),
+          .delete((session) => `/api/impresiones/borrar/${session.get("idSolicitud")}`)
+          .check(status().is(200)),
       )
     )
     .exitHereIfFailed()
     .exec (
       group ("Borrar usuario del sistema").on (
         http("Borrar usuario del sistema")
-        .delete((session) => `/api/usuarios/rut/${session.get("rut")}`)
-        .check(status().is(200)),
+          .delete((session) => `/api/usuarios/rut/${session.get("rut")}`)
+          .check(status().is(200)),
       )
     )
     ;
   setUp(
     registroUsuario.injectOpen(atOnceUsers(vu)).andThen(inicioSesionUsuario.injectOpen(atOnceUsers(vu)))
-    .andThen(borrarUsuarios.injectOpen(atOnceUsers(vu))),
+      .andThen(borrarUsuarios.injectOpen(atOnceUsers(vu))),
 
     creacionSolicitud.injectOpen(atOnceUsers(vu))
   )

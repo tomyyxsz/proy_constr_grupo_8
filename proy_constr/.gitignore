@@ -32,3 +32,6 @@ coverage
 
 /backend/generated/prisma
 
+# Ignore Gatling test results
+/frontend/gatling/target
+
