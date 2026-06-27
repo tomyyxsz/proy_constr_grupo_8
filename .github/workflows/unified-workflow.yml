@@ -1,0 +1,187 @@
+name: Unified Workflow
+
+on:
+push:
+    branches:
+      - main
+      - testing
+      - "feature/**"
+pull request:
+    branches:
+      - main
+      - testing
+      - "feature/**"
+workflow_dispatch:      
+
+jobs:
+build-frontend:
+runs-on: ubuntu-latest
+defaults:
+    run:
+        working-directory: proy_constr
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+              node-version: 22
+              cache: npm
+              cache-dependency-path: proy_constr/package-lock.json
+
+        - name: Install dependencies
+          run: npm ci --ignore-scripts
+
+        - name: Generate Prisma client
+          run: npm run prisma:generate --workspace backend
+          env:
+              DATABASE_URL: ${{ secrets.BD_URL }}
+
+        - name: Build frontend
+          run: npm run build
+lint-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+        run:
+            working-directory: proy_constr
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+              node-version: 22
+              cache: npm
+              cache-dependency-path: proy_constr/package-lock.json
+
+        - name: Install dependencies
+          run: npm ci --ignore-scripts
+
+        - name: Run frontend linter
+          run: npm run lint --workspace frontend --if-present
+lint-backend:
+runs-on: ubuntu-latest
+defaults:
+    run:
+        working-directory: proy_constr
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+              node-version: 22
+              cache: npm
+              cache-dependency-path: proy_constr/package-lock.json
+
+        - name: Install dependencies
+          run: npm ci --ignore-scripts
+
+        - name: Run backend linter
+          run: npm run lint --workspace backend --if-present
+test-frontend:
+runs-on: ubuntu-latest
+defaults:
+    run:
+        working-directory: proy_constr
+  steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+            node-version: 22
+            cache: npm
+            cache-dependency-path: proy_constr/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run frontend tests
+        working-directory: proy_constr/frontend
+        run: npm run test
+test-backend:
+runs-on: ubuntu-latest
+services:
+    postgres:
+        image: postgres:14.1-alpine
+        env:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: postgres
+        ports:
+            - 5433:5432
+        options: >-
+            --health-cmd "pg_isready -U postgres"
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+defaults:
+    run:
+        working-directory: proy_constr
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+              node-version: 22
+              cache: npm
+              cache-dependency-path: proy_constr/package-lock.json
+
+        - name: Install dependencies
+          run: npm ci --ignore-scripts
+
+        - name: Generate Prisma client
+          run: npm run prisma:generate
+          working-directory: proy_constr/backend
+          env:
+              DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
+
+        - name: Apply Prisma migrations
+          run: npx prisma migrate deploy
+          working-directory: proy_constr/backend
+          env:
+              DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
+
+        - name: Run backend unit tests
+          working-directory: proy_constr/backend
+          run: npm run test:unit
+          env:
+              CI: true
+
+        - name: Run backend integration tests
+          working-directory: proy_constr/backend
+          run: npm run test:int
+          env:
+              CI: true
+              DATABASE_URL: postgresql://postgres:postgres@localhost:5433/postgres?schema=public
+deploy:
+runs-on: ubuntu-latest
+needs:
+    - build-frontend
+    - lint-frontend
+    - lint-backend
+    - test-frontend
+    - test-backend
+if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+env:
+    RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+    VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+steps: 
+    - name: Dispatch Render deploy hook
+      run: |
+          if [ -n "$RENDER_DEPLOY_HOOK_URL" ]; then
+              curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"
+          fi
+
+    - name: Dispatch Vercel deploy hook
+      run: |
+          if [ -n "$VERCEL_DEPLOY_HOOK_URL" ]; then
+              curl -fsS -X POST "$VERCEL_DEPLOY_HOOK_URL"
+          fi
