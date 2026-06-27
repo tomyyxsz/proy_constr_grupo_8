@@ -1,12 +1,14 @@
 import StudentDashboard from '../components/dashboard/StudentDashboard'
 import AyudanteDashboard from '../components/dashboard/AyudanteDashboard'
 import ProfesorDashboard from '../components/dashboard/ProfesorDashboard'
+import SolicitanteDashboard from '../components/dashboard/SolicitanteDashboard'
 import './Home.css'
 
 const DASHBOARDS = {
   ESTUDIANTE: StudentDashboard,
   AYUDANTE: AyudanteDashboard,
   PROFESOR: ProfesorDashboard,
+  SOLICITANTE: SolicitanteDashboard,
 }
 
 function Home({ user}) {

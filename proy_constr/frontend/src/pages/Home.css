@@ -68,6 +68,11 @@
   color: #712B13;
 }
 
+.role-solicitante {
+  background: #FDF0EF;
+  color: #ff0bde;
+}
+
 /* Fallback rol no reconocido */
 .home-role-error {
   color: #c0392b;

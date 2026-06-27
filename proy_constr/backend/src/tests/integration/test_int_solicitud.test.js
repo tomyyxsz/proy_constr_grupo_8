@@ -214,7 +214,7 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
 
   it("validar creacion correcta de solicitud personal usando rutas POST", async () => {
     const response = await request(app).post("/crear").send({
-      idEstudiante: contexto.estudiante.id,
+      idUsuario: contexto.estudiante.id,
       color1: "#00000",
       color2: "#00000",
       color3: "#00000",
@@ -228,7 +228,7 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
   });
   it("validar tipo de solicitud", async () => {
     const response = await request(app).post("/crear").send({
-      idEstudiante: contexto.estudiante.id,
+      idUsuario: contexto.estudiante.id,
       color1: "#00000",
       color2: "#00000",
       color3: "#00000",
@@ -243,7 +243,7 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
 
   it("validar campos obligatorios", async () => {
     const response = await request(app).post("/crear").send({
-      idEstudiante: contexto.estudiante.id,
+      idUsuario: contexto.estudiante.id,
       // color1 falta
       color2: "#00000",
       color3: "#00000",
@@ -258,7 +258,7 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
 
   it("validar si es personal, no se necesita refcurso", async () => {
     const response = await request(app).post("/crear").send({
-      idEstudiante: contexto.estudiante.id,
+      idUsuario: contexto.estudiante.id,
       color1: "#00000",
       color2: "#00000",
       color3: "#00000",
@@ -272,7 +272,7 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
   });
   it("validar formato url", async () => {
     const response = await request(app).post("/crear").send({
-      idEstudiante: contexto.estudiante.id,
+      idUsuario: contexto.estudiante.id,
       color1: "#00000",
       color2: "#00000",
       color3: "#00000",
@@ -286,7 +286,7 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
   });
   it("validar que estudiante no existe", async () => {
     const response = await request(app).post("/crear").send({
-      idEstudiante: "non-existent-id",
+      idUsuario: "non-existent-id",
       color1: "#00000",
       color2: "#00000",
       color3: "#00000",
@@ -300,7 +300,7 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
   });
   it("validar que estudiante no esta inscrito en el curso", async () => {
     const response = await request(app).post("/crear").send({
-      idEstudiante: contexto.estudiante.id,
+      idUsuario: contexto.estudiante.id,
       color1: "#00000",
       color2: "#00000",
       color3: "#00000",
@@ -314,7 +314,7 @@ describe("Solicitud de Impresion - Integracion con Base de Datos", () => {
   });
   it("validar que el curso no existe", async () => {
     const response = await request(app).post("/crear").send({
-      idEstudiante: contexto.estudiante.id,
+      idUsuario: contexto.estudiante.id,
       color1: "#00000",
       color2: "#00000",
       color3: "#00000",

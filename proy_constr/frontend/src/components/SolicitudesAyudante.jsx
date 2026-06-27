@@ -2,6 +2,7 @@ import { useState } from "react";
 import { aprobarSolicitud } from "../api/ApiGestionImpresion.js";
 import { rechazarSolicitud } from "../api/ApiGestionImpresion.js";
 import Swal from "sweetalert2";
+import './Solicitudes.css'
 //import { actualizarObservacionAyudante } from "../api/ApiGestionImpresion.js";
 
 export default function SolicitudesAyudante({ onClose, solicitudes = null, onRefresh, idAyudante = 1 }) {
@@ -97,11 +98,11 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
   };
 
   return (
-    <div className="modal-backdrop" style={modalStyles.backdrop}>
-      <div className="modal-content" style={modalStyles.content}>
-        <div style={modalStyles.header}>
+    <div className="modal-backdrop">
+      <div className="modal-content">
+        <div className="modal-header">
           <h2>Gestión de Solicitudes - Impresión 3D</h2>
-          <button onClick={onClose} style={modalStyles.closeButton}>
+          <button onClick={onClose} className="modal-close-button">
             ✕
           </button>
         </div>
@@ -130,16 +131,16 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
         ) : listaReal.length === 0 ? (
           <p>No hay solicitudes de diseño 3D pendientes de gestión.</p>
         ) : (
-          <div style={modalStyles.tableContainer}>
-            <table style={modalStyles.table}>
+          <div className="modal-table-container">
+            <table className="modal-table">
               <thead>
                 <tr>
-                  <th style={modalStyles.th}>ID</th>
-                  <th style={modalStyles.th}>Estudiante</th>
-                  <th style={modalStyles.th}>Modelo / Archivo</th>
-                  <th style={modalStyles.th}>Email</th>
-                  <th style={modalStyles.th}>Tipo de Solicitud</th>
-                  <th style={modalStyles.th}>Estado </th>
+                  <th className="modal-th">ID</th>
+                  <th className="modal-th">Estudiante</th>
+                  <th className="modal-th">Modelo / Archivo</th>
+                  <th className="modal-th">Email</th>
+                  <th className="modal-th">Tipo de Solicitud</th>
+                  <th className="modal-th">Estado </th>
                 </tr>
               </thead>
               <tbody>
@@ -148,33 +149,25 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
                   const esMenuAbierto = casillaEstados === solicitud.id;
 
                   return (
-                    <tr key={solicitud.idImpresion} style={modalStyles.tr}>
-                      <td style={modalStyles.td}>
+                    <tr key={solicitud.idImpresion} className="modal-tr">
+                      <td className="modal-td">
                         <strong>#{solicitud.id}</strong>
                       </td>
-                      <td style={modalStyles.td}>
+                      <td className="modal-td">
                         {solicitud.solicitanteNombre || "No especificado"}
                       </td>
-                      <td style={modalStyles.td}>{solicitud.urlModelo3d}</td>
-                      <td style={modalStyles.td}>
+                      <td className="modal-td">{solicitud.urlModelo3d}</td>
+                      <td className="modal-td">
                         {solicitud.solicitanteEmail || "No especificado"}
                       </td>
-                      <td style={modalStyles.td}>{solicitud.tipoSolicitud}</td>
-                      
+                      <td className="modal-td">{solicitud.tipoSolicitud}</td>
+
                       {/* celda para estado */}
-                      <td style={{ ...modalStyles.td, position: "relative" }}>
+                      <td className="modal-td" style={{ position: "relative" }}>
                         <button
                           onClick={() => toggleApertura(solicitud.id)}
                           disabled={esFilaCargando}
-                          style={{
-                            ...statusBadgeStyle(solicitud.estadoImpresion),
-                            cursor: esFilaCargando ? "wait" : "pointer",
-                            border: "1px solid currentColor",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            opacity: esFilaCargando ? 0.5 : 1,
-                          }}
+                          className={`btn-status-selector ${String(solicitud.estadoImpresion || 'PENDIENTE').toLowerCase().replace('_', '-')}`}
                         >
                           {esFilaCargando ? "..." : (solicitud.estadoImpresion || "PENDIENTE")}
                           <span style={{ fontSize: "9px" }}>{esMenuAbierto ? "▲" : "▼"}</span>
@@ -211,84 +204,3 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
     </div>
   );
 }
-const modalStyles = {
-  backdrop: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000,
-  },
-  content: {
-    backgroundColor: "#fff",
-    padding: "20px",
-    borderRadius: "8px",
-    width: "95%",
-    maxWidth: "850px",
-    maxHeight: "80vh",
-    overflowY: "auto",
-    boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
-    color: "#333",
-    fontFamily: "sans-serif",
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  closeButton: {
-    background: "none",
-    border: "none",
-    fontSize: "22px",
-    cursor: "pointer",
-    color: "#666",
-  },
-  tableContainer: { marginTop: "15px" },
-  table: { width: "100%", borderCollapse: "collapse", textAlign: "left" },
-  th: {
-    padding: "12px",
-    borderBottom: "2px solid #ddd",
-    backgroundColor: "#f8f9fa",
-    fontWeight: "bold",
-    color: "#555",
-  },
-  td: {
-    padding: "12px",
-    borderBottom: "1px solid #eee",
-    verticalAlign: "middle",
-  },
-  tr: { hover: { backgroundColor: "#f9f9f9" } },
-};
-
-function statusBadgeStyle(status) {
-  const base = {
-    padding: "5px 10px",
-    borderRadius: "20px",
-    fontSize: "11px",
-    fontWeight: "bold",
-    display: "inline-block",
-  };
-  if (
-    status === "Aprobado" ||
-    status === "Finalizado" ||
-    status === "Impreso"
-  ) {
-    return { ...base, backgroundColor: "#d4edda", color: "#155724" };
-  }
-  if (status === "Pendiente" || status === "En cola") {
-    return { ...base, backgroundColor: "#fff3cd", color: "#856404" };
-  }
-  if (status === "Imprimiendo") {
-    return { ...base, backgroundColor: "#cce5ff", color: "#004085" };
-  }
-  if (status === "Rechazado" || status === "Fallo") {
-    return { ...base, backgroundColor: "#f8d7da", color: "#721c24" };
-  }
-  return { ...base, backgroundColor: "#e2e3e5", color: "#383d41" };
-}
-
