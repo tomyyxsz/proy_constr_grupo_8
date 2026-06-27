@@ -145,8 +145,8 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
               </thead>
               <tbody>
                 {listaReal.map((solicitud) => {
-                  const esFilaCargando = estadoActualizandose === solicitud.id;
-                  const esMenuAbierto = casillaEstados === solicitud.id;
+                  const esFilaCargando = estadoActualizandose === solicitud.idImpresion;
+                  const esMenuAbierto = casillaEstados === solicitud.idImpresion;
 
                   return (
                     <tr key={solicitud.idImpresion} className="modal-tr">
@@ -165,31 +165,51 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
                       {/* celda para estado */}
                       <td className="modal-td" style={{ position: "relative" }}>
                         <button
-                          onClick={() => toggleApertura(solicitud.id)}
+                          onClick={() => toggleApertura(solicitud.idImpresion)}
                           disabled={esFilaCargando}
-                          className={`btn-status-selector ${String(solicitud.estadoImpresion || 'PENDIENTE').toLowerCase().replace('_', '-')}`}
+                          className={`btn-status-selector ${String(
+                            solicitud.estadoImpresion || "PENDIENTE",
+                          )
+                            .toLowerCase()
+                            .replace("_", "-")}`}
                         >
-                          {esFilaCargando ? "..." : (solicitud.estadoImpresion || "PENDIENTE")}
-                          <span style={{ fontSize: "9px" }}>{esMenuAbierto ? "▲" : "▼"}</span>
+                          {esFilaCargando
+                            ? "..."
+                            : solicitud.estadoImpresion || "PENDIENTE"}
+                          <span style={{ fontSize: "9px" }}>
+                            {esMenuAbierto ? "▲" : "▼"}
+                          </span>
                         </button>
 
                         {/* menu flotante */}
                         {esMenuAbierto && (
-                          <div >
-                            <div >Cambiar estado:</div>
-                            {ESTADOS_DISPONIBLES.map((estadoOpcion) => (
-                              <button
-                                key={estadoOpcion}
-                                onClick={() => handleCambiarEstado(solicitud.idImpresion, estadoOpcion, solicitud.estado, solicitud.solicitanteEmail)}
-                                style={{
-                                  fontWeight: estadoOpcion === solicitud.estado ? "bold" : "normal",
-                                  backgroundColor: estadoOpcion === solicitud.estado ? "#f0f0f0" : "transparent",
-                                }}
-                              >
-                                {estadoOpcion}
-                                {estadoOpcion === solicitud.estado && " ✓"}
-                              </button>
-                            ))}
+                          <div className="menu-abierto">
+                            <div className="menu-abierto-title">
+                              Cambiar estado:
+                            </div>
+                            {ESTADOS_DISPONIBLES.map((estadoOpcion) => {
+                              // comprobar si el estado de la opcion a seleccionar es el mismo que el actual
+                              const esActivo =
+                                estadoOpcion === solicitud.estadoImpresion;
+
+                              return (
+                                <button
+                                  key={estadoOpcion}
+                                  onClick={() =>
+                                    handleCambiarEstado(
+                                      solicitud.idImpresion,
+                                      estadoOpcion,
+                                      solicitud.estadoImpresion,
+                                      solicitud.solicitanteEmail,
+                                    )
+                                  }
+                                  className={`dropdown-item status-badge ${estadoOpcion.toLowerCase().replace("_", "-")} ${esActivo ? "active-option" : ""}`}
+                                >
+                                  {estadoOpcion}
+                                  {esActivo && " ✓"}
+                                </button>
+                              );
+                            })}
                           </div>
                         )}
                       </td>

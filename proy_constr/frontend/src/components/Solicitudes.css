@@ -148,3 +148,45 @@
   background-color: #e2e3e5;
   color: #383d41;
 }
+
+.menu-abierto{
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px;
+}
+.menu-abierto-title{
+  font-size: 11px;
+  font-weight: bold;
+  color: #777;
+  margin-bottom: 4px;
+  padding: 0 4px;
+}
+
+.menu-abierto-item{
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: all 0.2s ease;
+  padding: 6px 12px;
+  font-size: 11px;
+}
+
+.menu-abierto-item:hover {
+  filter: brightness(0.95);
+  border-color: currentColor;
+}
+
+.menu-abierto-item.active-option {
+  box-shadow: inset 0 0 0 2px #333; /* Un borde sutil interior negro */
+}
