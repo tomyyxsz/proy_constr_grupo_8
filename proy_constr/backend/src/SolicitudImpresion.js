@@ -11,11 +11,7 @@ const TIPOS_SOLICITUD = ["PERSONAL", "ACADEMICA"];
 
 router.post("/crear", async (req, res) => {
   let {
-    idUsuario,
-    color1,
-    color2,
-    color3,
-    tipoSolicitud,
+    idUsuario, color1, color2, color3, tipoSolicitud,
     comentario,
     urlModelo3d,
     urlModeloStl,
@@ -77,6 +73,7 @@ router.post("/crear", async (req, res) => {
         apellido: true,
         email: true,
         rut: true,
+        usuarioRol: true,
       },
     });
 
@@ -85,8 +82,6 @@ router.post("/crear", async (req, res) => {
         error: "El usuario con ese ID no existe.",
       });
     }
-
-    //let cursoRef = "5eb68c60-f502-4be8-9276-f706c33d31bc";
 
     // si la solicitud es academica, se debe verificar que el estudiante esta inscrito en ese curso
     let nombreCursoData = "";
@@ -130,7 +125,7 @@ router.post("/crear", async (req, res) => {
 
     // recuperar nombre del curso
 
-    // crear la impresion, estado inicial = "creado"
+    // crear la impresion, estado inicial = "Pendiente"
     const impresion = await prisma.impresion.create({
       data: {
         solicitanteNombre: usuario.nombre,
@@ -138,7 +133,6 @@ router.post("/crear", async (req, res) => {
         solicitanteEmail: usuario.email,
         solicitanteRut: usuario.rut,
         refEstudiante: idUsuario,
-        tipoUsuario: usuario.usuarioRol,
         tipoSolicitud: tipoSolicitud,
         nombreCurso: nombreCursoData,
         refCurso: refCurso,
@@ -152,6 +146,7 @@ router.post("/crear", async (req, res) => {
         comentarioTecnico: "",
         observacionAyudante: "",
         tiempoEstimadoImpresion: "10 minutos",
+        tipoUsuario: usuario.usuarioRol,
       },
       select: {
         idImpresion: true,
