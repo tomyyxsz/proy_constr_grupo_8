@@ -90,3 +90,26 @@ export async function actualizarObservacionAyudante(idSolicitud, idAyudante, obs
     }
   }
 }
+
+export async function completarSolicitud(idSolicitud, idAyudante, emailEstudiante) {
+  try {
+    const response = await axios.put(`${API_BASE_URL}/${idSolicitud}/completar`,
+      {
+        idAyudante: idAyudante,
+        emailEstudiante: emailEstudiante
+      },
+    );
+    return response;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.error ||
+          "Error al marcar la solicitud como completada.",
+      );
+    } else {
+      throw new Error(
+        "Error de red al marcar la solicitud como completada.",
+      );
+    }
+  }
+}

@@ -176,11 +176,11 @@ router.put("/:id/aprobar", async (req, res) => {
       });
     }
 
-    // if (impresion.estadoImpresion !== "PENDIENTE") {
-    //   return res.status(400).json({
-    //     error: "Solo se pueden aprobar impresiones en estado PENDIENTE.",
-    //   });
-    // }
+    if (impresion.estadoImpresion !== "PENDIENTE") {
+      return res.status(400).json({
+        error: "Solo se pueden aprobar impresiones en estado PENDIENTE.",
+      });
+    }
 
     // Actualizar impresión
     const impresionActualizada = await prisma.impresion.update({
@@ -246,11 +246,11 @@ router.put("/:id/rechazar", async (req, res) => {
       });
     }
 
-    // if (impresion.estadoImpresion !== "PENDIENTE") {
-    //   return res.status(400).json({
-    //     error: "Solo se pueden rechazar impresiones en estado PENDIENTE.",
-    //   });
-    // }
+    if (impresion.estadoImpresion !== "PENDIENTE") {
+      return res.status(400).json({
+        error: "Solo se pueden rechazar impresiones en estado PENDIENTE.",
+      });
+    }
 
     // Actualizar impresión
     const impresionActualizada = await prisma.impresion.update({
@@ -281,6 +281,62 @@ router.put("/:id/rechazar", async (req, res) => {
   }
 });
 
+
+// PUT: completar impresion
+router.put("/:id/completar", async (req, res) => {
+  const { idAyudante, emailEstudiante } = req.body;
+
+  if (!idAyudante) {
+    return res.status(400).json({
+      error: "Debes enviar idAyudante.",
+    });
+  }
+
+  try {
+    // Verificar que la impresión existe
+    const impresion = await prisma.impresion.findUnique({
+      where: { idImpresion: req.params.id },
+    });
+
+    if (!impresion) {
+      return res.status(404).json({
+        error: "Impresión no encontrada.",
+      });
+    }
+
+    if (impresion.estadoImpresion !== "EN_PROGRESO") {
+      return res.status(400).json({
+        error: "Solo se pueden completar impresiones en estado EN_PROGRESO.",
+      });
+    }
+
+    // Actualizar impresión
+    const impresionActualizada = await prisma.impresion.update({
+      where: { idImpresion: req.params.id },
+      data: {
+        estadoImpresion: "COMPLETADA",
+      },
+      select: {
+        idImpresion: true,
+        estadoImpresion: true,
+      },
+    });
+
+
+    if(emailEstudiante){
+      enviarNotificacionEstado(emailEstudiante, "COMPLETADA", null);
+    }
+    res.json({
+      message: "Impresión marcada como COMPLETADA correctamente.",
+      impresion: impresionActualizada,
+    });
+  }
+  catch (error) {
+    console.error("Error al marcar impresión como COMPLETADA:", error);
+    res.status(500).json({ error: "Error interno al marcar impresión como COMPLETADA." });
+  }
+});
+
 // PUT: Actualizar observaciones
 router.put("/:id/observaciones", async (req, res) => {
   const { idAyudante, observacion } = req.body;
@@ -300,6 +356,11 @@ router.put("/:id/observaciones", async (req, res) => {
     if (!impresion) {
       return res.status(404).json({
         error: "Impresión no encontrada.",
+      });
+    }
+    if (impresion.estadoImpresion !== "PENDIENTE") {
+      return res.status(400).json({ 
+        error: `No se puede rechazar una solicitud que ya está en estado ${impresion.estadoImpresion}.` 
       });
     }
 
@@ -324,6 +385,7 @@ router.put("/:id/observaciones", async (req, res) => {
     res.status(500).json({ error: "Error interno al actualizar observaciones." });
   }
 });
+
 
 // borrar una solicitud
 router.delete("/borrar/:id", async (req, res) => {

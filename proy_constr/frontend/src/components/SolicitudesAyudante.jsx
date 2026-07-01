@@ -1,25 +1,18 @@
 import { useState } from "react";
 import { aprobarSolicitud } from "../api/ApiGestionImpresion.js";
 import { rechazarSolicitud } from "../api/ApiGestionImpresion.js";
+import { completarSolicitud } from "../api/ApiGestionImpresion.js";
 import Swal from "sweetalert2";
 import './Solicitudes.css'
 //import { actualizarObservacionAyudante } from "../api/ApiGestionImpresion.js";
 
 export default function SolicitudesAyudante({ onClose, solicitudes = null, onRefresh, idAyudante = 1 }) {
 
-  const ESTADOS_DISPONIBLES = [
-    "PENDIENTE",
-    "EN_PROGRESO",
-    "COMPLETADA",
-    "RECHAZADA",
-  ];
-
+  const ESTADOS_DISPONIBLES = ["PENDIENTE","EN_PROGRESO","COMPLETADA","RECHAZADA",];
 
   const [casillaEstados, setCasillaEstados] = useState(null);
   const [estadoActualizandose, setEstadoActualizandose] = useState(null);
   
-
-
   const isLoading = solicitudes === null;
   //Filtro de seguridad: Extraemos el arreglo real sin importar cómo venga del backend
   const listaReal = Array.isArray(solicitudes)
@@ -34,12 +27,41 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
 
         
   const handleCambiarEstado = async (id, nuevoEstado, estadoActual, emailEnviar) => {
-    // Si hacen clic en el mismo estado, cerramos y no hacemos nada.
-    if (nuevoEstado === estadoActual) {
+    // verificacion de cambios de estado, si es el mismo no hace nada
+    if (nuevoEstado === estadoActual) { setCasillaEstados(null); return; }
+    
+    //si ya fue completada no deberia poder
+    if (estadoActual === "COMPLETADA") {
       setCasillaEstados(null);
+      Swal.fire({ icon: "error",
+        title: "Acción bloqueada",
+        text: `Esta solicitud ya fue finalizada como ${estadoActual}. No puedes modificar su flujo.`,
+      });
       return;
-      
     }
+
+    // no se puede saltar estados, por ej de pendiente a completada de una
+    if (estadoActual === 'PENDIENTE' && nuevoEstado === 'COMPLETADA') {
+      setCasillaEstados(null);
+      Swal.fire({ icon: 'warning', title: 'Flujo incorrecto', text: 'Primero debes cambiar el estado a EN_PROGRESO para iniciar la impresion'
+      });
+      return;
+    }
+ 
+    // no se puede regresar de estados, por ej de completada a pendiente
+    if (estadoActual === 'EN_PROGRESO' && nuevoEstado === 'PENDIENTE') {
+      setCasillaEstados(null);
+      Swal.fire({
+        icon: 'warning',
+        title: 'Cambio inválido',
+        text: 'La solicitud ya está en cola de impresión activa, no puede volver a estar pendiente.'
+      });
+      return;
+    }
+
+    setCasillaEstados(null);
+    setEstadoActualizandose(id);
+
     setCasillaEstados(null); // menu cerrado x default
     setEstadoActualizandose(id); // se marca la fila
     try {
@@ -60,6 +82,21 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
         }
 
         response = await rechazarSolicitud(id, idAyudante, motivo, emailEnviar);
+      }
+      if (nuevoEstado === ESTADOS_DISPONIBLES[2]) { // COMPLETADA
+        response = await Swal.fire({
+          title: 'Confirmación de finalización',
+          text: '¿Estás seguro de que deseas marcar esta solicitud como COMPLETADA?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#28a745',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, marcar como COMPLETADA',
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            return await completarSolicitud(id, idAyudante, emailEnviar);
+          }
+        });
       }
       if (nuevoEstado === ESTADOS_DISPONIBLES[1] || nuevoEstado === ESTADOS_DISPONIBLES[0]) { // EN_PROGRESO
         const { value : observacion } = await Swal.fire({
@@ -90,11 +127,7 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
     };}
     
   const toggleApertura = (id) => {
-    if (casillaEstados === id) {
-      setCasillaEstados(null);
-    } else {
-      setCasillaEstados(id);
-    }
+    if (casillaEstados === id) { setCasillaEstados(null); } else { setCasillaEstados(id); }
   };
 
   return (
@@ -113,14 +146,7 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
         {isLoading ? (
           <p>Cargando panel de solicitudes...</p>
         ) : listaReal === null ? (
-          <div
-            style={{
-              color: "orange",
-              padding: "10px",
-              backgroundColor: "#fff3cd",
-              borderRadius: "5px",
-            }}
-          >
+          <div style={{ color: "orange", padding: "10px", backgroundColor: "#fff3cd", borderRadius: "5px",}}>
             Los datos recibidos no tienen un formato válido.
             <small
               style={{ display: "block", marginTop: "5px", color: "#666" }}
@@ -145,51 +171,50 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
               </thead>
               <tbody>
                 {listaReal.map((solicitud) => {
-                  const esFilaCargando = estadoActualizandose === solicitud.id;
-                  const esMenuAbierto = casillaEstados === solicitud.id;
+                  const esFilaCargando = estadoActualizandose === solicitud.idImpresion;
+                  const esMenuAbierto = casillaEstados === solicitud.idImpresion;
 
                   return (
                     <tr key={solicitud.idImpresion} className="modal-tr">
-                      <td className="modal-td">
-                        <strong>#{solicitud.id}</strong>
-                      </td>
-                      <td className="modal-td">
-                        {solicitud.solicitanteNombre || "No especificado"}
-                      </td>
+                      <td className="modal-td"> <strong>#{solicitud.id}</strong> </td>
+                      <td className="modal-td"> {solicitud.solicitanteNombre || "No especificado"}</td>
                       <td className="modal-td">{solicitud.urlModelo3d}</td>
-                      <td className="modal-td">
-                        {solicitud.solicitanteEmail || "No especificado"}
-                      </td>
+                      <td className="modal-td"> {solicitud.solicitanteEmail || "No especificado"}</td>
                       <td className="modal-td">{solicitud.tipoSolicitud}</td>
 
                       {/* celda para estado */}
                       <td className="modal-td" style={{ position: "relative" }}>
-                        <button
-                          onClick={() => toggleApertura(solicitud.id)}
-                          disabled={esFilaCargando}
-                          className={`btn-status-selector ${String(solicitud.estadoImpresion || 'PENDIENTE').toLowerCase().replace('_', '-')}`}
-                        >
-                          {esFilaCargando ? "..." : (solicitud.estadoImpresion || "PENDIENTE")}
-                          <span style={{ fontSize: "9px" }}>{esMenuAbierto ? "▲" : "▼"}</span>
+                        <button onClick={() => toggleApertura(solicitud.idImpresion)} disabled={esFilaCargando} className={`btn-status-selector ${String(
+                          solicitud.estadoImpresion || "PENDIENTE",
+                        ) .toLowerCase().replace("_", "-")}`} >
+                          {esFilaCargando? "..." : solicitud.estadoImpresion || "PENDIENTE"}
+                          <span style={{ fontSize: "9px" }}> {esMenuAbierto ? "▲" : "▼"} </span>
                         </button>
 
                         {/* menu flotante */}
                         {esMenuAbierto && (
-                          <div >
-                            <div >Cambiar estado:</div>
-                            {ESTADOS_DISPONIBLES.map((estadoOpcion) => (
-                              <button
-                                key={estadoOpcion}
-                                onClick={() => handleCambiarEstado(solicitud.idImpresion, estadoOpcion, solicitud.estado, solicitud.solicitanteEmail)}
-                                style={{
-                                  fontWeight: estadoOpcion === solicitud.estado ? "bold" : "normal",
-                                  backgroundColor: estadoOpcion === solicitud.estado ? "#f0f0f0" : "transparent",
-                                }}
-                              >
-                                {estadoOpcion}
-                                {estadoOpcion === solicitud.estado && " ✓"}
-                              </button>
-                            ))}
+                          <div className="menu-abierto">
+                            <div className="menu-abierto-title">Cambiar estado:</div>
+                            {ESTADOS_DISPONIBLES.map((estadoOpcion) => {
+                              // comprobar si el estado de la opcion a seleccionar es el mismo que el actual
+                              const esActivo =
+                                estadoOpcion === solicitud.estadoImpresion;
+
+                              return (
+                                <button
+                                  key={estadoOpcion}
+                                  onClick={() =>
+                                    handleCambiarEstado( solicitud.idImpresion,estadoOpcion,solicitud.estadoImpresion,
+                                      solicitud.solicitanteEmail,
+                                    )
+                                  }
+                                  className={`dropdown-item status-badge ${estadoOpcion.toLowerCase().replace("_", "-")} ${esActivo ? "active-option" : ""}`}
+                                >
+                                  {estadoOpcion}
+                                  {esActivo && " ✓"}
+                                </button>
+                              );
+                            })}
                           </div>
                         )}
                       </td>
