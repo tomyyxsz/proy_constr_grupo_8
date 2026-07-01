@@ -64,8 +64,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
     try {
       // configurar el url del archivo stl para la BD
       const nombreLimpioArchivo = archivoStl.name.replace(/[^a-zA-Z0-9.]/g, '_')
-
-
+      
       const rutaArchivo = `estudiantes/${user.email}/${Date.now()}_${nombreLimpioArchivo}` // la ruta del archivo se deberia crear en la carpeta estudiantes/[rut del estudiante]/nombrearchivo
       const { error: storageError } = await supabase.storage
         .from("archivos-subidos")
@@ -89,7 +88,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
         throw new Error("Error al subir el archivo 3D" + storageError3D.message);
 
       const { data: urlData3D } = supabase.storage
-        .from("modelos-3d")
+        .from("archivos-subidos")
         .getPublicUrl(rutaArchivo2);
 
       const urlPublica3D = urlData3D.publicUrl
