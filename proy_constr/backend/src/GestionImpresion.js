@@ -7,14 +7,14 @@ import { enviarNotificacionEstado } from "./lib/mailer.js";
 const router = express.Router();
 
 // GET: Listar impresiones por estudiante
-router.get("/estudiante/:idEstudiante", async (req, res) => {
-  const { idEstudiante } = req.params;
+router.get("/usuario/:idUsuario", async (req, res) => {
+  const { idUsuario } = req.params;
 
   try {
     // Buscar todas las solicitudes de un estudiante
     const solicitudes = await prisma.impresion.findMany({
       where: {
-        refEstudiante: idEstudiante,
+        refEstudiante: idUsuario,
       },
       select: {
         idImpresion: true,
@@ -45,7 +45,7 @@ router.get("/estudiante/:idEstudiante", async (req, res) => {
 
     if (solicitudes.length === 0) {
       return res.status(200).json({
-        message: "El estudiante no tiene solicitudes de impresión.",
+        message: "El usuario no tiene solicitudes de impresión.",
         solicitudes: [],
       });
     }
@@ -55,7 +55,7 @@ router.get("/estudiante/:idEstudiante", async (req, res) => {
       solicitudes,
     });
   } catch (error) {
-    console.error("Error al obtener solicitudes del estudiante:", error);
+    console.error("Error al obtener solicitudes del usuario:", error);
     res.status(500).json({
       error: "Error interno al obtener solicitudes.",
     });

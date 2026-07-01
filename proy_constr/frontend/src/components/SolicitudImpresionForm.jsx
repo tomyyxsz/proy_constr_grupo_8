@@ -8,9 +8,6 @@ const supabase = createClient('https://kywbczhepfqbgtlpxemr.supabase.co', 'sb_pu
 // Componente para el formulario de solicitud de impresión, utilizado en el dashboard del estudiante
 function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
 
-  console.log(user.rut)
-  console.log(user.id)
-  console.log(user)
   const [formData, setFormData] = useState({
     color1: '#000000',
     color2: '#ffffff',
@@ -95,7 +92,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
       const urlPublica3D = urlData3D.publicUrl
 
       const data = await crearSolicitudImpresion({
-        idEstudiante: user.id,
+        idUsuario: user.id,
         color1: formData.color1,
         color2: formData.color2,
         color3: formData.color3,
