@@ -63,7 +63,7 @@ describe('StudentDashboard', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledTimes(1)
-      expect(globalThis.fetch).toHaveBeenCalledWith(expect.stringContaining(`/estudiante/${mockUser.id}`))
+      expect(globalThis.fetch).toHaveBeenCalledWith(expect.stringContaining(`/usuario/${mockUser.id}`))
     })
 
     expect(screen.queryByTestId('mock-solicitud-form')).not.toBeInTheDocument()
