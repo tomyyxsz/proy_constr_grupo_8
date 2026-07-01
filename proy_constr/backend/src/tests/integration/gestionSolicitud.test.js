@@ -30,6 +30,7 @@ describe("gestión de solicitudes de impresión", () => {
         email: "estudiante.prueba@universidad.cl",
         password: "password123",
         rut: "12345678-9",
+        usuarioRol: "ESTUDIANTE",
       },
     });
     idEstudiante = estudiante1.id;
@@ -51,6 +52,7 @@ describe("gestión de solicitudes de impresión", () => {
         email: "estudiante.sin.solicitudes@universidad.cl",
         password: "password123",
         rut: "98765432-1",
+        usuarioRol: "ESTUDIANTE",
       },
     });
     idEstudiante2 = estudiante2.id;
@@ -62,6 +64,7 @@ describe("gestión de solicitudes de impresión", () => {
         email: "ayudante.prueba@universidad.cl",
         password: "password123",
         rut: "22222222-1",
+        usuarioRol: "AYUDANTE",
       },
     });
     idAyudante = ayudante.id;
@@ -121,7 +124,7 @@ describe("gestión de solicitudes de impresión", () => {
   });
 
   it("deberia recuperar las solicitudes de impresion de un estudiante", async () => {
-    const response = await request(app).get(`/estudiante/${idEstudiante}`);
+    const response = await request(app).get(`/usuario/${idEstudiante}`);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("message");
     expect(response.body).toHaveProperty("solicitudes");
@@ -129,7 +132,7 @@ describe("gestión de solicitudes de impresión", () => {
   });
 
   it("validar que el usuario no tiene solicitudes", async () => {
-    const response = await request(app).get(`/estudiante/${idEstudiante2}`);
+    const response = await request(app).get(`/usuario/${idEstudiante2}`);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("message");
     expect(response.body).toHaveProperty("solicitudes");

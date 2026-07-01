@@ -16,8 +16,8 @@ function StudentDashboard({ user }) {
   useEffect(() => {
     const fetchSolicitudes = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/estudiante/${user.id}`); //conexion con el backend
-        console.log("URL de la API:", `${API_BASE_URL}/estudiante/${user.id}`);
+        const response = await fetch(`${API_BASE_URL}/usuario/${user.id}`); //conexion con el backend
+        console.log("URL de la API:", `${API_BASE_URL}/usuario/${user.id}`);
         if (!response.ok) {
           throw new Error("Error al conectar con el servidor");
         }

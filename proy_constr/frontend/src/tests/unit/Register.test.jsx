@@ -28,7 +28,7 @@ describe('Register', () => {
     fireEvent.change(screen.getByPlaceholderText('Confirmar contraseña'), { target: { value: overrides.confirmPassword !== undefined ? overrides.confirmPassword : 'Tomivaldes1!' } })
     
     const roleSelect = screen.getByRole('combobox')
-    fireEvent.change(roleSelect, { target: { value: overrides.role !== undefined ? overrides.role : 'estudiante' } })
+    fireEvent.change(roleSelect, { target: { value: overrides.role !== undefined ? overrides.role : 'solicitante' } })
   }
 
   // Test para verificar que el componente se renderiza correctamente
