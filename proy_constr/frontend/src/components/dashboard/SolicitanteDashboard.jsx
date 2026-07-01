@@ -1,6 +1,6 @@
 // dashboard para solicitante, no tiene tantas acciones como un estudiante, no deberia
 // poder ver cursos (no esta inscrito a ninguno) pero si sus solicitudes de impresion
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import ActionCard from "../ActionCard";
 import SolicitudImpresionForm from "../SolicitudImpresionForm";
 import "./Dashboard.css";
@@ -14,26 +14,33 @@ function SolicitanteDashboard({ user }) {
   const [solicitudesEstudiante, setSolicitudesEstudiante] = useState(null);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchSolicitudes = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/usuario/${user.id}`); //conexion con el backend
-        console.log("URL de la API:", `${API_BASE_URL}/usuario/${user.id}`);
-        if (!response.ok) {
-          throw new Error("Error al conectar con el servidor");
-        }
-        const data = await response.json();
-        setSolicitudesEstudiante(data);
-      } catch (err) {
-        setError(err.message);
-        setSolicitudesEstudiante([]);
+  const fetchSolicitudes = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/usuario/${user.id}`); //conexion con el backend
+      console.log("URL de la API:", `${API_BASE_URL}/usuario/${user.id}`);
+      if (!response.ok) {
+        throw new Error("Error al conectar con el servidor");
       }
-    };
-
-    fetchSolicitudes();
+      const data = await response.json();
+      setSolicitudesEstudiante(data);
+    } catch (err) {
+      setError(err.message);
+      setSolicitudesEstudiante([]);
+    }
   }, [user.id]);
 
-  const handleSolicitudSuccess = () => {
+  useEffect(() => {
+    fetchSolicitudes();
+  }, [fetchSolicitudes]);
+
+  useEffect(() => {
+    if (showSolicitudes) {
+      fetchSolicitudes();
+    }
+  }, [showSolicitudes, fetchSolicitudes]);
+
+  const handleSolicitudSuccess = async () => {
+    await fetchSolicitudes();
     console.log("Solicitud enviada exitosamente");
   };
 
