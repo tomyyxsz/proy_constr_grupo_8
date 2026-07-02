@@ -25,18 +25,20 @@ const importarEstudiantesDesdeCSV = async (req, res) => {
   if (!idCurso) {
     return res.status(400).json({ error: "Debes enviar idCurso en los parametros." });
   }
-
+  console.log("idCurso recibido:", idCurso);
+  console.log("Archivos recibidos:", req.files);
   try {
     const curso = await prisma.curso.findUnique({ where: { idCurso } });
     if (!curso) {
       return res.status(404).json({ error: "El curso con ese ID no existe." });
     }
 
-    if (!req.files || !req.files.csvFile) {
+    if (!req.files || !req.files.csvData) {
       return res.status(400).json({ error: "Se debe subir un archivo CSV" });
     }
 
-    const csvFile = req.files.csvFile;
+    const csvFile = req.files.csvData;
+    console.log("Archivo CSV recibido:", csvFile.name);
     const csvContent = csvFile.data.toString("utf-8");
     const lines = csvContent.split(/\r?\n/); // para detectar saltos de linea
 

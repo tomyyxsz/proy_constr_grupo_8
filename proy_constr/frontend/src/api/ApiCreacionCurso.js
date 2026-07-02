@@ -2,7 +2,7 @@
 // Vincular creación de cursos con el backend usando axios
 
 import axios from "axios";
-
+const API_IMPORTAR_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/importar`;
 const API_BASE_URL =
   `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/cursos`;
 const SEMESTRES_API_URL =
@@ -46,5 +46,33 @@ export async function obtenerSemestres() {
     }
 
     throw new Error("Error de red al cargar los semestres.");
+  }
+}
+
+export async function cargarCSV(idCurso, archivoCSV) {
+  try {
+    const formData = new FormData();
+    formData.append("archivoCSV", archivoCSV);
+
+    const response = await axios.post(
+      `${API_IMPORTAR_URL}/${idCurso}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.error ||
+        "Error al importar estudiantes desde CSV."
+      );
+    }
+
+    throw new Error("Error de red al importar estudiantes desde CSV.");
   }
 }

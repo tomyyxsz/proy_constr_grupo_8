@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { crearCurso as crearCursoApi, obtenerSemestres } from "../api/ApiCreacionCurso";
+import { crearCurso as crearCursoApi, obtenerSemestres, cargarCSV } from "../api/ApiCreacionCurso";
 
 export default function CreacionCurso({ onClose }) {
   const [nombreCurso, setNombreCurso] = useState("");
@@ -9,6 +9,7 @@ export default function CreacionCurso({ onClose }) {
   const [exitoMensaje, setExitoMensaje] = useState("");
   const [semestres, setSemestres] = useState([]);
   const [cargandoSemestres, setCargandoSemestres] = useState(true);
+  const [archivoCSV, setArchivoCSV] = useState(null);
 
   const usuarioGuardado = typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const usuario = usuarioGuardado ? JSON.parse(usuarioGuardado) : null;
@@ -53,11 +54,14 @@ export default function CreacionCurso({ onClose }) {
 
     try {
       setIsSubmitting(true);
-      await crearCursoApi({
+      const cursoCreado = await crearCursoApi({
         nombreCurso: nombreCurso.trim(),
         semestreId: semestreId.trim(),
         profesorId,
       });
+      console.log("archivo csv:", archivoCSV);
+      await cargarCSV(cursoCreado.curso.idCurso, archivoCSV);
+
       setExitoMensaje("Curso creado correctamente.");
       setNombreCurso("");
       setSemestreId("");
@@ -101,7 +105,18 @@ export default function CreacionCurso({ onClose }) {
               </option>
             ))}
           </select>
-
+            
+          <label htmlFor="cursoCSV">Archivo CSV de Estudiantes</label>
+          <input
+          id = "cursoCSV"
+          type = "file"
+          accept = ".csv"
+          onChange = {(e) => {
+            const file = e.target.files[0];
+            setArchivoCSV(file);
+          }}
+          >
+          </input>
           <input type="hidden" value={profesorId} />
 
           {errorMensaje ? <p role="alert">{errorMensaje}</p> : null}
