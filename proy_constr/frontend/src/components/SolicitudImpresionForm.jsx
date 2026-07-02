@@ -61,8 +61,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
     try {
       // configurar el url del archivo stl para la BD
       const nombreLimpioArchivo = archivoStl.name.replace(/[^a-zA-Z0-9.]/g, '_')
-
-
+      
       const rutaArchivo = `estudiantes/${user.email}/${Date.now()}_${nombreLimpioArchivo}` // la ruta del archivo se deberia crear en la carpeta estudiantes/[rut del estudiante]/nombrearchivo
       const { error: storageError } = await supabase.storage
         .from("archivos-subidos")

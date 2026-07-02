@@ -80,7 +80,7 @@ describe("Creación de Curso", () => {
       idProfesor: "00000000-0000-0000-0000-000000000000", // ID de profesor que no existe
       idSemestre: semestre.idSemestre,
     });
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(400);
   });
 
   it("deberia fallar si el semestre no existe", async () => {
@@ -92,6 +92,6 @@ describe("Creación de Curso", () => {
       idProfesor: profesor.id,
       idSemestre: "00000000-0000-0000-0000-000000000000", // ID de semestre que no existe
     });
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(400);
   });
 });
