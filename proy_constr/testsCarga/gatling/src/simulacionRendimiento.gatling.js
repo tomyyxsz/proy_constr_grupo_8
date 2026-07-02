@@ -178,7 +178,7 @@ export default simulation((setUp) => {
       .check(jsonPath("$.impresion.idImpresion").exists())
   )
 )
-
+/* comentario para debug de respuesta de estado
 .exec((session) => {
   const status = session.get("status");
   const body = session.get("responseBody");
@@ -190,7 +190,7 @@ export default simulation((setUp) => {
   }
 
   return session;
-})
+})*/
 
 .exitHereIfFailed();
   setUp(

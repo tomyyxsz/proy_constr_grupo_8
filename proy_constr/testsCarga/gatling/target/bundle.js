@@ -3442,15 +3442,15 @@ var gatling = (() => {
   // <stdin>
   var stdin_exports = {};
   __export(stdin_exports, {
-    basicSimulation: () => basicSimulation_gatling_default
+    simulacionRendimiento: () => simulacionRendimiento_gatling_default
   });
   init_globals();
 
-  // src/basicSimulation.gatling.js
+  // src/simulacionRendimiento.gatling.js
   init_globals();
   var import_core = __toESM(require_target());
   var import_http = __toESM(require_target2());
-  var basicSimulation_gatling_default = (0, import_core.simulation)((setUp) => {
+  var simulacionRendimiento_gatling_default = (0, import_core.simulation)((setUp) => {
     const vu = parseInt((0, import_core.getParameter)("vu", "10"), 10);
     const backendBaseUrl = (0, import_core.getParameter)("baseUrl", "https://proy-constr-grupo-8.onrender.com");
     const runId = Date.now();
