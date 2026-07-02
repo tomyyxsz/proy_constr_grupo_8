@@ -9,7 +9,7 @@ import SolicitudesAyudante from "../SolicitudesAyudante";
 const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/impresiones`;
 
 function ProfesorDashboard({ user }) {
-  const idUsuario = user?.idUsuario; 
+  const idUsuario = user?.id; 
 
   const [showCrearCurso, setShowCrearCurso] = useState(false);
   const [showSolicitudForm, setShowSolicitudForm] = useState(false);
@@ -24,8 +24,10 @@ function ProfesorDashboard({ user }) {
     if (!idUsuario) return; // Usamos la variable extraída
     
     try {
+
       const datos = await obtenerSolicitudesProfesor(idUsuario);
       setSolicitudesProfesor(datos);
+      
     } catch (err) {
       console.error("Error al obtener solicitudes del profesor:", err);
       setSolicitudesProfesor([]);

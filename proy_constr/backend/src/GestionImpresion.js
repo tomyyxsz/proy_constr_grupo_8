@@ -424,7 +424,7 @@ router.get("/profesor/:idProfesor", async (req, res) => {
         }
       },
       include: {
-        usuario: { 
+        estudiante: { 
           select: {
             nombre: true,
             apellido: true, 

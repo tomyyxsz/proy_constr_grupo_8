@@ -90,9 +90,9 @@ router.post("/crear", async (req, res) => {
           .status(400)
           .json({ error: "Faltan datos de curso o usuario." });
       }
-      const inscripcion = await prisma.EstudianteCurso.findFirst({
+
+      const inscripcion = await prisma.estudianteCurso.findFirst({
         where: {
-          refCurso,
           refEstudiante: idUsuario,
         },
         include: {

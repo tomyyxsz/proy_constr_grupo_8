@@ -45,6 +45,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
   const handleChange = (e) => {
     const { name, value } = e.target
     if (name === 'tipoSolicitud' && value === 'PERSONAL') {
+      console.log("ref curso:" + formData.refCurso)
       setFormData(prev => ({ ...prev, tipoSolicitud: value, refCurso: '' }))
     } else {
       setFormData(prev => ({ ...prev, [name]: value }))
@@ -175,7 +176,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
                 </select>
               </div>
 
-              {formData.tipoSolicitud === "ACADEMICA" && !esSolicitante(
+              {!esSolicitante && formData.tipoSolicitud === "ACADEMICA"  && (
                 <div className="form-group">
                   <label htmlFor="refCurso">
                     Curso <span className="slide-panel__required">*</span>
@@ -192,7 +193,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
                       {esProfesor ? "Selecciona una de las asignaturas que dictas" : "Selecciona uno de los cursos en los que estás inscrito"}
                     </option>
                     {cursosInscritos.map((curso) => (
-                      <option key={curso.idCurso}>
+                      <option key={curso.idCurso} value={curso.idCurso}>
                         {curso.nombreCurso}
                       </option>
                     ))}
