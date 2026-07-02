@@ -412,4 +412,42 @@ router.delete("/borrar/:id", async (req, res) => {
     res.status(500).json({ error: "Error interno al eliminar impresión." });
   }
 });
+
+router.get("/profesor/:idProfesor", async (req, res) => {
+  const { idProfesor } = req.params;
+
+  try {
+    const solicitudes = await prisma.impresion.findMany({
+      where: {
+        curso: {
+          refProfesor: idProfesor
+        }
+      },
+      include: {
+        usuario: { 
+          select: {
+            nombre: true,
+            apellido: true, 
+            email: true,    
+          }
+        },
+        curso: { 
+          select: {
+            nombreCurso: true
+          }
+        }
+      }
+    });
+
+    return res.status(200).json(solicitudes);
+
+  } catch (error) {
+    console.error("Error al obtener solicitudes del profesor:", error);
+    return res.status(500).json({ 
+      error: "Error interno al cargar las solicitudes de tus alumnos." 
+    });
+  }
+});
+
+
 export default router;
