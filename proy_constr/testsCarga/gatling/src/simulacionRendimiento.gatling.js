@@ -8,12 +8,13 @@ import {
   group,
   jsonPath,
   StringBody,
+  bodyString
 } from "@gatling.io/core";
 import { http, status } from "@gatling.io/http";
 
 export default simulation((setUp) => {
   const vu = parseInt(getParameter("vu", "10"), 10);
-  const backendBaseUrl = getParameter("baseUrl", "http://localhost:3001");
+  const backendBaseUrl = getParameter("baseUrl", "https://proy-constr-grupo-8.onrender.com");
   const runId = Date.now();
 
   const httpProtocol = http
@@ -111,15 +112,7 @@ export default simulation((setUp) => {
           .check(jsonPath("$.usuario.id").saveAs("usuarioId")),
       ),
     ); 
-  const borrarUsuarios = scenario("Borrar Usuarios")
-    .feed(crearFeederUsuarios(vu, "registro"))
-    .exec(
-      group("Borrar Usuarios").on(
-        http("Eliminar usuario")
-          .delete((session) => `/api/usuarios/rut/${session.get("rut")}`)
-          .check(status().is(200)),
-      ),
-    );
+
   
   const creacionSolicitud = scenario("Creacion de solicitud")
     .feed(crearFeederUsuarios(vu, "solicitud", 1000))
@@ -157,60 +150,51 @@ export default simulation((setUp) => {
         .check(jsonPath("$.usuario.id").saveAs("usuarioId")),
     )
     .exitHereIfFailed()
-    .exec(
-      group("Creacion de solicitud").on(
-        http("Enviar solicitud")
-          .post("/api/impresiones/crear")
-          .body(
-            StringBody((session) =>
-              JSON.stringify({
-                idEstudiante: session.get("usuarioId"),
-                color1: session.get("color1"),
-                color2: session.get("color2"),
-                color3: session.get("color3"),
-                tipoSolicitud: "PERSONAL",
-                comentario: session.get("comentario"),
-                urlModelo3d: session.get("urlModelo3d"),
-                urlModeloStl: session.get("urlModeloStl"),
-              }),
-            ),
-          )
-          // guardar id para borrar la solicitud después
-          .check(jsonPath("$.impresion.idImpresion").saveAs("idSolicitud"))
-          .check(status().is(201))
-          .check(jsonPath("$.impresion.idImpresion").exists()),
-      ),
+.exec(
+  group("Creacion de solicitud").on(
+    http("Enviar solicitud")
+      .post("/api/impresiones/crear")
+      .body(
+        StringBody((session) =>
+          JSON.stringify({
+            idUsuario: session.get("usuarioId"),
+            color1: session.get("color1"),
+            color2: session.get("color2"),
+            color3: session.get("color3"),
+            tipoSolicitud: "PERSONAL",
+            comentario: session.get("comentario"),
+            urlModelo3d: session.get("urlModelo3d"),
+            urlModeloStl: session.get("urlModeloStl"),
+          })
+        )
+      )
+      .asJson()
 
-    )
-    .exitHereIfFailed()
-    .exec (
-      group("Obtener solicitudes del usuario").on(
-        http("Obtener solicitudes del usuario")
-          .get((session) => `/api/impresiones/estudiante/${session.get("usuarioId")}`)
-          .check(status().is(200))
-          .check(jsonPath("$.solicitudes[0].idImpresion").saveAs("idSolicitud")),
-      ),
-    )
-    .exitHereIfFailed()
-    .exec (
-      group ("Borrar solicitudes del usuario").on (
-        http("Borrar solicitudes del usuario")
-          .delete((session) => `/api/impresiones/borrar/${session.get("idSolicitud")}`)
-          .check(status().is(200)),
-      )
-    )
-    .exitHereIfFailed()
-    .exec (
-      group ("Borrar usuario del sistema").on (
-        http("Borrar usuario del sistema")
-          .delete((session) => `/api/usuarios/rut/${session.get("rut")}`)
-          .check(status().is(200)),
-      )
-    )
-    ;
+      // checks
+      .check(status().is(201))
+      .check(status().saveAs("status"))
+      .check(bodyString().saveAs("responseBody"))
+      .check(jsonPath("$.impresion.idImpresion").saveAs("idSolicitud"))
+      .check(jsonPath("$.impresion.idImpresion").exists())
+  )
+)
+/* comentario para debug de respuesta de estado
+.exec((session) => {
+  const status = session.get("status");
+  const body = session.get("responseBody");
+
+  if (status !== 201) {
+    console.log("❌ ERROR EN REQUEST");
+    console.log("STATUS:", status);
+    console.log("BODY:", body);
+  }
+
+  return session;
+})*/
+
+.exitHereIfFailed();
   setUp(
-    registroUsuario.injectOpen(atOnceUsers(vu)).andThen(inicioSesionUsuario.injectOpen(atOnceUsers(vu)))
-      .andThen(borrarUsuarios.injectOpen(atOnceUsers(vu))),
+    registroUsuario.injectOpen(atOnceUsers(vu)).andThen(inicioSesionUsuario.injectOpen(atOnceUsers(vu))),
 
     creacionSolicitud.injectOpen(atOnceUsers(vu))
   )

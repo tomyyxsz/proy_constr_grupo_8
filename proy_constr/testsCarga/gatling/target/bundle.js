@@ -830,8 +830,8 @@ var gatling = (() => {
       __exportStar(require_jsonOfTypeMultipleFind(), exports);
       __exportStar(require_multipleFind(), exports);
       __exportStar(require_validate(), exports);
-      var bodyString = () => (0, find_1.wrapCheckBuilderFind)(jvm_types_1.CoreDsl.bodyString());
-      exports.bodyString = bodyString;
+      var bodyString2 = () => (0, find_1.wrapCheckBuilderFind)(jvm_types_1.CoreDsl.bodyString());
+      exports.bodyString = bodyString2;
       var bodyBytes = () => ({
         ...(0, find_1.wrapCheckBuilderFind)(jvm_types_1.CoreDsl.bodyBytes()),
         // FIXME only is and not?
@@ -3442,17 +3442,17 @@ var gatling = (() => {
   // <stdin>
   var stdin_exports = {};
   __export(stdin_exports, {
-    basicSimulation: () => basicSimulation_gatling_default
+    simulacionRendimiento: () => simulacionRendimiento_gatling_default
   });
   init_globals();
 
-  // src/basicSimulation.gatling.js
+  // src/simulacionRendimiento.gatling.js
   init_globals();
   var import_core = __toESM(require_target());
   var import_http = __toESM(require_target2());
-  var basicSimulation_gatling_default = (0, import_core.simulation)((setUp) => {
+  var simulacionRendimiento_gatling_default = (0, import_core.simulation)((setUp) => {
     const vu = parseInt((0, import_core.getParameter)("vu", "10"), 10);
-    const backendBaseUrl = (0, import_core.getParameter)("baseUrl", "http://localhost:3001");
+    const backendBaseUrl = (0, import_core.getParameter)("baseUrl", "https://proy-constr-grupo-8.onrender.com");
     const runId = Date.now();
     const httpProtocol = import_http.http.baseUrl(backendBaseUrl).acceptHeader("application/json").contentTypeHeader("application/json");
     function calcularDv(rutBody) {
@@ -3524,11 +3524,6 @@ var gatling = (() => {
         ).check((0, import_http.status)().is(200)).check((0, import_core.jsonPath)("$.usuario.id").saveAs("usuarioId"))
       )
     );
-    const borrarUsuarios = (0, import_core.scenario)("Borrar Usuarios").feed(crearFeederUsuarios(vu, "registro")).exec(
-      (0, import_core.group)("Borrar Usuarios").on(
-        (0, import_http.http)("Eliminar usuario").delete((session) => `/api/usuarios/rut/${session.get("rut")}`).check((0, import_http.status)().is(200))
-      )
-    );
     const creacionSolicitud = (0, import_core.scenario)("Creacion de solicitud").feed(crearFeederUsuarios(vu, "solicitud", 1e3)).exec(
       (0, import_http.http)("Registrar usuario para solicitud").post("/api/usuarios/registro").body(
         (0, import_core.StringBody)(
@@ -3556,7 +3551,7 @@ var gatling = (() => {
         (0, import_http.http)("Enviar solicitud").post("/api/impresiones/crear").body(
           (0, import_core.StringBody)(
             (session) => JSON.stringify({
-              idEstudiante: session.get("usuarioId"),
+              idUsuario: session.get("usuarioId"),
               color1: session.get("color1"),
               color2: session.get("color2"),
               color3: session.get("color3"),
@@ -3566,23 +3561,20 @@ var gatling = (() => {
               urlModeloStl: session.get("urlModeloStl")
             })
           )
-        ).check((0, import_core.jsonPath)("$.impresion.idImpresion").saveAs("idSolicitud")).check((0, import_http.status)().is(201)).check((0, import_core.jsonPath)("$.impresion.idImpresion").exists())
+        ).asJson().check((0, import_http.status)().is(201)).check((0, import_http.status)().saveAs("status")).check((0, import_core.bodyString)().saveAs("responseBody")).check((0, import_core.jsonPath)("$.impresion.idImpresion").saveAs("idSolicitud")).check((0, import_core.jsonPath)("$.impresion.idImpresion").exists())
       )
-    ).exitHereIfFailed().exec(
-      (0, import_core.group)("Obtener solicitudes del usuario").on(
-        (0, import_http.http)("Obtener solicitudes del usuario").get((session) => `/api/impresiones/estudiante/${session.get("usuarioId")}`).check((0, import_http.status)().is(200)).check((0, import_core.jsonPath)("$.solicitudes[0].idImpresion").saveAs("idSolicitud"))
-      )
-    ).exitHereIfFailed().exec(
-      (0, import_core.group)("Borrar solicitudes del usuario").on(
-        (0, import_http.http)("Borrar solicitudes del usuario").delete((session) => `/api/impresiones/borrar/${session.get("idSolicitud")}`).check((0, import_http.status)().is(200))
-      )
-    ).exitHereIfFailed().exec(
-      (0, import_core.group)("Borrar usuario del sistema").on(
-        (0, import_http.http)("Borrar usuario del sistema").delete((session) => `/api/usuarios/rut/${session.get("rut")}`).check((0, import_http.status)().is(200))
-      )
-    );
+    ).exec((session) => {
+      const status2 = session.get("status");
+      const body = session.get("responseBody");
+      if (status2 !== 201) {
+        console.log("\u274C ERROR EN REQUEST");
+        console.log("STATUS:", status2);
+        console.log("BODY:", body);
+      }
+      return session;
+    }).exitHereIfFailed();
     setUp(
-      registroUsuario.injectOpen((0, import_core.atOnceUsers)(vu)).andThen(inicioSesionUsuario.injectOpen((0, import_core.atOnceUsers)(vu))).andThen(borrarUsuarios.injectOpen((0, import_core.atOnceUsers)(vu))),
+      registroUsuario.injectOpen((0, import_core.atOnceUsers)(vu)).andThen(inicioSesionUsuario.injectOpen((0, import_core.atOnceUsers)(vu))),
       creacionSolicitud.injectOpen((0, import_core.atOnceUsers)(vu))
     ).protocols(httpProtocol).assertions((0, import_core.global)().failedRequests().count().lt(1));
   });

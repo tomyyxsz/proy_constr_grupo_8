@@ -17,7 +17,6 @@ router.post("/crear", async (req, res) => {
     urlModeloStl,
     refCurso,
   } = req.body;
-
   // validar campos obligatorios
   if (
     !idUsuario ||
