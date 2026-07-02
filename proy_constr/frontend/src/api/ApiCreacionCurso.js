@@ -12,18 +12,27 @@ export async function crearCurso({
   nombreCurso,
   semestreId,
   profesorId,
+  archivoCSV
 }) {
   try {
+    const formData = new FormData();
+    formData.append("nombreCurso", nombreCurso);
+    formData.append("idSemestre", semestreId);
+    formData.append("idProfesor", profesorId);
+    formData.append("archivoCSV", archivoCSV);
+    
     const response = await axios.post(
       `${API_BASE_URL}/crear-curso`,
+      formData,
       {
-        nombreCurso,
-        idSemestre: semestreId,
-        idProfesor: profesorId,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }
     );
-
+    console.log("Respuesta del backend al crear curso:", response.data);
     return response.data;
+
   } catch (error) {
     if (error.response) {
       throw new Error(

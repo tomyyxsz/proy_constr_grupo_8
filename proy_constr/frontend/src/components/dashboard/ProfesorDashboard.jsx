@@ -5,6 +5,9 @@ import CrearCurso from "../CreacionCurso";
 function ProfesorDashboard() {
   const [showCrearCurso, setShowCrearCurso] = useState(false);
 
+  const toggleCreacionCurso = () => {
+    setShowCrearCurso(!showCrearCurso);
+  }
   return (
     <>
       <div className="dashboard-grid">
@@ -12,7 +15,7 @@ function ProfesorDashboard() {
           icon="ti-books"
           title="Crear curso"
           description="Crear curso y cargar estudiantes"
-          onClick={() => setShowCrearCurso(true)}
+          onClick={() => toggleCreacionCurso()}
         />
 
         <ActionCard
@@ -31,9 +34,9 @@ function ProfesorDashboard() {
       </div>
 
       {showCrearCurso && (
-        <CrearCurso
-          onClose={() => setShowCrearCurso(false)}
-        />
+        <div onClick={(e) => e.stopPropagation()}>
+          <CrearCurso onClose={ () => setShowCrearCurso(false)} />
+        </div>
       )}
     </>
   );

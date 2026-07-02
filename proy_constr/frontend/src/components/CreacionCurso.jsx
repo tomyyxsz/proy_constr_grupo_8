@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { crearCurso as crearCursoApi, obtenerSemestres, cargarCSV } from "../api/ApiCreacionCurso";
+import { crearCurso as crearCursoApi, obtenerSemestres } from "../api/ApiCreacionCurso";
+import "./CreacionCurso.css";
+import Swal from "sweetalert2";
 
 export default function CreacionCurso({ onClose }) {
   const [nombreCurso, setNombreCurso] = useState("");
@@ -51,17 +53,32 @@ export default function CreacionCurso({ onClose }) {
       setErrorMensaje("No se encontró el profesor autenticado.");
       return;
     }
+    if (!archivoCSV) {
+      setErrorMensaje("Debe seleccionar un archivo CSV de estudiantes.");
+      return;
+    }
 
     try {
       setIsSubmitting(true);
-      const cursoCreado = await crearCursoApi({
+      const datosCurso = new FormData();
+      datosCurso.append("nombreCurso", nombreCurso.trim());
+      datosCurso.append("semestreId", semestreId.trim());
+      datosCurso.append("profesorId", profesorId);
+      datosCurso.append("archivoCSV", archivoCSV);
+      
+      await crearCursoApi({
         nombreCurso: nombreCurso.trim(),
         semestreId: semestreId.trim(),
         profesorId,
+        archivoCSV
       });
-      console.log("archivo csv:", archivoCSV);
-      await cargarCSV(cursoCreado.curso.idCurso, archivoCSV);
 
+      // mostrar mensaje de exito usando swal
+      await Swal.fire({
+        icon: "success",
+        title: "Curso creado correctamente",
+        text: `Se ha creado el curso "${nombreCurso}" y se han importado los estudiantes desde el archivo CSV.`,
+      });
       setExitoMensaje("Curso creado correctamente.");
       setNombreCurso("");
       setSemestreId("");
@@ -80,9 +97,12 @@ export default function CreacionCurso({ onClose }) {
       <div className="modal-content">
         <h2>Crear Curso</h2>
 
-        <form onSubmit={manejarSubmit}>
-          <label htmlFor="nombreCurso">Nombre del Curso</label>
+        <form className="form" onSubmit={manejarSubmit}>
+          <label className="form-label" htmlFor="nombreCurso">
+            Nombre del Curso
+          </label>
           <input
+            className="input"
             id="nombreCurso"
             data-testid="nombreCurso"
             type="text"
@@ -90,8 +110,11 @@ export default function CreacionCurso({ onClose }) {
             onChange={(e) => setNombreCurso(e.target.value)}
           />
 
-          <label htmlFor="semestreId">Semestre</label>
+          <label className="form-label" htmlFor="semestreId">
+            Semestre
+          </label>
           <select
+            className="input"
             id="semestreId"
             data-testid="semestreId"
             value={semestreId}
@@ -106,8 +129,11 @@ export default function CreacionCurso({ onClose }) {
             ))}
           </select>
             
-          <label htmlFor="cursoCSV">Archivo CSV de Estudiantes</label>
+          <label className="form-label" htmlFor="cursoCSV">
+            Archivo CSV de Estudiantes
+          </label>
           <input
+            className="input"
             id = "cursoCSV"
             type = "file"
             accept = ".csv"
@@ -122,10 +148,10 @@ export default function CreacionCurso({ onClose }) {
           {errorMensaje ? <p role="alert">{errorMensaje}</p> : null}
           {exitoMensaje ? <p>{exitoMensaje}</p> : null}
 
-          <button data-testid="crearCurso" type="submit" disabled={isSubmitting}>
+          <button className="createButton" data-testid="crearCurso" type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Creando..." : "Crear Curso"}
           </button>
-          <button type="button" onClick={onClose}>
+          <button className="cancelButton" type="button" onClick={onClose}>
             Cancelar
           </button>
         </form>
