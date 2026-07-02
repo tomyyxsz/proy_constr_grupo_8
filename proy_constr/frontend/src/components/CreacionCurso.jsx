@@ -108,13 +108,13 @@ export default function CreacionCurso({ onClose }) {
             
           <label htmlFor="cursoCSV">Archivo CSV de Estudiantes</label>
           <input
-          id = "cursoCSV"
-          type = "file"
-          accept = ".csv"
-          onChange = {(e) => {
-            const file = e.target.files[0];
-            setArchivoCSV(file);
-          }}
+            id = "cursoCSV"
+            type = "file"
+            accept = ".csv"
+            onChange = {(e) => {
+              const file = e.target.files[0];
+              setArchivoCSV(file);
+            }}
           >
           </input>
           <input type="hidden" value={profesorId} />
