@@ -117,7 +117,7 @@ describe('SolicitudImpresionForm', () => {
       expect(screen.getByText('¡Solicitud enviada correctamente!')).toBeInTheDocument()
 
       expect(crearSolicitudImpresion).toHaveBeenCalledWith(expect.objectContaining({
-        idEstudiante: mockUser.id,
+        idUsuario: mockUser.id,
         color1: '#000000',
         color2: '#ffffff',
         color3: '#ff0000',

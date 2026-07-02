@@ -5,7 +5,7 @@ const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}
 
 
 export async function crearSolicitudImpresion({
-  idEstudiante,
+  idUsuario,
   color1,
   color2,
   color3,
@@ -17,7 +17,7 @@ export async function crearSolicitudImpresion({
 }) {
   try {
     const response = await axios.post(`${API_BASE_URL}/crear`, {
-      idEstudiante,
+      idUsuario,
       color1,
       color2,
       color3,
@@ -39,9 +39,9 @@ export async function crearSolicitudImpresion({
   }
 }
 
-export async function obtenerSolicitudesEstudiante(idEstudiante) {
+export async function obtenerSolicitudesUsuario(idUsuario) {
   try {
-    const response = await axios.get(`${API_BASE_URL}/estudiante/${idEstudiante}`);
+    const response = await axios.get(`${API_BASE_URL}/usuario/${idUsuario}`);
     return response.data;
   } catch (error) {
     if (error.response) {

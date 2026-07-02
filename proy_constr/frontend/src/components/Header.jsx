@@ -3,13 +3,13 @@ import './Header.css'
 
 export const Header = ({
   isAuthenticated = false, //Se ve si se tiene la sesion iniciada o no
-  user = null, //Esta contiene la informacion del usuario
+  user = null, //Esta contiene la informacion del usuario, //Rol del usuario para controlar permisos
   onLoginClick, 
   onRegisterClick,
   onLogout,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false) //Es para ver si el estado del menú de usuario está abierto o cerrado
-
+  const puedeVerCursos = ['ADMINISTRADOR', 'AYUDANTE', 'ESTUDIANTE', 'PROFESOR'].includes(user?.role) // Ajusta esta lista según los roles permitidos
   const handleUserButtonClick = () => { //Cuando se hace click en el botón del usuario, se alterna el estado del menú entre abierto y cerrado
     setMenuOpen((currentValue) => !currentValue)
   }
@@ -51,9 +51,11 @@ export const Header = ({
                 <button type="button" className="app-header__menu-item" role="menuitem">
                   Mis datos
                 </button>
-                <button type="button" className="app-header__menu-item" role="menuitem">
-                  Mis cursos
-                </button>
+                {puedeVerCursos && (
+                  <button type="button" className="app-header__menu-item" role="menuitem">
+                    Mis cursos
+                  </button>
+                )}
                 <button type="button" className="app-header__menu-item app-header__menu-item--danger" role="menuitem" onClick={handleLogoutClick}>
                   Cerrar sesión
                 </button>

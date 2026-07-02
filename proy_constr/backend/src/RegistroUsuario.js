@@ -5,7 +5,7 @@ import {esCorreoValido, esContrasenaValida, normalizeRut} from "./lib/validacion
 
 const router = express.Router();
 
-const allowedRoles = ["ESTUDIANTE", "AYUDANTE", "PROFESOR","ADMINISTRADOR" ];
+const allowedRoles = ["ESTUDIANTE", "AYUDANTE", "PROFESOR","ADMINISTRADOR", "SOLICITANTE"];
 
 
 
@@ -18,7 +18,7 @@ function hashPassword(password) {
 
 function normalizeRole(role) {
   if (!role) {
-    return "ESTUDIANTE";
+    return "SOLICITANTE";
   }
 
   const normalized = String(role).trim().toUpperCase();
@@ -63,7 +63,7 @@ router.post("/registro", async (req, res) => {
 
   if (!role) {
     return res.status(400).json({
-      error: "usuarioRol invalido. Usa ESTUDIANTE, AYUDANTE o PROFESOR.",
+      error: "usuarioRol invalido. Usa ESTUDIANTE, AYUDANTE, PROFESOR O SOLICITANTE.",
     });
   }
 
