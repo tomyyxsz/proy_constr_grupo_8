@@ -10,6 +10,7 @@ const supabase = createClient('https://kywbczhepfqbgtlpxemr.supabase.co', 'sb_pu
 function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
   const [cursosInscritos, setCursosInscritos] = useState([])
   const esProfesor = user?.role === 'PROFESOR'
+  const esSolicitante = user?.role === 'SOLICITANTE'
 
   useEffect(() => {
     async function fetchCursos() {
@@ -33,7 +34,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
   }, [isOpen, user.id, esProfesor]);
 
   const [formData, setFormData] = useState({
-    color1: '#000000', color2: '#ffffff', color3: '#ff0000', tipoSolicitud: 'ACADEMICA',comentario: '',urlModelo3d: '',urlModeloStl: '',refCurso: '',
+    color1: '#000000', color2: '#ffffff', color3: '#ff0000', tipoSolicitud: 'PERSONAL',comentario: '',urlModelo3d: '',urlModeloStl: '',refCurso: '',
   })
   const [archivoStl, setArchivoStl] = useState(null)
   const [archivoModelo3D, setArchivoModelo3d] = useState(null)
@@ -169,12 +170,12 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
                   value={formData.tipoSolicitud}
                   onChange={handleChange}
                 >
-                  <option value="ACADEMICA">Académica</option>
+                  {!esSolicitante && <option value="ACADEMICA">Académica</option>}
                   <option value="PERSONAL">Personal</option>
                 </select>
               </div>
 
-              {formData.tipoSolicitud === "ACADEMICA" && (
+              {formData.tipoSolicitud === "ACADEMICA" && !esSolicitante(
                 <div className="form-group">
                   <label htmlFor="refCurso">
                     Curso <span className="slide-panel__required">*</span>
