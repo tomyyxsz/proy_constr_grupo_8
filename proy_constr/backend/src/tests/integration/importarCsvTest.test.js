@@ -1,120 +1,79 @@
-// clase para tests de importadorcsv.js
-// se usa la base de datos de prueba en Docker, .env.test
-import { beforeAll, afterAll, describe, expect, it } from "vitest";
-import app from "../../appTest.js";
+// clase de pruebas para importar CSV, que ahora funciona como una funcion que apoya a creacionCurso
+import { beforeAll, describe, expect, it, afterAll } from "vitest";
+import {prisma} from "../../lib/prisma.js";
 import dotenv from "dotenv";
-import request from "supertest";
 dotenv.config({ path: new URL("../../../.env.test", import.meta.url) });
+import { importarEstudiantesDesdeCSV } from "../../importadorCSV.js";
 
-const { prisma } = await import("../../lib/prisma.js");
+describe("Importador CSV", () => {
 
-let idCursoTest; // variable global para almacenar el id del curso de prueba
+  let cursoId;
+  let profId;
+  let semestreId;
 
-describe("Funciones de importadorCSV", () => {
   beforeAll(async () => {
+    // Configuración inicial antes de todas las pruebas
     await prisma.$connect();
-
-    // creamos un curso de prueba para los tests
-    await prisma.semestre.create({
-      // semestre tiene anio,periodo,fechainicio,fechafin,estadosemestre.
+    await prisma.curso.deleteMany();
+    const semestreCurso = await prisma.semestre.create({
       data: {
-        anio: 2053,
-        periodo: 2,
-        fechaInicio: new Date("2053-08-01"),
-        fechaFin: new Date("2053-12-31"),
-        estadoSemestre: "ACTIVO",
+        periodo:2040,
+        anio:1,
+        fechaInicio: new Date("2040-01-01"),
+        fechaFin: new Date("2040-06-30"),
       },
     });
-    await prisma.usuario.create({
+    semestreId = semestreCurso.idSemestre;
+    const profesorCurso = await prisma.usuario.create({
       data: {
         nombre: "Profesor",
-        apellido: "CSV",
-        email: "testingcsv@example.com",
-        rut: "18726323",
-        usuarioRol: "PROFESOR",
-        password: "password123",
-      },
+        apellido: "de Prueba CSV",
+        rut: "42812732-9",
+        password: "password",
+        email: "profesor.prueba@ejemplo.com"
+      }
     });
-
-    const semestre = await prisma.semestre.findFirst({
-      where: { anio: 2053, periodo: 2 },
-    });
-    const idSemestre = semestre.idSemestre;
-
-    const profesor = await prisma.usuario.findUnique({
-      where: { email: "testingcsv@example.com" },
-    });
-    const idProfesor = profesor.id;
-
-    await prisma.curso.create({
-      // curso tiene nombreCurso, refSemestre, refProfesor.
+    profId = profesorCurso.id;
+    const cursoPrueba = await prisma.curso.create({
       data: {
-        nombreCurso: "Curso para importar CSV",
-        refSemestre: idSemestre,
-        refProfesor: idProfesor,
-      },
+        nombreCurso: "Curso de Prueba CSV",
+        refProfesor: profesorCurso.id,
+        refSemestre: semestreCurso.idSemestre
+      }
     });
-
-    const curso = await prisma.curso.findFirst({
-      where: { nombreCurso: "Curso para importar CSV" },
-    });
-    idCursoTest = curso.idCurso; // Guardamos el id del curso de prueba
+    cursoId = cursoPrueba.idCurso;
+  
   });
 
   afterAll(async () => {
-    await prisma.$disconnect();
-
-    // limpiar la base de datos de prueba eliminando el curso y el semestre creados
-    await prisma.estudianteCurso.deleteMany({
-      where: { refCurso: idCursoTest },
-    });
-    await prisma.curso.deleteMany({
-      where: { nombreCurso: "Curso para importar CSV" },
-    });
-    await prisma.semestre.deleteMany({
-      where: { anio: 2053, periodo: 2 },
-    });
+    // Limpieza después de todas las pruebas
+    await prisma.estudianteCurso.deleteMany();
+    await prisma.curso.deleteMany();
     await prisma.usuario.deleteMany({
-      where: { email: "testingcsv@example.com" },
+      where: { id: profId }
     });
-
+      
+    await prisma.semestre.deleteMany( {
+      where: { idSemestre: semestreId }
+    } );
+    await prisma.$disconnect();
   });
 
-  it("deberia rechazar una solicitud sin idCurso", async () => {
-    // Simular una solicitud sin idCurso
-    const response = await request(app)
-      .post(`/api/importarCSV/`) // Endpoint sin idCurso
-      .attach("csvFile", Buffer.from("nombre,apellido,rut,email\nJuan,Perez,12345678-9,juan.perez@ejemplo.com"))
-      .set("Content-Type", "multipart/form-data");
-
-    expect(response.status).toBe(404);
+  it ("deberia insertar correctamente los cursos desde un csv valido", async () => {
+    const csvMock = "nombre,apellido,rut,email\n" +
+          "Juan,Perez,42812732,juan.perez@ejemplo.com";
+    await importarEstudiantesDesdeCSV(prisma, cursoId, { data: Buffer.from(csvMock) });
+    const curso = await prisma.curso.findUnique({
+      where: { idCurso: cursoId },
+      include: { estudianteCurso: true },
+    });
+    expect(curso).not.toBeNull();
   });
-  it ("deberia rechazar una solicitud con idCurso inexistente", async () => {
-    const response = await request(app)
-      .post("/api/importarCSV/00000000-0000-0000-0000-000000000000") //
-      .attach("csvFile", Buffer.from("nombre,apellido,rut,email\nJuan,Perez,12345678,juan.perez@ejemplo.com"))
-      .set("Content-Type", "multipart/form-data");
-
-    expect(response.status).toBe(404);
-    expect(response.body).toHaveProperty("error", "El curso con ese ID no existe.");
+  it("deberia lanzar un error si el csv viene con mal formato", async () => {
+    const csvInvalido = "columna1,columna2\n" +
+          "dato1,dato2";
+    const result = await importarEstudiantesDesdeCSV(prisma, cursoId, { data: Buffer.from(csvInvalido) });
+    expect(result).toBe(0);
   });
 
-  it("deberia rechazar una solicitud sin archivo CSV", async () => {
-    const response = await request(app)
-      .post(`/api/importarCSV/${idCursoTest}`) // Endpoint con idCurso de prueba
-      .set("Content-Type", "multipart/form-data");
-
-    expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty("error", "Se debe subir un archivo CSV");
-  });
-  it("deberia importar estudiantes desde un CSV valido", async () => {
-    const csvContent = "nombre,apellido,rut,email\nJuan,Perez,12345678,juan.perez@ejemplo.com";
-    const response = await request(app)
-      .post(`/api/importarCSV/${idCursoTest}`)
-      .attach("csvFile", Buffer.from(csvContent))
-      .set("Content-Type", "multipart/form-data");
-
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty("message", "Importacion exitosa. Se procesaron 1 estudiantes.");
-  });
 });

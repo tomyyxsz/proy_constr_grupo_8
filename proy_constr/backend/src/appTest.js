@@ -8,7 +8,6 @@ import buscarUsuarioRouter from "./BuscarUsuario.js";
 import CreacionCursoRouter from "./CreacionCurso.js";
 import CreacionSemestreRouter from "./CreacionSemestre.js";
 // importar la funcion de importadorCSV.js
-import importarEstudiantesDesdeCSV from "./importadorCSV.js";
 import app from "./server.js";
 
 // rutas
@@ -19,6 +18,5 @@ app.use(gestionImpresionRouter);
 app.use("/api/usuarios", buscarUsuarioRouter);
 app.use(CreacionCursoRouter);
 app.use(CreacionSemestreRouter);
-app.use("/api/importarCSV", importarEstudiantesDesdeCSV);
 
 export default app;
