@@ -113,3 +113,20 @@ export async function completarSolicitud(idSolicitud, idAyudante, emailEstudiant
     }
   }
 }
+
+export async function obtenerSolicitudesProfesor (idProfesor) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/profesor/${idProfesor}`);
+    return response.data;
+  
+  } catch (error) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.error ||
+          "Error al obtener solicitudes del profesor.",
+      );
+    } else {
+      throw new Error("Error de red al obtener solicitudes del profesor.");
+    }
+  }
+}

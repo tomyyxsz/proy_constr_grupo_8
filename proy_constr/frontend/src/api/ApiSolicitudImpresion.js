@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/impresiones`;
-
+const API_BUSQUEDA_USUARIO_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/usuarios`;
 
 export async function crearSolicitudImpresion({
   idUsuario,
@@ -50,6 +50,36 @@ export async function obtenerSolicitudesUsuario(idUsuario) {
       );
     } else {
       throw new Error("Error de red al obtener solicitudes.");
+    }
+  }
+}
+
+export async function obtenerCursosEstudiante(idUsuario) {
+  try {
+    const response = await axios.get(`${API_BUSQUEDA_USUARIO_URL}/${idUsuario}/cursos`);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.error || "Error al obtener cursos del estudiante.",
+      );
+    } else {
+      throw new Error("Error de red al obtener cursos del estudiante.");
+    }
+  }
+}
+
+export async function obtenerCursosProfesor(idProfesor) {
+  try {
+    const response = await axios.get(`${API_BUSQUEDA_USUARIO_URL}/profesores/${idProfesor}/cursos`);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.error || "Error al obtener cursos del profesor.",
+      );
+    } else {
+      throw new Error("Error de red al obtener cursos del profesor.");
     }
   }
 }

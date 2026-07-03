@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { useState } from "react";
 import { aprobarSolicitud } from "../api/ApiGestionImpresion.js";
 import { rechazarSolicitud } from "../api/ApiGestionImpresion.js";
@@ -166,6 +167,7 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
                   <th className="modal-th">Modelo / Archivo</th>
                   <th className="modal-th">Email</th>
                   <th className="modal-th">Tipo de Solicitud</th>
+                  <th className="modal-th">Curso</th>
                   <th className="modal-th">Estado </th>
                 </tr>
               </thead>
@@ -181,7 +183,10 @@ export default function SolicitudesAyudante({ onClose, solicitudes = null, onRef
                       <td className="modal-td">{solicitud.urlModelo3d}</td>
                       <td className="modal-td"> {solicitud.solicitanteEmail || "No especificado"}</td>
                       <td className="modal-td">{solicitud.tipoSolicitud}</td>
-
+                      <td className="modal-td"> 
+                        {solicitud.tipoSolicitud ==="ACADEMICA"
+                          ? (solicitud.curso?.nombreCurso || "No especificado") : "N/A"}
+                      </td>
                       {/* celda para estado */}
                       <td className="modal-td" style={{ position: "relative" }}>
                         <button onClick={() => toggleApertura(solicitud.idImpresion)} disabled={esFilaCargando} className={`btn-status-selector ${String(
