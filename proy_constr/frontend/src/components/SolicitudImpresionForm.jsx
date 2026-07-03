@@ -11,7 +11,6 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
   const [cursosInscritos, setCursosInscritos] = useState([])
   const esProfesor = user?.role === 'PROFESOR'
   const esSolicitante = user?.role === 'SOLICITANTE'
-
   useEffect(() => {
     async function fetchCursos() {
       try {
@@ -45,11 +44,11 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
   const handleChange = (e) => {
     const { name, value } = e.target
     if (name === 'tipoSolicitud' && value === 'PERSONAL') {
-      console.log("ref curso:" + formData.refCurso)
       setFormData(prev => ({ ...prev, tipoSolicitud: value, refCurso: '' }))
     } else {
       setFormData(prev => ({ ...prev, [name]: value }))
     }
+
   }
   //validamos que los campos esten completos y tengan un formato correcto 
   const validar = () => {
@@ -64,7 +63,6 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
     }
     return null
   }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError(null)
@@ -87,6 +85,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
         .upload(rutaArchivo, archivoStl);
       if (storageError) throw new Error ('Error al subir el archivo STL' + storageError.message);
 
+
       const { data: urlData } = supabase.storage
         .from('archivos-subidos')
         .getPublicUrl(rutaArchivo)
@@ -102,12 +101,11 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
         .upload(rutaArchivo2, archivoModelo3D);
       if (storageError3D)
         throw new Error("Error al subir el archivo 3D" + storageError3D.message);
-
       const { data: urlData3D } = supabase.storage
         .from("archivos-subidos")
         .getPublicUrl(rutaArchivo2);
-
       const urlPublica3D = urlData3D.publicUrl
+
 
       const data = await crearSolicitudImpresion({
         idUsuario: user.id, color1: formData.color1, color2: formData.color2, color3: formData.color3,
@@ -178,8 +176,8 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
 
               {!esSolicitante && formData.tipoSolicitud === "ACADEMICA"  && (
                 <div className="form-group">
-                  <label htmlFor="refCurso">
-                    Curso <span className="slide-panel__required">*</span>
+                  <label htmlFor="refCurso">Curso
+                    <span className="slide-panel__required">*</span>
                   </label>
 
                   <select
@@ -190,7 +188,7 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
                     required
                   >
                     <option value="" disabled>
-                      {esProfesor ? "Selecciona una de las asignaturas que dictas" : "Selecciona uno de los cursos en los que estás inscrito"}
+                      {esProfesor ? "Selecciona una de las asignaturas que dictas" : "Selecciona uno de los cursos en los que estas inscrito"}
                     </option>
                     {cursosInscritos.map((curso) => (
                       <option key={curso.idCurso} value={curso.idCurso}>
@@ -233,7 +231,8 @@ function SolicitudImpresionForm({ user, isOpen, onClose, onSuccess }) {
                   id="modelo3d"
                   type="file"
                   accept="*" // se crea con accept = "*" para probar, pero deberia ser accept = ".3d"
-                  onChange={(e) => setArchivoModelo3d(e.target.files[0])}
+                  onChange={(e) => {
+                    setArchivoModelo3d(e.target.files[0])}}
                 />
               </div>
 

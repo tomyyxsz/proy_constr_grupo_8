@@ -3,6 +3,7 @@ import "@testing-library/jest-dom";
 import { beforeEach, vi } from "vitest";
 import CreacionCurso from "../../components/CreacionCurso";
 import { crearCurso, obtenerSemestres } from "../../api/ApiCreacionCurso";
+import userEvent from "@testing-library/user-event";
 
 vi.mock("../../api/ApiCreacionCurso", () => ({
   crearCurso: vi.fn(),
@@ -69,6 +70,7 @@ describe("Pruebas creación curso", () => {
   });
 
   test("debe enviar los datos del curso al crear", async () => {
+    const user = userEvent.setup();
     const mockCrearCurso = vi.mocked(crearCurso);
     mockCrearCurso.mockResolvedValue({ message: "ok" });
 
@@ -82,13 +84,27 @@ describe("Pruebas creación curso", () => {
       target: { value: "semestre-123" },
     });
 
+
+    const fileCSV = new File(
+      [
+        "nombre,apellido,rut,email\n" +
+          "Juan,Perez,12345678-9,juan.perez@ejemplo.com",
+      ],
+      "estudiantes.csv",
+      { type: "text/csv" },
+    );
+
+    await user.upload(screen.getByLabelText(/Archivo CSV/i), fileCSV);
+
     fireEvent.click(screen.getByTestId("crearCurso"));
+
 
     await waitFor(() => {
       expect(mockCrearCurso).toHaveBeenCalledWith({
         nombreCurso: "Programación Web",
         semestreId: "semestre-123",
         profesorId: "profesor-123",
+        archivoCSV: expect.any(File),
       });
     });
   });
