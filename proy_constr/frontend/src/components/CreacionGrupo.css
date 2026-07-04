@@ -14,7 +14,7 @@
   z-index: 1000;
 }
 
-/* Contenedor del modal (tu form) */
+/* Contenedor del modal */
 .creacion-grupo-container {
   background-color: #fff;
   padding: 20px;
@@ -88,12 +88,12 @@
 
 /* Submit */
 .creacion-grupo-container button[type="submit"] {
-  background-color: #2563eb;
+  background-color: #c0392b;
   color: white;
 }
 
 .creacion-grupo-container button[type="submit"]:disabled {
-  background-color: #93c5fd;
+  background-color: #77797a;
   cursor: not-allowed;
 }
 

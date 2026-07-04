@@ -132,6 +132,7 @@ export default function GestionEstudiante({ profesorId, onClose }) {
                   <td>
                     {estudiante.grupo ? (
                       <button
+                        className="cambiar-grupo-button"
                         onClick={() => {
                           setEstudianteSeleccionado(estudiante);
                           setGrupoSeleccionado(estudiante.refGrupo);
@@ -141,6 +142,7 @@ export default function GestionEstudiante({ profesorId, onClose }) {
                       </button>
                     ) : (
                       <button
+                        className="asignar-grupo-button"
                         onClick={() => {
                           setEstudianteSeleccionado(estudiante);
                           setGrupoSeleccionado("");
@@ -163,7 +165,7 @@ export default function GestionEstudiante({ profesorId, onClose }) {
             }}
           >
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <h3>Asignar Grupo a {estudianteSeleccionado.nombre}</h3>
+              <h3>Asignar Grupo a {estudianteSeleccionado.nombre} en Curso {estudianteSeleccionado.cursoNombre}</h3>
               <select
                 value={grupoSeleccionado}
                 onChange={(e) => setGrupoSeleccionado(e.target.value)}
@@ -175,8 +177,11 @@ export default function GestionEstudiante({ profesorId, onClose }) {
                   </option>
                 ))}
               </select>
-              <button onClick={manejarAsignarGrupo}>Asignar</button>
+              <button className="asignar-grupo-button" onClick={manejarAsignarGrupo}>
+                Asignar
+              </button>
               <button
+                
                 onClick={() => {
                   setEstudianteSeleccionado(null);
                   setGrupoSeleccionado("");

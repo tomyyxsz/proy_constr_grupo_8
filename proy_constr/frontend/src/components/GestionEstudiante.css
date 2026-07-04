@@ -34,6 +34,12 @@
   color: #000;
 }
 
+.modal-overlay {
+  /* dejarlo centrado */
+  display: flex;
+  justify-content: center;
+}
+
 /* Contenedor del modal */
 .gestion-estudiante-container {
   background-color: #fff;
@@ -43,7 +49,7 @@
   max-height: 85vh;
 
   overflow-y: auto;
-  overflow-x: auto;   /* 👈 clave para tablas */
+  overflow-x: auto; 
 
   padding: 20px;
   border-radius: 8px;
@@ -54,7 +60,7 @@
   margin-bottom: 15px;
 }
 
-/* Sección de información del estudiante */
+/* Seccion de información del estudiante */
 .estudiante-info {
   background: #f8f9fa;
   padding: 10px 12px;
@@ -107,7 +113,6 @@
   padding: 8px 12px;
   border-radius: 6px;
   border: none;
-
   cursor: pointer;
   font-size: 13px;
 
@@ -115,20 +120,10 @@
 }
 
 /* Botón principal (asignar / guardar) */
-.gestion-estudiante-container button[type="submit"] {
-  background-color: #2563eb;
+.asignar-grupo-button,
+.cambiar-grupo-button {
+  background-color: #c0392b;
   color: white;
-}
-
-.gestion-estudiante-container button[type="submit"]:disabled {
-  background-color: #93c5fd;
-  cursor: not-allowed;
-}
-
-/* Botón cancelar */
-.gestion-estudiante-container button[type="button"] {
-  background-color: #e5e7eb;
-  color: #333;
 }
 
 /* Mensajes */
