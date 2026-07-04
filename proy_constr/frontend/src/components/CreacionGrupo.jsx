@@ -8,9 +8,9 @@ import { useState, useEffect } from "react";
 // import { crearGrupo as crearGrupoApi, obtenerCursos } from "../api/ApiCreacionGrupo";
 import {
   crearGrupo as crearGrupoApi,
-  obtenerCursos, agregarEstudianteAGrupo,
+  obtenerCursos,
 } from "../api/ApiCreacionGrupo";
-//import "./CreacionGrupo.css";
+import "./CreacionGrupo.css";
 import Swal from "sweetalert2";
 
 export default function CreacionGrupo({ onClose }) {
@@ -31,8 +31,7 @@ export default function CreacionGrupo({ onClose }) {
     const cargarCursos = async () => {
       try {
         const data = await obtenerCursos(profesorId);
-        setCursos(data);
-        console.log("Cursos obtenidos:", data);
+        setCursos(data.cursos);
       } catch (error) {
         setErrorMensaje(error.message || "No se pudieron cargar los cursos.");
       } finally {
@@ -78,46 +77,52 @@ export default function CreacionGrupo({ onClose }) {
   };
 
   return (
-    <div className="creacion-grupo-container">
-      <h2>Crear Grupo</h2>
-      {errorMensaje && <p className="error">{errorMensaje}</p>}
-      {exitoMensaje && <p className="exito">{exitoMensaje}</p>}
-      <form onSubmit={manejarSubmit}>
-        <div className="form-group">
-          <label htmlFor="nombreGrupo">Nombre del Grupo:</label>
-          <input
-            type="text"
-            id="nombreGrupo"
-            value={nombreGrupo}
-            onChange={(e) => setNombreGrupo(e.target.value)}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="cursoId">Curso:</label>
-          {cargandoCursos ? (
-            <p>Cargando cursos...</p>
-          ) : (
-            <select
-              id="cursoId"
-              value={cursoId}
-              onChange={(e) => setCursoId(e.target.value)}
-            >
-              <option value="">Seleccione un curso</option>
-              {cursos.cursos.map((curso) => (
-                <option key={curso.idCurso} value={curso.idCurso}>
-                  {curso.nombreCurso}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-        <button type="submit" data-testid="crearGrupo" disabled={isSubmitting}>
-          {isSubmitting ? "Creando..." : "Crear Grupo"}
-        </button>
-        <button type="button" onClick={onClose}>
-          Cancelar
-        </button>
-      </form>
+    <div className="modal-backdrop">
+      <div className="creacion-grupo-container">
+        <h2>Crear Grupo</h2>
+        {errorMensaje && <p className="error">{errorMensaje}</p>}
+        {exitoMensaje && <p className="exito">{exitoMensaje}</p>}
+        <form onSubmit={manejarSubmit}>
+          <div className="form-group">
+            <label htmlFor="nombreGrupo">Nombre del Grupo:</label>
+            <input
+              type="text"
+              id="nombreGrupo"
+              value={nombreGrupo}
+              onChange={(e) => setNombreGrupo(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="cursoId">Curso:</label>
+            {cargandoCursos ? (
+              <p>Cargando cursos...</p>
+            ) : (
+              <select
+                id="cursoId"
+                value={cursoId}
+                onChange={(e) => setCursoId(e.target.value)}
+              >
+                <option value="">Seleccione un curso</option>
+                {cursos.map((curso) => (
+                  <option key={curso.idCurso} value={curso.idCurso}>
+                    {curso.nombreCurso}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+          <button
+            type="submit"
+            data-testid="crearGrupo"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Creando..." : "Crear Grupo"}
+          </button>
+          <button type="button" onClick={onClose}>
+            Cancelar
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

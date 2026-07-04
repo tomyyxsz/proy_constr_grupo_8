@@ -132,9 +132,9 @@ router.get("/listar-grupos/:idCurso", async (req, res) => {
     const grupos = await prisma.grupoCurso.findMany({
       where: { refCurso: idCurso },
       include: {
-        grupoEstudiante: {
+        grupoEstudiantes: {
           include: {
-            refEstudiante: true,
+            estudiante: true,
           },
         },
       },

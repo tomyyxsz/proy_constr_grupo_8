@@ -154,5 +154,55 @@ router.get("/profesores/:idProfesor/cursos", async (req, res) => {
     return res.status(500).json({ error: "Error interno al obtener cursos del profesor." });
   }
 });
+// ruta para obtener todos los estudiantes de un profesor, se envia el id del profesor y se devuelve un array de estudiantes
+// devolver nombre, correo, curso y grupo al que pertenece el estudiante, si no tiene grupo devolver null
+router.get("/profesores/alumnos/:idProfesor", async (req, res) => {
+  const { idProfesor } = req.params;
+
+  try {
+    const cursos = await prisma.curso.findMany({
+      where: {
+        refProfesor: idProfesor,
+      },
+      include: {
+        estudianteCurso: {
+          include: {
+            estudiante: {
+              include: {
+                grupoEstudiante: {
+                  include: {
+                    grupo: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    // una vez recuperado el id del estudiante, recuperar otros campos necesarios para frontend
+    const estudiantes = cursos.flatMap((curso) =>
+      curso.estudianteCurso.map((inscripcion) => {
+        const estudiante = inscripcion.estudiante;
+        const grupoEstudiante = estudiante.grupoEstudiante.find(
+          (ge) => ge.refEstudiante === estudiante.id,
+        );
+        return {
+          id: estudiante.id,
+          nombre: estudiante.nombre,
+          correo: estudiante.email,
+          refCurso: curso.idCurso,
+          cursoNombre: curso.nombreCurso,
+          grupo: grupoEstudiante ? grupoEstudiante.grupo.nombreGrupo : null,
+        };
+      }
+      ),
+    );
+    return res.status(200).json({ estudiantes });
+  } catch (error) {
+    console.error("Error al obtener estudiantes del profesor:", error);
+    return res.status(500).json({ error: "Error interno al obtener estudiantes del profesor." });
+  }
+});
 
 export default router;
