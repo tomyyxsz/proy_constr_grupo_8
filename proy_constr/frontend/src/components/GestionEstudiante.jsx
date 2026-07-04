@@ -7,6 +7,7 @@ import {
   obtenerAlumnosProfesor,
   agregarEstudianteAGrupo,
   obtenerGruposCurso,
+  cambiarGrupoEstudiante,
 } from "../api/ApiCreacionGrupo.js";
 import Swal from "sweetalert2";
 import "./GestionEstudiante.css";
@@ -51,22 +52,35 @@ export default function GestionEstudiante({ profesorId, onClose }) {
     }
 
     try {
-      await agregarEstudianteAGrupo({
-        refGrupo: grupoSeleccionado,
-        refEstudiante: estudianteSeleccionado.id,
-      });
-      Swal.fire(
-        "Éxito",
-        "Estudiante asignado al grupo correctamente.",
-        "success",
-      );
+      if (!estudianteSeleccionado.grupo) {
+        await agregarEstudianteAGrupo({
+          refGrupo: grupoSeleccionado,
+          refEstudiante: estudianteSeleccionado.id,
+        });
+        Swal.fire(
+          "Éxito",
+          "Estudiante asignado al grupo correctamente.",
+          "success",
+        );
 
-      // actualizar para ver el cambio
-      const data = await obtenerAlumnosProfesor(profesorId);
-      setEstudiantes(data.estudiantes);
+        // actualizar para ver el cambio
+        const data = await obtenerAlumnosProfesor(profesorId);
+        setEstudiantes(data.estudiantes);
 
-      setGrupoSeleccionado("");
-      setEstudianteSeleccionado(null);
+        setGrupoSeleccionado("");
+        setEstudianteSeleccionado(null);
+      } else {
+        // cambio de grupo
+        await cambiarGrupoEstudiante({
+          refGrupo: grupoSeleccionado,
+          refEstudiante: estudianteSeleccionado.id,
+        });
+        Swal.fire(
+          "Éxito",
+          "Estudiante cambiado de grupo correctamente.",
+          "success",
+        );
+      }
     } catch (error) {
       Swal.fire(
         "Error",
@@ -108,20 +122,31 @@ export default function GestionEstudiante({ profesorId, onClose }) {
             </thead>
             <tbody>
               {estudiantes.map((estudiante) => (
-                <tr key={estudiante.id}>
+                <tr
+                  key={`${estudiante.id}-${estudiante.refCurso}-${estudiante.refGrupo ?? "sin-grupo"}`}
+                >
                   <td>{estudiante.nombre}</td>
                   <td>{estudiante.correo}</td>
                   <td>{estudiante.cursoNombre || "N/A"}</td>
                   <td>{estudiante.grupo || "Sin grupo"}</td>
                   <td>
-                    {!estudiante.grupo && (
+                    {estudiante.grupo ? (
+                      <button
+                        onClick={() => {
+                          setEstudianteSeleccionado(estudiante);
+                          setGrupoSeleccionado(estudiante.refGrupo);
+                        }}
+                      >
+                        Cambiar grupo
+                      </button>
+                    ) : (
                       <button
                         onClick={() => {
                           setEstudianteSeleccionado(estudiante);
                           setGrupoSeleccionado("");
                         }}
                       >
-                        Asignar Grupo
+                        Asignar grupo
                       </button>
                     )}
                   </td>
@@ -137,7 +162,7 @@ export default function GestionEstudiante({ profesorId, onClose }) {
               setEstudianteSeleccionado(null);
             }}
           >
-            <div className="modal-content">
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <h3>Asignar Grupo a {estudianteSeleccionado.nombre}</h3>
               <select
                 value={grupoSeleccionado}

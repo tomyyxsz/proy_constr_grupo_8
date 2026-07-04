@@ -90,3 +90,23 @@ export async function obtenerGruposCurso(idCurso) {
     throw new Error("Error de red al obtener los grupos del curso.");
   }
 }
+
+export async function cambiarGrupoEstudiante({ refGrupo, refEstudiante }) {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL_ENV}/cambiar-grupo`,
+      {
+        refGrupo,
+        refEstudiante,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.error || "Error al cambiar el grupo del estudiante.",
+      );
+    }
+    throw new Error("Error de red al cambiar el grupo del estudiante.");
+  }
+}

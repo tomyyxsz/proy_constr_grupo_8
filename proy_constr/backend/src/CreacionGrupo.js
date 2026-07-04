@@ -42,6 +42,21 @@ router.post("/crear-grupo", async (req, res) => {
     });
   }
 
+  // validar que no existe un curso con ese nombre, ya que no es unico pero deberia serlo
+
+  const grupoExistente = await prisma.grupoCurso.findFirst({
+    where: {
+      refCurso,
+      nombreGrupo,
+    },
+  });
+
+  if (grupoExistente) {
+    return res.status(400).json({
+      error: "Ya existe un grupo con ese nombre en este curso.",
+    });
+  }
+
   try {
     const curso = await prisma.curso.findUnique({
       where: { idCurso: refCurso },
@@ -144,6 +159,43 @@ router.get("/listar-grupos/:idCurso", async (req, res) => {
   } catch (error) {
     console.error("Error al listar los grupos:", error);
     res.status(500).json({ error: "Error al listar los grupos" });
+  }
+});
+
+router.post("/cambiar-grupo", async (req, res) => {
+  const { refGrupo, refEstudiante } = req.body;
+  // se borra primero su entrada en grupoEstudiante y luego se agrega al nuevo grupo
+  if (!refGrupo || !refEstudiante) {
+    return res.status(400).json({
+      error:
+        "Debes enviar refGrupo y refEstudiante para cambiar el grupo del estudiante.",
+    });
+  }
+
+  if (!uuidValidate(refGrupo) || !uuidValidate(refEstudiante)) {
+    return res.status(400).json({
+      error: "refGrupo y refEstudiante deben ser UUID válidos.",
+    });
+  }
+
+  try {
+    // primero se borra la entrada del estudiante en grupoEstudiante
+    await prisma.grupoEstudiante.deleteMany({
+      where: { refEstudiante },
+    });
+
+    // luego se agrega al nuevo grupo
+    const grupoEstudiante = await prisma.grupoEstudiante.create({
+      data: {
+        refGrupo,
+        refEstudiante,
+      },
+    });
+
+    res.status(201).json(grupoEstudiante);
+  } catch (error) {
+    console.error("Error al cambiar el grupo del estudiante:", error);
+    res.status(500).json({ error: "Error al cambiar el grupo del estudiante" });
   }
 });
 

@@ -3563,16 +3563,7 @@ var gatling = (() => {
           )
         ).asJson().check((0, import_http.status)().is(201)).check((0, import_http.status)().saveAs("status")).check((0, import_core.bodyString)().saveAs("responseBody")).check((0, import_core.jsonPath)("$.impresion.idImpresion").saveAs("idSolicitud")).check((0, import_core.jsonPath)("$.impresion.idImpresion").exists())
       )
-    ).exec((session) => {
-      const status2 = session.get("status");
-      const body = session.get("responseBody");
-      if (status2 !== 201) {
-        console.log("\u274C ERROR EN REQUEST");
-        console.log("STATUS:", status2);
-        console.log("BODY:", body);
-      }
-      return session;
-    }).exitHereIfFailed();
+    ).exitHereIfFailed();
     setUp(
       registroUsuario.injectOpen((0, import_core.atOnceUsers)(vu)).andThen(inicioSesionUsuario.injectOpen((0, import_core.atOnceUsers)(vu))),
       creacionSolicitud.injectOpen((0, import_core.atOnceUsers)(vu))
