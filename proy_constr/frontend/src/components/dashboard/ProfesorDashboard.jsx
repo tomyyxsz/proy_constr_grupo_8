@@ -1,29 +1,104 @@
-//dashboard para profesores donde se controlan acciones especificas de profesor 
-import ActionCard from '../ActionCard'
+import { useState } from "react";
+import ActionCard from "../ActionCard";
+import CrearCurso from "../CreacionCurso";
+import { useCallback } from "react";
+import SolicitudImpresionForm from "../SolicitudImpresionForm";
+import {obtenerSolicitudesProfesor} from "../../api/ApiGestionImpresion";
+import "./Dashboard.css";
+import SolicitudesAyudante from "../SolicitudesAyudante";
+const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/impresiones`;
 
-function ProfesorDashboard() {
+function ProfesorDashboard({ user }) {
+  const idUsuario = user?.id; 
+
+  const [showCrearCurso, setShowCrearCurso] = useState(false);
+  const [showSolicitudForm, setShowSolicitudForm] = useState(false);
+  const [showSolicitudes, setShowSolicitudes] = useState(false);
+  const [solicitudesProfesor, setSolicitudesProfesor] = useState([]);
+
+  const toggleCreacionCurso = () => {
+    setShowCrearCurso(!showCrearCurso);
+  };
+
+  const fetchSolicitudes = useCallback(async () => {
+    if (!idUsuario) return; // Usamos la variable extraída
+    
+    try {
+
+      const datos = await obtenerSolicitudesProfesor(idUsuario);
+      setSolicitudesProfesor(datos);
+      
+    } catch (err) {
+      console.error("Error al obtener solicitudes del profesor:", err);
+      setSolicitudesProfesor([]);
+    }
+  }, [idUsuario]);
+
+
+
+  const handleSolicitudSuccess = async () => {
+    await fetchSolicitudes();
+    console.log("Solicitud enviada exitosamente");
+  };
+
   return (
-    <div className="dashboard-grid">
-      <ActionCard
-        icon="ti-books"
-        title="Mis cursos"
-        description="Gestiona tus cursos y secciones"
-        onClick={() => {}}
-      />
-      <ActionCard
-        icon="ti-clipboard-check"
-        title="Solicitudes pendientes"
-        description="Revisa solicitudes que requieren tu aprobación"
-        onClick={() => {}}
-      />
-      <ActionCard
-        icon="ti-users"
-        title="Gestionar ayudantías"
-        description="Asigna y supervisa a tus ayudantes"
-        onClick={() => {}}
-      />
-    </div>
-  )
-}
+    <>
+      <div className="dashboard-grid">
+        <ActionCard
+          icon="ti-books"
+          title="Crear curso"
+          description="Crear curso y cargar estudiantes"
+          onClick={() => toggleCreacionCurso()}
+        />
 
-export default ProfesorDashboard
+        <ActionCard
+          icon="ti-clipboard-check"
+          title="Solicitudes pendientes"
+          description="Revisa solicitudes que requieren tu aprobación"
+          onClick={() => {setShowSolicitudes(true)
+            fetchSolicitudes();
+          }}
+        />
+
+        <ActionCard
+          icon="ti-users"
+          title="Gestionar ayudantías"
+          description="Asigna y supervisa a tus ayudantes"
+          onClick={() => {}}
+        />
+
+        <ActionCard
+          icon="ti-3d-cube-sphere"
+          iconClass="icon-estudiante"
+          title="Solicitar impresión"
+          description="Crea una nueva solicitud de impresión 3D como docente"
+          onClick={() => setShowSolicitudForm(true)}
+        />
+      </div>
+
+      {showCrearCurso && (
+        <div onClick={(e) => e.stopPropagation()}>
+          <CrearCurso onClose={() => setShowCrearCurso(false)} />
+        </div>
+      )}
+
+      {showSolicitudForm && (
+        <SolicitudImpresionForm
+          user={user}
+          isOpen={showSolicitudForm}
+          onClose={() => setShowSolicitudForm(false)}
+          onSuccess={handleSolicitudSuccess}
+        />
+      )}
+
+      {showSolicitudes && (
+        <SolicitudesAyudante
+          onClose={() => setShowSolicitudes(false)}
+          solicitudes={solicitudesProfesor}
+          onRefresh={fetchSolicitudes}
+        />
+      )}
+    </>
+  );
+}
+export default ProfesorDashboard;

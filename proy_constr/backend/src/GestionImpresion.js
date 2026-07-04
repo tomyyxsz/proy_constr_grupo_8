@@ -7,14 +7,14 @@ import { enviarNotificacionEstado } from "./lib/mailer.js";
 const router = express.Router();
 
 // GET: Listar impresiones por estudiante
-router.get("/estudiante/:idEstudiante", async (req, res) => {
-  const { idEstudiante } = req.params;
+router.get("/usuario/:idUsuario", async (req, res) => {
+  const { idUsuario } = req.params;
 
   try {
     // Buscar todas las solicitudes de un estudiante
     const solicitudes = await prisma.impresion.findMany({
       where: {
-        refEstudiante: idEstudiante,
+        refEstudiante: idUsuario,
       },
       select: {
         idImpresion: true,
@@ -45,7 +45,7 @@ router.get("/estudiante/:idEstudiante", async (req, res) => {
 
     if (solicitudes.length === 0) {
       return res.status(200).json({
-        message: "El estudiante no tiene solicitudes de impresión.",
+        message: "El usuario no tiene solicitudes de impresión.",
         solicitudes: [],
       });
     }
@@ -55,7 +55,7 @@ router.get("/estudiante/:idEstudiante", async (req, res) => {
       solicitudes,
     });
   } catch (error) {
-    console.error("Error al obtener solicitudes del estudiante:", error);
+    console.error("Error al obtener solicitudes del usuario:", error);
     res.status(500).json({
       error: "Error interno al obtener solicitudes.",
     });
@@ -176,11 +176,11 @@ router.put("/:id/aprobar", async (req, res) => {
       });
     }
 
-    // if (impresion.estadoImpresion !== "PENDIENTE") {
-    //   return res.status(400).json({
-    //     error: "Solo se pueden aprobar impresiones en estado PENDIENTE.",
-    //   });
-    // }
+    if (impresion.estadoImpresion !== "PENDIENTE") {
+      return res.status(400).json({
+        error: "Solo se pueden aprobar impresiones en estado PENDIENTE.",
+      });
+    }
 
     // Actualizar impresión
     const impresionActualizada = await prisma.impresion.update({
@@ -246,11 +246,11 @@ router.put("/:id/rechazar", async (req, res) => {
       });
     }
 
-    // if (impresion.estadoImpresion !== "PENDIENTE") {
-    //   return res.status(400).json({
-    //     error: "Solo se pueden rechazar impresiones en estado PENDIENTE.",
-    //   });
-    // }
+    if (impresion.estadoImpresion !== "PENDIENTE") {
+      return res.status(400).json({
+        error: "Solo se pueden rechazar impresiones en estado PENDIENTE.",
+      });
+    }
 
     // Actualizar impresión
     const impresionActualizada = await prisma.impresion.update({
@@ -281,6 +281,62 @@ router.put("/:id/rechazar", async (req, res) => {
   }
 });
 
+
+// PUT: completar impresion
+router.put("/:id/completar", async (req, res) => {
+  const { idAyudante, emailEstudiante } = req.body;
+
+  if (!idAyudante) {
+    return res.status(400).json({
+      error: "Debes enviar idAyudante.",
+    });
+  }
+
+  try {
+    // Verificar que la impresión existe
+    const impresion = await prisma.impresion.findUnique({
+      where: { idImpresion: req.params.id },
+    });
+
+    if (!impresion) {
+      return res.status(404).json({
+        error: "Impresión no encontrada.",
+      });
+    }
+
+    if (impresion.estadoImpresion !== "EN_PROGRESO") {
+      return res.status(400).json({
+        error: "Solo se pueden completar impresiones en estado EN_PROGRESO.",
+      });
+    }
+
+    // Actualizar impresión
+    const impresionActualizada = await prisma.impresion.update({
+      where: { idImpresion: req.params.id },
+      data: {
+        estadoImpresion: "COMPLETADA",
+      },
+      select: {
+        idImpresion: true,
+        estadoImpresion: true,
+      },
+    });
+
+
+    if(emailEstudiante){
+      enviarNotificacionEstado(emailEstudiante, "COMPLETADA", null);
+    }
+    res.json({
+      message: "Impresión marcada como COMPLETADA correctamente.",
+      impresion: impresionActualizada,
+    });
+  }
+  catch (error) {
+    console.error("Error al marcar impresión como COMPLETADA:", error);
+    res.status(500).json({ error: "Error interno al marcar impresión como COMPLETADA." });
+  }
+});
+
 // PUT: Actualizar observaciones
 router.put("/:id/observaciones", async (req, res) => {
   const { idAyudante, observacion } = req.body;
@@ -300,6 +356,11 @@ router.put("/:id/observaciones", async (req, res) => {
     if (!impresion) {
       return res.status(404).json({
         error: "Impresión no encontrada.",
+      });
+    }
+    if (impresion.estadoImpresion !== "PENDIENTE") {
+      return res.status(400).json({ 
+        error: `No se puede rechazar una solicitud que ya está en estado ${impresion.estadoImpresion}.` 
       });
     }
 
@@ -324,5 +385,69 @@ router.put("/:id/observaciones", async (req, res) => {
     res.status(500).json({ error: "Error interno al actualizar observaciones." });
   }
 });
+
+
+// borrar una solicitud
+router.delete("/borrar/:id", async (req, res) => {
+  try {
+    const impresion = await prisma.impresion.findUnique({
+      where: { idImpresion: req.params.id },
+    });
+
+    if (!impresion) {
+      return res.status(404).json({
+        error: "Impresión no encontrada.",
+      });
+    }
+
+    await prisma.impresion.deleteMany({
+      where: { idImpresion: req.params.id },
+    });
+
+    res.json({
+      message: "Impresión eliminada correctamente.",
+    });
+  } catch (error) {
+    console.error("Error al eliminar impresión:", error);
+    res.status(500).json({ error: "Error interno al eliminar impresión." });
+  }
+});
+
+router.get("/profesor/:idProfesor", async (req, res) => {
+  const { idProfesor } = req.params;
+
+  try {
+    const solicitudes = await prisma.impresion.findMany({
+      where: {
+        curso: {
+          refProfesor: idProfesor
+        }
+      },
+      include: {
+        estudiante: { 
+          select: {
+            nombre: true,
+            apellido: true, 
+            email: true,    
+          }
+        },
+        curso: { 
+          select: {
+            nombreCurso: true
+          }
+        }
+      }
+    });
+
+    return res.status(200).json(solicitudes);
+
+  } catch (error) {
+    console.error("Error al obtener solicitudes del profesor:", error);
+    return res.status(500).json({ 
+      error: "Error interno al cargar las solicitudes de tus alumnos." 
+    });
+  }
+});
+
 
 export default router;

@@ -1,4 +1,5 @@
-// dashboard para estudiante con acciones especificas de estudiante
+// dashboard para solicitante, no tiene tantas acciones como un estudiante, no deberia
+// poder ver cursos (no esta inscrito a ninguno) pero si sus solicitudes de impresion
 import { useState, useEffect, useCallback } from "react";
 import ActionCard from "../ActionCard";
 import SolicitudImpresionForm from "../SolicitudImpresionForm";
@@ -7,7 +8,7 @@ import SolicitudesEstudiante from "../SolicitudesEstudiante";
 
 const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/api/impresiones`;
 
-function StudentDashboard({ user }) {
+function SolicitanteDashboard({ user }) {
   const [showSolicitudForm, setShowSolicitudForm] = useState(false);
   const [showSolicitudes, setShowSolicitudes] = useState(false);
   const [solicitudesEstudiante, setSolicitudesEstudiante] = useState(null);
@@ -76,13 +77,6 @@ function StudentDashboard({ user }) {
               description="Revisa el estado de tus solicitudes"
               onClick={() => setShowSolicitudes(true)}
             />
-            <ActionCard
-              icon="ti-school"
-              iconClass="icon-estudiante"
-              title="Inscribirse en ayudantía"
-              description="Postula a una ayudantía disponible"
-              onClick={() => {}}
-            />
           </div>
         </div>
 
@@ -105,4 +99,4 @@ function StudentDashboard({ user }) {
   );
 }
 
-export default StudentDashboard;
+export default SolicitanteDashboard;

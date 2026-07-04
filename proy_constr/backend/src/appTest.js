@@ -7,6 +7,7 @@ import gestionImpresionRouter from "./GestionImpresion.js";
 import buscarUsuarioRouter from "./BuscarUsuario.js";
 import CreacionCursoRouter from "./CreacionCurso.js";
 import CreacionSemestreRouter from "./CreacionSemestre.js";
+// importar la funcion de importadorCSV.js
 import app from "./server.js";
 
 // rutas

@@ -1,0 +1,5 @@
+-- AlterEnum
+ALTER TYPE "TipoRol" ADD VALUE 'SOLICITANTE';
+
+-- AlterTable
+ALTER TABLE "Usuario" ALTER COLUMN "usuarioRol" SET DEFAULT 'SOLICITANTE';

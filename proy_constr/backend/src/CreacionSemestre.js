@@ -9,6 +9,25 @@ import { prisma } from "./lib/prisma.js";
 
 const router = express.Router();
 
+router.get("/", async (_req, res) => {
+  try {
+    const semestres = await prisma.semestre.findMany({
+      orderBy: [{ anio: "desc" }, { periodo: "desc" }],
+      select: {
+        idSemestre: true,
+        anio: true,
+        periodo: true,
+        estadoSemestre: true,
+      },
+    });
+
+    res.status(200).json(semestres);
+  } catch (error) {
+    console.error("Error al listar los semestres:", error);
+    res.status(500).json({ error: "Error al listar los semestres" });
+  }
+});
+
 router.post("/crear-semestre", async (req, res) => {
   const { anio, periodo, fechaInicio, fechaFin } = req.body;
 

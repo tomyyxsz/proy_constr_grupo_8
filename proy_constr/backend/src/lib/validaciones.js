@@ -32,7 +32,7 @@ export function esContrasenaValida(password) {
   return PASSWORD_REGEX.test(String(password));
 }
 
-function calcularDV(rutBody) {
+export function calcularDV(rutBody) {
   let sum = 0;
   let multiplicador = 2;
 

@@ -14,7 +14,7 @@ const USER_SELECT = {
   actualizadoEn: true,
 };
 
-const ALLOWED_ROLES = ["ESTUDIANTE", "AYUDANTE", "PROFESOR"];
+const ALLOWED_ROLES = ["ESTUDIANTE", "AYUDANTE", "PROFESOR", "ADMINISTRADOR", "SOLICITANTE"];
 
 function normalizeRole(role) {
   if (!role) {
@@ -41,7 +41,7 @@ router.get("/buscar", async (req, res) => {
     const normalizedRole = normalizeRole(rol);
     if (!normalizedRole) {
       return res.status(400).json({
-        error: "Rol de usuario invalido. Usa ESTUDIANTE, AYUDANTE o PROFESOR.",
+        error: "Rol de usuario invalido. Usa ESTUDIANTE, AYUDANTE, PROFESOR, ADMINISTRADOR O SOLICITANTE.",
       });
     }
 
@@ -121,6 +121,37 @@ router.delete("/rut/:rut", async (req, res) => {
   } catch (error) {
     console.error("Error al eliminar usuarios por rut:", error);
     return res.status(500).json({ error: "Error interno al eliminar usuarios." });
+  }
+});
+
+router.get("/:idUsuario/cursos", async (req, res) => {
+  const { idUsuario } = req.params;
+
+  try {
+    const inscripciones = await prisma.estudianteCurso.findMany({
+      where: { refEstudiante: idUsuario },
+      include: {
+        curso: true,
+      },
+    });
+    const cursos = inscripciones.map((inscripcion) => inscripcion.curso);
+    return res.status(200).json({ cursos });
+  } catch (error) {
+    console.error("Error al obtener cursos del usuario:", error);
+    return res.status(500).json({ error: "Error interno al obtener cursos del usuario." });
+  }
+});
+
+router.get("/profesores/:idProfesor/cursos", async (req, res) => {
+  const { idProfesor } = req.params;
+  try {
+    const cursos = await prisma.curso.findMany({
+      where: { refProfesor: idProfesor },
+    });
+    return res.status(200).json({ cursos });
+  } catch (error) {
+    console.error("Error al obtener cursos del profesor:", error);
+    return res.status(500).json({ error: "Error interno al obtener cursos del profesor." });
   }
 });
 

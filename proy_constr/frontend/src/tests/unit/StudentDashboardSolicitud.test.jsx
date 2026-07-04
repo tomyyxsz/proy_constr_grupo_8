@@ -63,7 +63,7 @@ describe('StudentDashboard', () => {
 
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalledTimes(1)
-      expect(globalThis.fetch).toHaveBeenCalledWith(expect.stringContaining(`/estudiante/${mockUser.id}`))
+      expect(globalThis.fetch).toHaveBeenCalledWith(expect.stringContaining(`/usuario/${mockUser.id}`))
     })
 
     expect(screen.queryByTestId('mock-solicitud-form')).not.toBeInTheDocument()
@@ -84,14 +84,17 @@ describe('StudentDashboard', () => {
 
   describe('Interacciones con las tarjetas y modales', () => {
     // Test para verificar que al hacer clic en la tarjeta "Solicitar impresión" se abre el formulario
-    it('abre y cierra el formulario de nueva solicitud, y maneja el onSuccess', () => {
+    it('abre y cierra el formulario de nueva solicitud, y maneja el onSuccess', async () => { 
       render(<StudentDashboard user={mockUser} />)
 
       fireEvent.click(screen.getByTestId('card-Solicitar impresión'))
       expect(screen.getByTestId('mock-solicitud-form')).toBeInTheDocument()
 
       fireEvent.click(screen.getByText('Simular Éxito'))
-      expect(console.log).toHaveBeenCalledWith('Solicitud enviada exitosamente')
+
+      await waitFor(() => {
+        expect(console.log).toHaveBeenCalledWith('Solicitud enviada exitosamente')
+      })
 
       fireEvent.click(screen.getByText('Cerrar Formulario'))
       expect(screen.queryByTestId('mock-solicitud-form')).not.toBeInTheDocument()

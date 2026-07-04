@@ -11,20 +11,15 @@ const TIPOS_SOLICITUD = ["PERSONAL", "ACADEMICA"];
 
 router.post("/crear", async (req, res) => {
   let {
-    idEstudiante,
-    color1,
-    color2,
-    color3,
-    tipoSolicitud,
+    idUsuario, color1, color2, color3, tipoSolicitud,
     comentario,
     urlModelo3d,
     urlModeloStl,
     refCurso,
   } = req.body;
-
   // validar campos obligatorios
   if (
-    !idEstudiante ||
+    !idUsuario ||
     !color1 ||
     !color2 ||
     !color3 ||
@@ -34,7 +29,7 @@ router.post("/crear", async (req, res) => {
   ) {
     return res.status(400).json({
       error:
-        "Debes enviar idEstudiante, color1, color2, color3, tipoSolicitud, urlModelo3d y urlModeloStl.",
+        "Debes enviar idUsuario, color1, color2, color3, tipoSolicitud, urlModelo3d y urlModeloStl.",
     });
   }
 
@@ -69,37 +64,37 @@ router.post("/crear", async (req, res) => {
 
   try {
     // buscar al usuario en la base de datos
-    const estudiante = await prisma.usuario.findUnique({
-      where: { id: idEstudiante },
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: idUsuario },
       select: {
         id: true,
         nombre: true,
         apellido: true,
         email: true,
         rut: true,
+        usuarioRol: true,
       },
     });
 
-    if (!estudiante) {
+    if (!usuario) {
       return res.status(404).json({
-        error: "El estudiante con ese ID no existe.",
+        error: "El usuario con ese ID no existe.",
       });
     }
-
-    //let cursoRef = "5eb68c60-f502-4be8-9276-f706c33d31bc";
 
     // si la solicitud es academica, se debe verificar que el estudiante esta inscrito en ese curso
     let nombreCursoData = "";
     if (tipoSolicitud === "ACADEMICA") {
-      if (!refCurso || !idEstudiante) {
+      if (!refCurso || !idUsuario) {
         return res
           .status(400)
-          .json({ error: "Faltan datos de curso o estudiante." });
+          .json({ error: "Faltan datos de curso o usuario." });
       }
-      const inscripcion = await prisma.EstudianteCurso.findFirst({
+
+      const inscripcion = await prisma.estudianteCurso.findFirst({
         where: {
-          refCurso,
-          refEstudiante: idEstudiante,
+          refEstudiante: idUsuario,
+          refCurso: refCurso,
         },
         include: {
           curso: {
@@ -109,6 +104,7 @@ router.post("/crear", async (req, res) => {
           },
         },
       });
+      console.log("Inscripcion encontrada:", inscripcion);
       if (!inscripcion) {
         return res.status(403).json({
           error: "El estudiante no está inscrito en ese curso.",
@@ -130,15 +126,14 @@ router.post("/crear", async (req, res) => {
 
     // recuperar nombre del curso
 
-    // crear la impresion, estado inicial = "creado"
+    // crear la impresion, estado inicial = "Pendiente"
     const impresion = await prisma.impresion.create({
       data: {
-        solicitanteNombre: estudiante.nombre,
-        solicitanteApellido: estudiante.apellido,
-        solicitanteEmail: estudiante.email,
-        solicitanteRut: estudiante.rut,
-        refEstudiante: idEstudiante,
-        tipoUsuario: "ESTUDIANTE",
+        solicitanteNombre: usuario.nombre,
+        solicitanteApellido: usuario.apellido,
+        solicitanteEmail: usuario.email,
+        solicitanteRut: usuario.rut,
+        refEstudiante: idUsuario,
         tipoSolicitud: tipoSolicitud,
         nombreCurso: nombreCursoData,
         refCurso: refCurso,
@@ -152,6 +147,7 @@ router.post("/crear", async (req, res) => {
         comentarioTecnico: "",
         observacionAyudante: "",
         tiempoEstimadoImpresion: "10 minutos",
+        tipoUsuario: usuario.usuarioRol,
       },
       select: {
         idImpresion: true,
