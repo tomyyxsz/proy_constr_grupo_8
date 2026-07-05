@@ -2,11 +2,9 @@
 
 import dotenv from "dotenv";
 
-dotenv.config({
-  path: "/home/tomy/Desktop/proy_constr_grupo_8/proy_constr/backend/.env",
-});
+dotenv.config({ path: "../../backend/.env"});
 
-const {prisma} = await import ("/home/tomy/Desktop/proy_constr_grupo_8/proy_constr/backend/src/lib/prisma.js");
+const {prisma} = await import ("../../backend/src/lib/prisma.js");
 
  async function deleteTestUsers() {
 

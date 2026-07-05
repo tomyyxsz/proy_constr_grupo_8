@@ -10,6 +10,7 @@ import creacionSemestreRouter from "./CreacionSemestre.js";
 import creacionCursoRouter from "./CreacionCurso.js";
 import solicitudImpresionRouter from "./SolicitudImpresion.js";
 import gestionImpresionRouter from "./GestionImpresion.js";
+import creacionGrupoRouter from "./CreacionGrupo.js";
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -26,8 +27,10 @@ app.use("/api/usuarios", buscarUsuarioRouter);
 app.use("/api/usuarios", loginUsuarioRouter);
 app.use("/api/semestres", creacionSemestreRouter);
 app.use("/api/cursos", creacionCursoRouter);
+app.use("/api/cursos/grupos", creacionGrupoRouter);
 app.use("/api/impresiones", solicitudImpresionRouter);
 app.use("/api/impresiones", gestionImpresionRouter);
+
 
 
 app.get("/health", (_req, res) => {

@@ -25,6 +25,7 @@
     "express-fileupload": "^1.5.2",
     "nodemailer": "^9.0.1",
     "pg": "^8.20.0",
+    "uuid": "^14.0.1",
     "vitest": "^4.1.6"
   },
   "devDependencies": {

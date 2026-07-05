@@ -1,10 +1,26 @@
 * {
     box-sizing: border-box;
 }
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1000;
+}
+
 .modal-overlay {
     margin-top: 5vh;
     margin-bottom: 5vh;
-    width: 100%;
+    width: 50%;
+    height: 50%;
     display: block;
     padding: 0; 
 }
