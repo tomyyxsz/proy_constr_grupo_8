@@ -81,7 +81,7 @@ router.post("/crear-curso", async (req, res) => {
         archivoCSV,
       );
       return { curso: nuevoCurso, alumnosProcesados };
-    });
+    }, {timeout:300000});
 
     return res.status(201).json({
       message: "Curso creado y alumnos importados con exito.",

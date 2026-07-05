@@ -39,16 +39,22 @@ export const importarEstudiantesDesdeCSV = async (tx, idCurso, archivoCSV) => {
       const apellidos = campos[1].replace(/"/g, "").trim();
       const rutSinDv = campos[2].replace(/"/g, "").trim(); // "nombre usuario = rut sin dv"
       const correo = campos[3].replace(/"/g, "").trim();
-
       // la contrasenia del estudiante ingresado por el profesor sera
       // rutSinDv + "@prov" y se debe guardar hasheada en la base de datos
       const passwordPlana = `${rutSinDv}@prov`;
       const passwordHasheada = hashPassword(passwordPlana);
 
       const dvCalculado = calcularDV(rutSinDv);
-      const rutCompleto = `${rutSinDv}-${dvCalculado}`;
+      let rutCompleto = `${rutSinDv}-${dvCalculado}`;
 
+      if (correo == "director3407@utalca.cl"){
+        // el correo del director no viene incluido, al insertarlo con este formato se ingresara algo que no es valido, por lo tanto deberia ingresarse el rut como
+        // 000000000
+      
+        rutCompleto = "00000000-0";
+      }
       // insertar usuario en bd
+      console.log ({"usuario a insertar: ": {nombre, apellidos, rutCompleto, correo, passwordHasheada}});
       await tx.usuario.upsert({
         where: { rut: rutCompleto },
         update: { usuarioRol: "ESTUDIANTE" },
