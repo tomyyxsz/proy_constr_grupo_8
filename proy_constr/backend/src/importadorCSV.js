@@ -54,7 +54,6 @@ export const importarEstudiantesDesdeCSV = async (tx, idCurso, archivoCSV) => {
         rutCompleto = "00000000-0";
       }
       // insertar usuario en bd
-      console.log ({"usuario a insertar: ": {nombre, apellidos, rutCompleto, correo, passwordHasheada}});
       await tx.usuario.upsert({
         where: { rut: rutCompleto },
         update: { usuarioRol: "ESTUDIANTE" },

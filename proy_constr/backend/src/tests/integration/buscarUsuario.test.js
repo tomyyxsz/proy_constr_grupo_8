@@ -8,8 +8,13 @@ dotenv.config({ path: new URL("../../../.env.test", import.meta.url) });
 
 const { prisma } = await import("../../lib/prisma.js");
 
+let idProfCurso = "";
+let idSemestreCurso = "";
+let idEstudianteCurso = "";
+//let idCursoBusqueda = "";
 describe("busqueda de usuarios", () => {
   // comentario de prueba XD
+
   beforeAll(async () => {
     await prisma.$connect();
     // borrar si habian datos de pruebas anteriores
@@ -20,7 +25,7 @@ describe("busqueda de usuarios", () => {
     await prisma.semestre.deleteMany();
     // crear usuario de prueba
 
-    await prisma.usuario.create({
+    const usuarioBusqueda = await prisma.usuario.create({
       data: {
         id: crypto.randomUUID(),
         rut: "87783738-9",
@@ -30,13 +35,59 @@ describe("busqueda de usuarios", () => {
         password: "password123",
         usuarioRol: "ESTUDIANTE",
       },
+    }); idEstudianteCurso = usuarioBusqueda.id;
+
+    const profCurso = await prisma.usuario.create({
+      data: {
+        rut: "12345678-9",
+        nombre: "Profesor",
+        apellido: "Busqueda",
+        email: "profbusq@gmail.com",
+        password: "password123",
+        usuarioRol: "PROFESOR",
+      },
     });
+    idProfCurso = profCurso.id;
+
+    const semestreCurso = await prisma.semestre.create({
+      data: {
+        anio: 2093,
+        periodo: 1,
+        fechaInicio: new Date("2093-01-01"),
+        fechaFin: new Date("2093-06-30"),
+        estadoSemestre: "ACTIVO",
+      },
+    });
+    idSemestreCurso = semestreCurso.idSemestre;
+
+    const cursoBusqueda = await prisma.curso.create({
+      data: {
+        nombreCurso: "Curso de Prueba",
+        refProfesor: idProfCurso,
+        refSemestre: idSemestreCurso,
+      },
+    });
+
+    await prisma.estudianteCurso.create({
+      data: {
+        refEstudiante: idEstudianteCurso,
+        refCurso: cursoBusqueda.idCurso,
+      },
+    });
+    // idCursoBusqueda = cursoBusqueda.idCurso;
+
   });
 
   afterAll(async () => {
     // eliminar usuario de prueba
+    await prisma.estudianteCurso.deleteMany();
+    await prisma.curso.deleteMany();
+    await prisma.semestre.deleteMany();
     await prisma.usuario.deleteMany({
       where: { email: "busqueda@example.com" },
+    });
+    await prisma.usuario.deleteMany({
+      where: { email: "profbusq@gmail.com" },
     });
     await prisma.$disconnect();
   });
@@ -45,15 +96,13 @@ describe("busqueda de usuarios", () => {
     // router.get("/buscar", async (req, res) => {
     //const { email, rut, rol, nombre, apellido } = req.query;
     //const filters = [];
-    const response = await request(app)
-      .get("/api/usuarios/buscar")
-      .query({
-        email: "busqueda@example.com",
-        rut: "87783738-9",
-        rol: "ESTUDIANTE",
-        nombre: "Test",
-        apellido: "Busqueda",
-      });
+    const response = await request(app).get("/api/usuarios/buscar").query({
+      email: "busqueda@example.com",
+      rut: "87783738-9",
+      rol: "ESTUDIANTE",
+      nombre: "Test",
+      apellido: "Busqueda",
+    });
     expect(response.status).toBe(200);
   });
 
@@ -63,15 +112,13 @@ describe("busqueda de usuarios", () => {
   });
 
   it("el usuario a buscar debe tener un rol valido", async () => {
-    const response = await request(app)
-      .get("/api/usuarios/buscar")
-      .query({
-        email: "busqueda@example.com",
-        rut: "87783738-9",
-        rol: "INVALIDO",
-        nombre: "Test",
-        apellido: "Busqueda",
-      });
+    const response = await request(app).get("/api/usuarios/buscar").query({
+      email: "busqueda@example.com",
+      rut: "87783738-9",
+      rol: "INVALIDO",
+      nombre: "Test",
+      apellido: "Busqueda",
+    });
     expect(response.status).toBe(400);
   });
 
@@ -111,5 +158,20 @@ describe("busqueda de usuarios", () => {
   it("borrar un usuario por rut que no existe debería retornar 404", async () => {
     const response = await request(app).delete("/api/usuarios/rut/00000000-0");
     expect(response.status).toBe(404);
+  });
+
+  it("recuperar cursos de un usuario", async () => {
+    const response = await request(app).get(`/api/usuarios/${idEstudianteCurso}/cursos`);
+    expect(response.status).toBe(200);
+  });
+
+  it("recuperar cursos de un profesor", async () => {
+    const response = await request(app).get(`/api/usuarios/${idProfCurso}/cursos`);
+    expect(response.status).toBe(200);
+  });
+
+  it("recuperar estudiantes de un profesor", async () => {
+    const response = await request(app).get(`/api/usuarios/profesores/alumnos/${idProfCurso}`);
+    expect(response.status).toBe(200);
   });
 });

@@ -50,4 +50,9 @@ describe("Creación de Semestre", () => {
       "Debes enviar anio, periodo, fechaInicio y fechaFin para crear un semestre.",
     );
   });
+
+  it ("deberia devolver la lista de todos los semestres", async () => {
+    const response = await request(app).get("/");
+    expect(response.status).toBe(200);
+  });
 });

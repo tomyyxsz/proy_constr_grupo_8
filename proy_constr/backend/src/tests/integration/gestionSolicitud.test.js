@@ -15,6 +15,7 @@ let idSolicitud = "";
 let idEstudiante2 = "";
 let dataEstudiante = {};
 let idAyudante = "";
+let idProfesor = "";
 describe("gestión de solicitudes de impresión", () => {
   
   
@@ -22,7 +23,17 @@ describe("gestión de solicitudes de impresión", () => {
     await prisma.$connect();
 
     // crear estudiante de prueba, curso, profesor, ayudante, semestre y la solicitud de impresión de tipo personal
-
+    const profesor = await prisma.usuario.create({
+      data: {
+        nombre: "Profesor de Prueba",
+        apellido: "Test",
+        email: "profpruebaintgest@gmail.com",
+        password: "password123",
+        rut: "67676767-1",
+        usuarioRol: "PROFESOR",
+      },
+    });
+    idProfesor = profesor.id;
     const estudiante1 = await prisma.usuario.create({
       data: {
         nombre: "Estudiante de Prueba",
@@ -102,6 +113,11 @@ describe("gestión de solicitudes de impresión", () => {
 
   afterAll(async () => {
     await prisma.$disconnect();
+    await prisma.impresion.deleteMany();
+    await prisma.usuario.deleteMany();
+    await prisma.curso.deleteMany();
+
+    
   });
 
   it("validar que no hay solicitudes", async () => {
@@ -256,4 +272,64 @@ describe("gestión de solicitudes de impresión", () => {
       });
     expect(response.status).toBe(404);
   });
+
+  it ("completar una solicitud de impresion, cambiando el estado a COMPLETADA", async () => {
+    // cambiar estado de la impresion a EN PROGRESO para poder completarla
+    await prisma.impresion.update({
+      where: { idImpresion: idSolicitud },
+      data: { estadoImpresion: "EN_PROGRESO" },
+    });
+    
+    const response = await request(app).put(`/${idSolicitud}/completar`).send({
+      idAyudante: idAyudante,
+      observacion: "Solicitud completada, impresión finalizada.",
+    });
+    expect(response.status).toBe(200);
+  });
+  it ("si el estado no es EN PROGRESO, no se debe poder completar la solicitud", async () => {
+    // cambiar estado de la impresion a PENDIENTE para que no se pueda completar
+    await prisma.impresion.update({
+      where: { idImpresion: idSolicitud },
+      data: { estadoImpresion: "PENDIENTE" },
+    });
+    const response = await request(app).put(`/${idSolicitud}/completar`).send({
+      idAyudante: idAyudante,
+      observacion: "Solicitud completada, impresión finalizada.",
+    });
+    expect(response.status).toBe(400);
+
+  });
+  it ("si idAyudante va vacio, no se debe poder completar la solicitud", async () => {
+    const response = await request(app).put(`/${idSolicitud}/completar`).send({
+      idAyudante: "",
+      observacion: "Solicitud completada, impresión finalizada.",
+    });
+    expect(response.status).toBe(400);
+  });
+
+  it ("si idSolicitud no existe, no se debe poder completar la solicitud", async () => {
+    const response = await request(app)
+      .put(`/00000000-0000-0000-0000-000000000000/completar`)
+      .send({
+        idAyudante: idAyudante,
+        observacion: "Solicitud completada, impresión finalizada.",
+      });
+    expect(response.status).toBe(404);
+  });
+
+  it("deberia borrar una solicitud de impresion", async () => {
+    const response = await request(app).delete(`/borrar/${idSolicitud}`);
+    expect(response.status).toBe(200);
+  });
+
+  it("si idSolicitud no existe, no se debe poder borrar", async () => {
+    const response = await request(app).delete(`/borrar/00000000-0000-0000-0000-000000000000`);
+    expect(response.status).toBe(404);
+  });
+
+  it("deberia recuperar las solicitudes de un profesor", async () => {
+    const response = await request(app).get(`/profesor/${idProfesor}`);
+    expect(response.status).toBe(200);
+  });
 });
+// uncovered lines 58-59,109-110,140-141,180,203,211-212,250,271,279-280,287-336,362,384-385,392-412,417-446 

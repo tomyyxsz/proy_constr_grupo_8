@@ -126,7 +126,6 @@ router.delete("/rut/:rut", async (req, res) => {
 
 router.get("/:idUsuario/cursos", async (req, res) => {
   const { idUsuario } = req.params;
-
   try {
     const inscripciones = await prisma.estudianteCurso.findMany({
       where: { refEstudiante: idUsuario },
