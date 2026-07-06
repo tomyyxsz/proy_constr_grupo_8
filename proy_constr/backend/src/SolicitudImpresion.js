@@ -104,7 +104,6 @@ router.post("/crear", async (req, res) => {
           },
         },
       });
-      console.log("Inscripcion encontrada:", inscripcion);
       if (!inscripcion) {
         return res.status(403).json({
           error: "El estudiante no está inscrito en ese curso.",

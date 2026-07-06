@@ -72,7 +72,6 @@ describe("validar registro en base de datos", () => {
       email: "amigos@example.com",
       password: "APIpassword1!",
     });
-    console.log("Response body:", response.body);
 
     expect(response.status).toBe(201);
   });

@@ -67,7 +67,6 @@ router.post("/crear-grupo", async (req, res) => {
         error: "El curso con ese ID no existe.",
       });
     }
-
     const nuevoGrupo = await prisma.grupoCurso.create({
       data: {
         idGrupoCurso: uuidv4(),
