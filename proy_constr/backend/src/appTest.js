@@ -7,6 +7,7 @@ import gestionImpresionRouter from "./GestionImpresion.js";
 import buscarUsuarioRouter from "./BuscarUsuario.js";
 import CreacionCursoRouter from "./CreacionCurso.js";
 import CreacionSemestreRouter from "./CreacionSemestre.js";
+import CreacionGrupoRouter from "./CreacionGrupo.js";
 // importar la funcion de importadorCSV.js
 import app from "./server.js";
 
@@ -18,5 +19,6 @@ app.use(gestionImpresionRouter);
 app.use("/api/usuarios", buscarUsuarioRouter);
 app.use(CreacionCursoRouter);
 app.use(CreacionSemestreRouter);
+app.use("/api/grupos", CreacionGrupoRouter);
 
 export default app;

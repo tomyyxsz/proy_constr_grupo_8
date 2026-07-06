@@ -3451,7 +3451,7 @@ var gatling = (() => {
   var import_core = __toESM(require_target());
   var import_http = __toESM(require_target2());
   var simulacionRendimiento_gatling_default = (0, import_core.simulation)((setUp) => {
-    const vu = parseInt((0, import_core.getParameter)("vu", "10"), 10);
+    const vu = parseInt((0, import_core.getParameter)("vu", "30"), 30);
     const backendBaseUrl = (0, import_core.getParameter)("baseUrl", "https://proy-constr-grupo-8.onrender.com");
     const runId = Date.now();
     const httpProtocol = import_http.http.baseUrl(backendBaseUrl).acceptHeader("application/json").contentTypeHeader("application/json");

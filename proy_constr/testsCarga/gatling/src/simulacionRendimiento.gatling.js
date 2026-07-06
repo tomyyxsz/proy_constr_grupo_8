@@ -178,19 +178,6 @@ export default simulation((setUp) => {
       .check(jsonPath("$.impresion.idImpresion").exists())
   )
 )
-/* comentario para debug de respuesta de estado
-.exec((session) => {
-  const status = session.get("status");
-  const body = session.get("responseBody");
-
-  if (status !== 201) {
-    console.log("❌ ERROR EN REQUEST");
-    console.log("STATUS:", status);
-    console.log("BODY:", body);
-  }
-
-  return session;
-})*/
 
 .exitHereIfFailed();
   setUp(
